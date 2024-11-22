@@ -8,6 +8,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      scrollbarWidth: {
+        none: 'none',
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

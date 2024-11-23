@@ -127,7 +127,7 @@ const HomePage = () => {
     };
   }, [machines.length]);
 
-  const enabledCount = machines.filter((machine) => machine.enable).length;
+  const enabledCount = machines.filter((machine) => machine.enable || (!machine.isConnect)).length;
   const idCount = machines.filter((machine) => machine.id).length;
 
   const openModal = (machine: Machine) => {
@@ -193,7 +193,7 @@ const HomePage = () => {
                   backgroundColor: machines
                     .filter((machine) => machine.hourTarget !== 0) // Lọc bỏ các máy có hourTarget = 0
                     .map((machine) =>
-                      machine.hourTarget < 0 ? '#ff6347' : '#34d089' // Chọn màu cho giá trị âm và dương
+                      machine.hourTarget < 0 ? '#f42429' : '#34d089' // Chọn màu cho giá trị âm và dương
                     ),
                   borderColor: '#111111',
                   borderWidth: 1,
@@ -486,17 +486,17 @@ const HomePage = () => {
                 >
                   <div
                     className={`py-8 rounded-2xl shadow-inner shadow-[inset_0px_0px_15px_rgba(255,255,255,0.8)] flex flex-col items-center justify-between ${!machine.isConnect
-                      ? "bg-[#f77052] text-gray-200 disabled"
+                      ? "bg-[#f42429] text-gray-200 disabled"
                       : !machine.enable
-                        ? "bg-gray-400 text-gray-200"
-                        : "bg-[#24c0cd] text-[#333333]"
+                        ? "bg-gray-400 text-gray-200 opacity-30"
+                        : "bg-[#34d089] text-white"
                       }`}
 
                   >
 
                     <div className="text-xl md:text-2xl font-bold flex items-center justify-between w-full max-w-sm py-0">
                       <div className="text-center w-2/5 text-base md:text-3xl">{String(machine.id).padStart(2, "0")}</div>
-                      <div className={`w-[2px] h-9 ${machine.enable ? "bg-[#333333]" : "bg-white"}`}></div>
+                      <div className={`w-[2px] h-9 bg-white`}></div>
                       <div className="text-center w-3/5 text-base md:text-3xl">{machine.name}</div>
                     </div>
 
@@ -553,21 +553,21 @@ const HomePage = () => {
         <div className='space-x-20 flex'>
           <div className="flex items-center space-x-2">
             <div>
-              Kết nối
+              Có Kết Nối
             </div>
-            <div className={`h-5 w-5 rounded-lg bg-[#24c0cd]`} />
+            <div className={`h-5 w-5 rounded-lg bg-[#34d089]`} />
           </div>
           <div className="flex items-center space-x-2">
             <div>
-              Không hoạt động
+              Không Hoạt Động
             </div>
             <div className={`h-5 w-5 rounded-lg bg-gray-400`} />
           </div>
           <div className="flex items-center space-x-2">
             <div>
-              Không kết nối
+              Mất Kết Nối
             </div>
-            <div className={`h-5 w-5 rounded-lg bg-[#f77052]`} />
+            <div className={`h-5 w-5 rounded-lg bg-[#f42429]`} />
           </div>
         </div>
       </div>

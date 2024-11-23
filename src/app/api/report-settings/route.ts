@@ -1,32 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 
 interface ReportSetting {
-    id: number;
-    reportId: string;
-    time: string;
+    id: number; // Thứ tự
+    time?: Date; // Thời gian là kiểu Date
 }
 
 // Bộ nhớ tạm thời lưu trữ các cài đặt (mock database)
-// Tạo sẵn hai dữ liệu mặc định
 let settings: ReportSetting[] = [
-    { id: 1, reportId: "1", time: "08:00" },
-    { id: 2, reportId: "2", time: "09:00" },
-    { id: 3, reportId: "3", time: "08:00" },
-    { id: 4, reportId: "4", time: "09:00" },
-    { id: 5, reportId: "5", time: "08:00" },
-    { id: 6, reportId: "6", time: "09:00" },
-    { id: 7, reportId: "7", time: "08:00" },
-    { id: 8, reportId: "8", time: "09:00" },
-    { id: 9, reportId: "9", time: "08:00" },
-    { id: 10, reportId: "10", time: "09:00" },
-    { id: 11, reportId: "11", time: "08:00" },
-    { id: 12, reportId: "12", time: "09:00" },
+    { id: 1, time: new Date().setHours(8, 0, 0, 0) ? new Date(new Date().setHours(8, 0, 0, 0)) : undefined },
+    { id: 2, time: new Date().setHours(10, 30, 0, 0) ? new Date(new Date().setHours(10, 30, 0, 0)) : undefined },
+    { id: 3 },
+    { id: 4, time: new Date().setHours(14, 30, 0, 0) ? new Date(new Date().setHours(14, 30, 0, 0)) : undefined },
+    { id: 5, time: new Date().setHours(16, 0, 0, 0) ? new Date(new Date().setHours(16, 0, 0, 0)) : undefined },
+    { id: 6 },
+    { id: 7, time: new Date().setHours(9, 0, 0, 0) ? new Date(new Date().setHours(9, 0, 0, 0)) : undefined },
+    { id: 8 },
+    { id: 9, time: new Date().setHours(23, 30, 0, 0) ? new Date(new Date().setHours(23, 30, 0, 0)) : undefined },
+    { id: 10 },
+    { id: 11 },
+    { id: 12, time: new Date().setHours(12, 30, 0, 0) ? new Date(new Date().setHours(12, 30, 0, 0)) : undefined },
+    { id: 13, time: new Date().setHours(18, 0, 0, 0) ? new Date(new Date().setHours(18, 0, 0, 0)) : undefined },
+    { id: 14 },
+    { id: 15, time: new Date().setHours(20, 0, 0, 0) ? new Date(new Date().setHours(20, 0, 0, 0)) : undefined },
+    { id: 16, time: new Date().setHours(21, 30, 0, 0) ? new Date(new Date().setHours(21, 30, 0, 0)) : undefined },
+    { id: 17 },
+    { id: 18 },
+    { id: 19, time: new Date().setHours(6, 0, 0, 0) ? new Date(new Date().setHours(6, 0, 0, 0)) : undefined },
+    { id: 20 },
+    { id: 21, time: new Date().setHours(2, 30, 0, 0) ? new Date(new Date().setHours(2, 30, 0, 0)) : undefined },
+    { id: 22 },
+    { id: 23 },
+    { id: 24, time: new Date().setHours(4, 30, 0, 0) ? new Date(new Date().setHours(4, 30, 0, 0)) : undefined },
 ];
-let nextId = 13; // ID tự tăng bắt đầu từ 3
 
 // Xử lý phương thức GET
 export async function GET() {
-    return NextResponse.json(settings);
+    // Trả về `time` dưới dạng chuỗi ISO để tránh lỗi JSON serialization
+    const formattedSettings = settings.map((s) => ({
+        ...s,
+        time: s.time ? new Date(s.time).toISOString() : undefined,
+    }));
+    return NextResponse.json(formattedSettings);
 }
 
 // Xử lý phương thức POST
@@ -44,9 +58,8 @@ export async function POST(req: NextRequest) {
     }
 
     const newSetting: ReportSetting = {
-        id: nextId++,
-        reportId,
-        time,
+        id: reportId,
+        time: new Date(time), // Chuyển chuỗi ISO sang Date
     };
 
     // Thêm cài đặt mới vào danh sách
@@ -79,7 +92,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Cập nhật thời gian
-    settings[settingIndex].time = time;
+    settings[settingIndex].time = new Date(time); // Chuyển chuỗi ISO sang Date
 
     return NextResponse.json(settings[settingIndex], { status: 200 });
 }

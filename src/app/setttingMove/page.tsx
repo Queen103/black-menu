@@ -107,10 +107,11 @@ const DetailPage = () => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, id: number) => {
         if (e.key === "Enter") {
             handleUpdate(id);
+
         }
     };
 
-    const enabledCount = machines.filter((machine) => machine.enable).length;
+    const enabledCount = machines.filter((machine) => machine.enable || (!machine.isConnect)).length;
     const idCount = machines.filter((machine) => machine.id).length;
 
     return (
@@ -119,7 +120,7 @@ const DetailPage = () => {
             <ToastContainer position="top-center" autoClose={5000} hideProgressBar={false} /> {/* Thêm ToastContainer */}
 
             {/* Header */}
-            <div className="text-[#333333] font-semibold flex items-center space-x-4 justify-between px-2 p-2">
+            <div className="text-[#333333] text-2xl font-semibold flex items-center space-x-4 justify-between px-2 p-4">
                 <div>
                     Số Line đang hoạt động: {enabledCount}/{idCount}
                 </div>
@@ -127,18 +128,15 @@ const DetailPage = () => {
 
             {/* Bảng dữ liệu */}
             <div className="overflow-x-auto text-2xl shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
-                <table className="table-auto w-full border-collapse border-2 border-black ">
+                <table className="table-auto w-full border-collapse border-2 border-black">
                     <thead>
                         <tr className="bg-gray-200 ">
-                            <th className="border-2 border-black px-4 py-2">ID</th>
-                            <th className="border-2 border-black px-4 py-2">Tên</th>
-                            <th className="border-2 border-black px-4 py-2">Mục Tiêu Hằng Ngày</th>
-                            <th className="border-2 border-black px-4 py-2">Mục Tiêu Giờ</th>
-                            <th className="border-2 border-black px-4 py-2">Thực Hiện</th>
-                            <th className="border-2 border-black px-4 py-2">Hiệu Suất</th>
-                            <th className="border-2 border-black px-4 py-2">Trạng Thái Kết Nối</th>
-                            <th className="border-2 border-black px-4 py-2">Kích Hoạt</th>
-                            <th className="border-2 border-black px-4 py-2">Cập Nhật</th>
+                            <th className="border-2 border-black px-4 py-3">ID</th>
+                            <th className="border-2 border-black px-4 py-3">Tên</th>
+                            <th className="border-2 border-black px-4 py-3">Mục Tiêu Ngày</th>
+                            <th className="border-2 border-black px-4 py-3">Thực Hiện</th>
+                            <th className="border-2 border-black px-4 py-3">Trạng Thái Kết Nối</th>
+                            <th className="border-2 border-black px-4 py-3">Kích Hoạt</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -149,47 +147,58 @@ const DetailPage = () => {
                         ) : (
                             machines.map((machine) => (
                                 <tr key={machine.id} className={`${machine.isConnect ? "bg-white" : "bg-red-200 blink"}`}>
-                                    <td className="border-2 border-black px-4 py-1 text-center">
+                                    <td className="border-2 border-black px-4 py-0 text-center">
                                         {machine.id}
                                     </td>
                                     {/* Tên */}
-                                    <td className={`border-2 border-black text-center ${isFullScreen ? "py-1" : "py-0"}`}>
-                                        <input
-                                            type="text"
-                                            value={editedMachines[machine.id]?.name ?? machine.name}
-                                            onChange={(e) => handleChange(machine.id, "name", e.target.value)}
-                                            onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                            className={`w-4/5 p-2 border-l border-r border-gray-600 text-center `}
-                                            disabled={!machine.isConnect}
-                                        />
+                                    <td
+                                        className={`border-2 border-black text-center ${isFullScreen ? "py-1" : "py-0"}`}
+                                    >
+                                        <div className="flex items-center justify-between space-x-0">
+                                            {/* Tên máy */}
+                                            <span className="text-2xl font-semibold text-center w-1/2">{machine.name}</span>
+
+                                            {/* Ô input */}
+                                            <input
+                                                type="text"
+                                                placeholder="Nhập tên mới" // Gợi ý
+                                                value={editedMachines[machine.id]?.name ?? ""}
+                                                onChange={(e) => handleChange(machine.id, "name", e.target.value)}
+                                                onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                className={`w-1/2 px-2 py-1.5 border border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-blue-600`}
+                                                disabled={!machine.isConnect}
+                                            />
+                                        </div>
                                     </td>
+
                                     {/* Mục Tiêu Hằng Ngày */}
-                                    <td className={`border-2 border-black text-center ${isFullScreen ? "py-1" : "py-0"}`}>
-                                        <input
-                                            type="number"
-                                            value={editedMachines[machine.id]?.dailyTarget ?? machine.dailyTarget}
-                                            onChange={(e) =>
-                                                handleChange(machine.id, "dailyTarget", Number(e.target.value))
-                                            }
-                                            onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                            className="w-4/5 p-2 border-l border-r border-gray-600 text-center"
-                                            disabled={!machine.isConnect}
-                                        />
+                                    <td
+                                        className={`border-2 border-black text-center ${isFullScreen ? "py-1" : "py-0"}`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            {/* Nhãn tiêu đề */}
+                                            <span className="text-2xl font-semibold px-5 text-center text-center w-1/2">{machine.dailyTarget}</span>
+
+                                            {/* Ô input */}
+                                            <input
+                                                type="number"
+                                                value={editedMachines[machine.id]?.dailyTarget ?? ""}
+                                                onChange={(e) => handleChange(machine.id, "dailyTarget", Number(e.target.value))}
+                                                onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                className={`w-1/2 px-2 py-1.5 border border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                placeholder="Nhập mục tiêu mới"
+                                                disabled={!machine.isConnect}
+                                            />
+                                        </div>
                                     </td>
-                                    {/* Mục Tiêu Giờ */}
-                                    <td className="border-2 border-black px-4 py-1 text-center">
-                                        {machine.hourTarget}
-                                    </td>
+
                                     {/* Thực Hiện */}
-                                    <td className="border-2 border-black px-4 py-1 text-center">
+                                    <td className="border-2 border-black px-4 py-0.5 text-center">
                                         {machine.actual}
                                     </td>
-                                    {/* Hiệu Suất */}
-                                    <td className="border-2 border-black px-4 py-1 text-center">
-                                        {machine.performance}%
-                                    </td>
+
                                     {/* Trạng Thái Kết Nối */}
-                                    <td className="border-2 border-black px-4 py-0 text-center">
+                                    <td className="border-2 border-black px-4 py-0.5 text-center">
                                         <div className="flex justify-center items-center h-10">
                                             <span
                                                 className={`p-2 rounded-lg w-2/3 h-full flex items-center justify-center ${machine.isConnect ? "bg-green-500" : "bg-red-500"
@@ -203,7 +212,7 @@ const DetailPage = () => {
 
 
                                     {/* Kích Hoạt */}
-                                    <td className="items-center gap-2 px-4 py-1 text-center border-2-b border-t border-black">
+                                    <td className="border-2 border-black items-center gap-2 px-4 py-1 text-center ">
                                         <label className={`relative inline-flex items-center ${!machine.isConnect ? "cursor-not-allowed opacity-50" : ""}`}>
                                             <input
                                                 type="checkbox"
@@ -219,16 +228,6 @@ const DetailPage = () => {
                                         </label>
                                     </td>
 
-                                    {/* Cập Nhật */}
-                                    <td className="border-2 border-black px-4 py-1 text-center">
-                                        <button
-                                            onClick={() => handleUpdate(machine.id)}
-                                            className={`py-1 px-4 rounded ${machine.isConnect ? "bg-blue-500 text-white" : "bg-gray-400 text-gray-700 cursor-not-allowed"}`}
-                                            disabled={!machine.isConnect}
-                                        >
-                                            Cập Nhật
-                                        </button>
-                                    </td>
                                 </tr>
                             ))
                         )}

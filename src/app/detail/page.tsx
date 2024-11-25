@@ -62,7 +62,7 @@ const DetailPage = () => {
                 <div className="text-[#333333] text-2xl font-semibold flex items-center space-x-4 justify-start gap-x-10">
                     <div className="flex items-center space-x-2">
                         <div>Có Kết Nối</div>
-                        <div className={`h-5 w-5 rounded-lg bg-[#00c264]`} />
+                        <div className={`h-5 w-5 rounded-lg bg-connect`} />
                     </div>
                     <div className="flex items-center space-x-2">
                         <div>Không Hoạt Động</div>
@@ -70,7 +70,7 @@ const DetailPage = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                         <div>Mất Kết Nối</div>
-                        <div className={`h-5 w-5 rounded-lg bg-[#f42429]`} />
+                        <div className={`h-5 w-5 rounded-lg bg-notConnect`} />
                     </div>
                 </div>
             </div>
@@ -83,15 +83,15 @@ const DetailPage = () => {
                         // Xác định màu nền cho máy dựa trên trạng thái
                         let bgColor = "bg-gray-400 "; // Mặc định là màu xám
                         if (!machine.isConnect) {
-                            bgColor = "bg-[#f42429]"; // Màu đỏ khi mất kết nối
+                            bgColor = "bg-notConnect"; // Màu đỏ khi mất kết nối
                         } else if (machine.enable) {
-                            bgColor = "bg-[#00c264]"; // Màu xanh dương khi máy hoạt động
+                            bgColor = "bg-connect"; // Màu xanh dương khi máy hoạt động
                         }
                         let borderCol = "border-gray-400 opacity-20"; // Mặc định là màu xám
                         if (!machine.isConnect) {
-                            borderCol = "border-[#f42429] shadow-[0px_4px_4px_rgba(0,0,0,0.7)]"; // Màu đỏ khi mất kết nối
+                            borderCol = "border-notConnect shadow-[0px_4px_4px_rgba(0,0,0,0.7)]"; // Màu đỏ khi mất kết nối
                         } else if (machine.enable) {
-                            borderCol = "border-[#00c264] shadow-[0px_4px_4px_rgba(0,0,0,0.7)]"; // Màu xanh dương khi máy hoạt động
+                            borderCol = "border-connect shadow-[0px_4px_4px_rgba(0,0,0,0.7)]"; // Màu xanh dương khi máy hoạt động
                         }
 
                         return (
@@ -101,7 +101,7 @@ const DetailPage = () => {
                                     } text-center border-4 bg-white rounded-lg transition-transform hover:scale-[102%] ${borderCol} `}
                             >
                                 <h3
-                                    className={`text-2xl py-2 rounded-t-sm font-semibold justify-center ${bgColor} ${isFullScreen ? "mb-4" : "mb-2"
+                                    className={`text-2xl text-white py-2 rounded-t-sm font-semibold justify-center ${bgColor} ${isFullScreen ? "mb-4" : "mb-2"
                                         }`}
                                 >
                                     {machine.name}

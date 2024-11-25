@@ -9,6 +9,8 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 85,
+        morningTime: '08:00',
+        afternoonTime: '13:00',
     },
     {
         id: 2,
@@ -20,6 +22,8 @@ export const Lines = [
         enable: true,
         is_Blink: true,
         performance: 70,
+        morningTime: '08:30',
+        afternoonTime: '13:30',
     },
     {
         id: 3,
@@ -31,6 +35,8 @@ export const Lines = [
         enable: false,
         is_Blink: false,
         performance: 50,
+        morningTime: '09:00',
+        afternoonTime: '14:00',
     },
     {
         id: 4,
@@ -42,6 +48,8 @@ export const Lines = [
         enable: true,
         is_Blink: true,
         performance: 95,
+        morningTime: '08:15',
+        afternoonTime: '13:15',
     },
     {
         id: 5,
@@ -53,6 +61,8 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 90,
+        morningTime: '08:45',
+        afternoonTime: '13:45',
     },
     {
         id: 6,
@@ -64,6 +74,8 @@ export const Lines = [
         enable: true,
         is_Blink: true,
         performance: 45,
+        morningTime: '07:30',
+        afternoonTime: '12:30',
     },
     {
         id: 7,
@@ -75,6 +87,8 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 80,
+        morningTime: '09:15',
+        afternoonTime: '14:15',
     },
     {
         id: 8,
@@ -86,6 +100,8 @@ export const Lines = [
         enable: false,
         is_Blink: false,
         performance: 85,
+        morningTime: '08:10',
+        afternoonTime: '13:10',
     },
     {
         id: 9,
@@ -97,6 +113,8 @@ export const Lines = [
         enable: false,
         is_Blink: true,
         performance: 60,
+        morningTime: '07:45',
+        afternoonTime: '12:45',
     },
     {
         id: 10,
@@ -108,6 +126,8 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 95,
+        morningTime: '09:00',
+        afternoonTime: '14:00',
     },
     {
         id: 11,
@@ -119,6 +139,8 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 85,
+        morningTime: '08:50',
+        afternoonTime: '13:50',
     },
     {
         id: 12,
@@ -130,6 +152,8 @@ export const Lines = [
         enable: false,
         is_Blink: true,
         performance: 55,
+        morningTime: '07:40',
+        afternoonTime: '12:40',
     },
     {
         id: 13,
@@ -141,6 +165,8 @@ export const Lines = [
         enable: true,
         is_Blink: true,
         performance: 75,
+        morningTime: '09:20',
+        afternoonTime: '14:20',
     },
     {
         id: 14,
@@ -152,6 +178,8 @@ export const Lines = [
         enable: false,
         is_Blink: false,
         performance: 65,
+        morningTime: '08:25',
+        afternoonTime: '13:25',
     },
     {
         id: 15,
@@ -163,5 +191,7 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 90,
+        morningTime: '09:05',
+        afternoonTime: '14:05',
     },
 ];

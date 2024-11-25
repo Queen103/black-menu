@@ -33,7 +33,7 @@ const HomePage = () => {
 
   const [showPerformance, setShowPerformance] = useState(true);
   const [showActual, setShowActual] = useState(true);
-
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
 
 
@@ -96,6 +96,16 @@ const HomePage = () => {
   };
 
   useEffect(() => {
+
+    const savedTheme = localStorage.getItem("theme"); // Lấy giá trị từ localStorage
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === "dark");
+    } else {
+      // Nếu không có giá trị, kiểm tra hệ thống của người dùng
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(prefersDark);
+    }
+
     fetchMachineData();
     fetchCpuData();
     const intervalId = setInterval(() => {
@@ -193,7 +203,7 @@ const HomePage = () => {
                   backgroundColor: machines
                     .filter((machine) => machine.hourTarget !== 0) // Lọc bỏ các máy có hourTarget = 0
                     .map((machine) =>
-                      machine.hourTarget < 0 ? '#f42429' : '#34d089' // Chọn màu cho giá trị âm và dương
+                      machine.hourTarget < 0 ? '#c40005' : '#00964d' // Chọn màu cho giá trị âm và dương
                     ),
                   borderColor: '#111111',
                   borderWidth: 1,
@@ -314,7 +324,7 @@ const HomePage = () => {
           <div className='flex space-x-20 justify-between item-center' >
             <div className="flex space-x-20 text-sm text-[#333333] text-center font-bold item-center gap-x-2" onClick={() => setShowPerformance((prev) => !prev)}>
               HIỆU SUẤT (%)
-              <div className={`h-5 w-5 rounded-lg bg-[#ff6347] `} />
+              <div className={`h-5 w-5 rounded-lg bg-notConnect `} />
             </div>
             <div className="text-lg text-[#333333] text-center font-bold">
               BIỂU ĐỒ HIỆU SUẤT VÀ THỰC HIỆN
@@ -333,7 +343,7 @@ const HomePage = () => {
                 showPerformance && {
                   label: 'Hiệu Suất',
                   data: filteredMachines.map((machine) => machine.performance),
-                  borderColor: '#ff6347',
+                  borderColor: '#c40005',
                   backgroundColor: 'rgba(255, 99, 71, 0.2)',
                   type: 'line',
                   fill: false,
@@ -486,10 +496,10 @@ const HomePage = () => {
                 >
                   <div
                     className={`py-8 rounded-2xl shadow-inner shadow-[inset_0px_0px_15px_rgba(255,255,255,0.8)] flex flex-col items-center justify-between ${!machine.isConnect
-                      ? "bg-[#f42429] text-gray-200 disabled"
+                      ? "bg-notConnect text-gray-200 disabled"
                       : !machine.enable
                         ? "bg-gray-400 text-gray-200 opacity-30"
-                        : "bg-[#34d089] text-white"
+                        : "bg-connect text-white"
                       }`}
 
                   >
@@ -555,7 +565,7 @@ const HomePage = () => {
             <div>
               Có Kết Nối
             </div>
-            <div className={`h-5 w-5 rounded-lg bg-[#34d089]`} />
+            <div className={`h-5 w-5 rounded-lg bg-[#00964d]`} />
           </div>
           <div className="flex items-center space-x-2">
             <div>
@@ -567,7 +577,7 @@ const HomePage = () => {
             <div>
               Mất Kết Nối
             </div>
-            <div className={`h-5 w-5 rounded-lg bg-[#f42429]`} />
+            <div className={`h-5 w-5 rounded-lg bg-notConnect`} />
           </div>
         </div>
       </div>

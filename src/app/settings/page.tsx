@@ -48,7 +48,7 @@ const BarChart = () => {
             const names = filteredMachines.map((machine) => machine.name);
             const hourTargets = filteredMachines.map((machine) => machine.hourTarget);
             const barColors = filteredMachines.map((machine) =>
-                machine.hourTarget < 0 ? '#ff6347' : '#34d089'
+                machine.hourTarget < 0 ? '#ff6347' : 'connect'
             );
 
             const options = {
@@ -96,7 +96,7 @@ const BarChart = () => {
                         data: hourTargets,
                         barWidth: 30,
                         itemStyle: {
-                            color: (params: any) => (params.value < 0 ? '#ff6347' : '#34d089'), // Cột đỏ cho giá trị âm, xanh cho dương
+                            color: (params: any) => (params.value < 0 ? '#ff6347' : 'connect'), // Cột đỏ cho giá trị âm, xanh cho dương
                         },
                         label: {
                             show: true,

@@ -3,7 +3,7 @@ import { Lines } from "../db";
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
-    const { newName, newDailyTarget, newEnable } = await req.json();  // Extract newName, newDailyTarget, and newEnable from the request body
+    const { newName, newDailyTarget, newEnable, newActual, newMorningTime, newAfternoonTime } = await req.json();  // Extract newName, newDailyTarget, and newEnable from the request body
 
     // Validation for name and dailyTarget
     if (newName && typeof newName !== 'string') {
@@ -15,6 +15,16 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }
 
     // Validation for enable field
+    if (newEnable !== undefined && typeof newEnable !== 'boolean') {
+        return NextResponse.json({ error: 'Invalid enable value, it must be a boolean' }, { status: 400 });
+    }
+
+    if (newActual !== undefined && typeof newActual !== 'number') {
+        return NextResponse.json({ error: 'Invalid actual value, it must be a number' }, { status: 400 });
+    }
+    if (newEnable !== undefined && typeof newEnable !== 'boolean') {
+        return NextResponse.json({ error: 'Invalid enable value, it must be a boolean' }, { status: 400 });
+    }
     if (newEnable !== undefined && typeof newEnable !== 'boolean') {
         return NextResponse.json({ error: 'Invalid enable value, it must be a boolean' }, { status: 400 });
     }

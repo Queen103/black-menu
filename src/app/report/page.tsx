@@ -5,16 +5,17 @@ import "react-toastify/dist/ReactToastify.css"; // Import CSS của Toastify
 
 interface TimeSlot {
     id: number;
-    time?: Date; // Sử dụng kiểu Date
+    time?: string | null; // Sử dụng kiểu Date
 }
 
 const ReportPage = () => {
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentSlotId, setCurrentSlotId] = useState<number | null>(null);
-    const [newTime, setNewTime] = useState<string>(""); // Lưu trữ giá trị từ input
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
+    // Lưu trữ giá trị đã chỉnh sửa cho từng slot
+    const [editedTimes, setEditedTimes] = useState<{ [key: number]: string }>({});
 
     // Lấy dữ liệu từ API
     const fetchReportSettings = async () => {
@@ -27,7 +28,7 @@ const ReportPage = () => {
             setTimeSlots(
                 data.map((slot: TimeSlot) => ({
                     ...slot,
-                    time: slot.time ? new Date(slot.time) : undefined, // Chuyển dữ liệu thành Date
+                    time: slot.time ? slot.time : undefined, // Chuyển dữ liệu thành Date
                 }))
             );
         } catch (error: any) {
@@ -37,72 +38,70 @@ const ReportPage = () => {
         }
     };
 
+    const checkFullScreen = () => {
+        const isFullScreenNow = window.innerHeight === screen.height;
+        setIsFullScreen(isFullScreenNow);
+    };
+
     useEffect(() => {
         fetchReportSettings();
+        const interval = setInterval(() => {
+            fetchReportSettings();
+            document.addEventListener("fullscreenchange", checkFullScreen);
+            checkFullScreen();
+        }, 1000);
+
+        return () => clearInterval(interval);
+
     }, []);
 
-    const handleOpenModal = (id: number) => {
-        setCurrentSlotId(id);
-        setNewTime("");
-        setIsModalOpen(true);
+    const handleTimeChange = (slotId: number, newTime: string) => {
+        setEditedTimes((prev) => ({ ...prev, [slotId]: newTime })); // Lưu giá trị riêng biệt cho từng slot
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setCurrentSlotId(null);
-        setNewTime("");
-    };
-
-    const handleSaveTime = async () => {
+    // Hàm cập nhật thời gian qua API
+    const handleTimeUpdate = async (slotId: number, newTime: string) => {
         if (!newTime) {
-            toast.error("Vui lòng chọn giờ.");
+            newTime = "";
+        }
+
+        // Kiểm tra định dạng thời gian
+        const timeRegex = /^(?:[01]?\d|2[0-3]):([0-5]?\d)$/;
+        if (newTime && !(timeRegex.test(newTime) || newTime === "")) {
+            alert("Thời gian phải có định dạng HH:mm.");
             return;
         }
 
-        const [hours, minutes] = newTime.split(":").map(Number); // Lấy giờ và phút
-        const updatedTime = new Date();
-        updatedTime.setHours(hours, minutes, 0, 0); // Đặt giờ, phút, giây
 
-        const response = await fetch("/api/report-settings", {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                id: currentSlotId,
-                time: updatedTime.toISOString(),
-            }),
-        });
-
-        if (response.ok) {
-            setTimeSlots((prev) =>
-                prev.map((slot) =>
-                    slot.id === currentSlotId ? { ...slot, time: updatedTime } : slot
-                )
-            );
-            toast.success(`Đã cập nhật thời điểm thứ ${currentSlotId}`);
-            handleCloseModal();
-        } else {
-            const errorData = await response.json();
-            toast.error(errorData.error || "Lỗi khi cập nhật thời điểm.");
-        }
-    };
-
-    const handleDelete = async (id: number) => {
-        if (confirm("Bạn có chắc chắn muốn xóa thời điểm này?")) {
-            const response = await fetch(`/api/report-settings?id=${id}`, {
-                method: "DELETE",
+        try {
+            const response = await fetch("/api/report-settings", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: slotId, time: newTime }),
             });
 
             if (response.ok) {
-                setTimeSlots((prev) => prev.filter((slot) => slot.id !== id));
-                toast.success(`Đã xóa thời điểm thứ ${id}`);
+                const updatedSlot = await response.json();
+                // Cập nhật thời gian trong state
+                setTimeSlots((prevSlots) =>
+                    prevSlots.map((slot) =>
+                        slot.id === updatedSlot.id ? { ...slot, time: updatedSlot.time } : slot
+                    )
+                );
+                alert(`Cập nhật thời gian thành công: ${updatedSlot.time}`);
             } else {
                 const errorData = await response.json();
-                toast.error(errorData.error || "Lỗi khi xóa thời điểm.");
+                alert(errorData.error || "Lỗi khi cập nhật thời gian.");
             }
+        } catch (error) {
+            console.error("Lỗi:", error);
+            alert("Có lỗi xảy ra trong quá trình cập nhật.");
         }
     };
+
+
 
     if (loading) {
         return <div className="text-center text-xl">Đang tải dữ liệu...</div>;
@@ -113,104 +112,60 @@ const ReportPage = () => {
     }
 
     return (
-        <div className="p-5">
+        <div className="p-3">
             {/* Grid Layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-5">
                 {timeSlots.map((slot) => (
                     <div
                         key={slot.id}
-                        className="border border-[#00c264] border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg p-0 text-center bg-white hover:bg-gray-100 cursor-pointer"
-                        onClick={() => {
-                            if (!slot.time) { // Chỉ mở modal khi chưa có thời gian
-                                handleOpenModal(slot.id);
-                            }
-                        }}
+                        className="border border-connect border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center bg-bg-light "
                     >
-                        <div className="bg-[#00c264]">
-                            <h2 className="text-xl font-semibold mb-2 text-black p-3 border-t-lg">
+                        <div className="bg-connect">
+                            <h2 className={`text-xl text-white font-semibold mb-2 text-black p-3 border-t-lg ${isFullScreen ? "py-6" : "py-1"
+                                }`}>
                                 THỜI ĐIỂM THỨ {slot.id}
                             </h2>
                         </div>
 
-                        <div className="py-4">
-                            {slot.time ? (
-                                <>
-                                    <p className="text-2xl text-gray-700 mb-5">
-                                        Giờ:{" "}
-                                        <strong>
-                                            {slot.time.getHours().toString().padStart(2, "0")}:
-                                            {slot.time.getMinutes().toString().padStart(2, "0")}
-                                        </strong>
-                                    </p>
-                                    <div className="flex justify-center space-x-8">
-                                        <button
-                                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                                            onClick={(e) => {
-                                                e.stopPropagation(); // Ngăn chặn sự kiện onClick của card
-                                                handleOpenModal(slot.id);
-                                            }}
-                                        >
-                                            Cập nhật
-                                        </button>
-                                        <button
-                                            className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                            onClick={(e) => {
-                                                e.stopPropagation(); // Ngăn chặn sự kiện onClick của card
-                                                handleDelete(slot.id);
-                                            }}
-                                        >
-                                            Xóa
-                                        </button>
+                        <div className="py-0 text-black flex flex-col items-center bg-bg-light">
+                            <span className="font-semibold text-center mb-2 py-5 text-2xl">
+                                {/* Hiển thị thời gian hoặc thông báo chưa cài đặt */}
+                                {slot.time ? (
+                                    <>
+                                        <span>Thời Gian {slot.time}</span>
+                                        {/* Dấu "X" để xóa */}
+
+                                    </>
+                                ) : (
+                                    <div className="w-full p-4">
                                     </div>
-                                </>
-                            ) : (
-                                <div>
-                                    <p className="text-gray-500 italic">Chưa được cài đặt (Nhấp để thêm)</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ))
-                }
-            </div >
 
+                                )}
+                            </span>
 
-            {/* Modal */}
-            {
-                isModalOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <div className="bg-white p-9 rounded-md shadow-lg w-96 text-center">
-                            <h2 className="text-xl font-semibold mb-8 text-black">
-                                Cài đặt giờ cho thời điểm thứ {currentSlotId}
-                            </h2>
+                            {/* Input chỉnh sửa thời gian */}
                             <input
-                                type="time"
-                                value={newTime}
-                                onChange={(e) => setNewTime(e.target.value)}
-                                className="border border-gray-300 p-2 rounded w-1/2 mb-8 text-black text-center"
+                                type="text"
+                                value={editedTimes[slot.id] || ''} // Hiển thị giá trị từ editedTimes hoặc rỗng nếu không có giá trị
+                                onChange={(e) => handleTimeChange(slot.id, e.target.value)} // Cập nhật giá trị khi thay đổi
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        handleTimeUpdate(slot.id, editedTimes[slot.id] || ''); // Cập nhật thời gian khi nhấn Enter
+                                    }
+                                }}
+                                className={`w-full h-[5vh] item-end text-2xl px-2 ${isFullScreen ? "py-3" : "py-1"} border-t border-b border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-blue-600`}
+                                disabled={!slot.id}
                             />
-                            <div className="flex justify-end space-x-3">
-                                <button
-                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                    onClick={handleSaveTime}
-                                >
-                                    Lưu
-                                </button>
-                                <button
-                                    className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                                    onClick={handleCloseModal}
-                                >
-                                    Hủy
-                                </button>
-                            </div>
                         </div>
+
+
                     </div>
-                )
-            }
+                ))}
+            </div>
 
             {/* Thêm ToastContainer vào dưới */}
             <ToastContainer position="top-center" autoClose={3000} hideProgressBar />
-        </div >
+        </div>
     );
 };
 

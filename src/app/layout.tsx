@@ -64,7 +64,7 @@ export default function RootLayout({
             </div>
 
             {/* Nội dung chính */}
-            <main className={`flex-1 p-0 bg-[#e6e6e6] transition-all scrollbar-none scrollbar-hidden`}>
+            <main className={`flex-1 p-0 bg-bg-light transition-all scrollbar-none scrollbar-hidden`}>
               {children}
             </main>
           </div>

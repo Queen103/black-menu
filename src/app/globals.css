@@ -7,13 +7,6 @@
   --foreground: #e6e6e6;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #e6e6e6;
-    --foreground: #e6e6e6;
-  }
-}
-
 body {
   overflow: hidden;
   /* overflow-y: auto; */
@@ -42,7 +35,23 @@ body {
 
 .blink {
   animation: blink 1s infinite;
+  /* Chạy hiệu ứng lặp vô hạn */
 }
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+    /* Độ mờ đầy đủ */
+  }
+
+  50% {
+    opacity: 0.5;
+    /* Độ mờ 50% */
+  }
+}
+
 
 /* Ẩn trang trên thiết bị di động */
 @media (max-width: 768px) {
@@ -130,4 +139,20 @@ body {
 
 .disabled {
   pointer-events: none !important;
+}
+
+/* Nền cho mục được chọn trong chế độ sáng */
+.bg-light-selected {
+  background-color: #b1b1b1;
+  /* Màu nền sáng */
+  color: #333;
+  /* Màu chữ khi chọn */
+}
+
+/* Nền cho mục được chọn trong chế độ tối */
+.bg-dark-selected {
+  background-color: #374151;
+  /* Màu nền tối */
+  color: #fff;
+  /* Màu chữ khi chọn */
 }

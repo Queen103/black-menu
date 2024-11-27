@@ -13,6 +13,7 @@ const ReportPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isFullScreen, setIsFullScreen] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
     // Lưu trữ giá trị đã chỉnh sửa cho từng slot
     const [editedTimes, setEditedTimes] = useState<{ [key: number]: string }>({});
@@ -44,8 +45,24 @@ const ReportPage = () => {
     };
 
     useEffect(() => {
-        fetchReportSettings();
+        const savedTheme = localStorage.getItem("theme"); // Lấy giá trị từ localStorage
+        if (savedTheme) {
+            setIsDarkMode(savedTheme === "dark");
+        } else {
+            // Nếu không có giá trị, kiểm tra hệ thống của người dùng
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setIsDarkMode(prefersDark);
+        }
         const interval = setInterval(() => {
+            const savedTheme = localStorage.getItem("theme"); // Lấy giá trị từ localStorage
+            if (savedTheme) {
+                setIsDarkMode(savedTheme === "dark");
+            } else {
+                // Nếu không có giá trị, kiểm tra hệ thống của người dùng
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                setIsDarkMode(prefersDark);
+            }
+
             fetchReportSettings();
             document.addEventListener("fullscreenchange", checkFullScreen);
             checkFullScreen();
@@ -112,32 +129,33 @@ const ReportPage = () => {
     }
 
     return (
-        <div className="p-3">
+        <div className={`p-4 ${isDarkMode ? 'text-white bg-bg-dark' : 'text-[#333333] bg-bg-light'}`}>
             {/* Grid Layout */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-5">
                 {timeSlots.map((slot) => (
                     <div
                         key={slot.id}
-                        className="border border-connect border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center bg-bg-light "
+                        className={`border border-connect border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center ${isDarkMode ? 'bg-bg-dark text-white' : 'bg-bg-light text-black'}`}
                     >
                         <div className="bg-connect">
-                            <h2 className={`text-xl text-white font-semibold mb-2 text-black p-3 border-t-lg ${isFullScreen ? "py-6" : "py-1"
+                            <h2 className={`text-2xl font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"
                                 }`}>
                                 THỜI ĐIỂM THỨ {slot.id}
                             </h2>
                         </div>
 
-                        <div className="py-0 text-black flex flex-col items-center bg-bg-light">
-                            <span className="font-semibold text-center mb-2 py-5 text-2xl">
+                        <div className={`py-0  flex flex-col items-center`}>
+                            <span className="font-semibold text-center mb-2 py-3 text-3xl">
                                 {/* Hiển thị thời gian hoặc thông báo chưa cài đặt */}
                                 {slot.time ? (
                                     <>
-                                        <span>Thời Gian {slot.time}</span>
+                                        <span>{slot.time}</span>
                                         {/* Dấu "X" để xóa */}
 
                                     </>
                                 ) : (
-                                    <div className="w-full p-4">
+                                    <div className="w-full text-transparent">
+                                        .
                                     </div>
 
                                 )}
@@ -153,7 +171,7 @@ const ReportPage = () => {
                                         handleTimeUpdate(slot.id, editedTimes[slot.id] || ''); // Cập nhật thời gian khi nhấn Enter
                                     }
                                 }}
-                                className={`w-full h-[5vh] item-end text-2xl px-2 ${isFullScreen ? "py-3" : "py-1"} border-t border-b border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-blue-600`}
+                                className={`w-full h-[5vh] text-black item-end text-2xl px-2 ${isFullScreen ? "py-3" : "py-1"} border-t border-b border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-blue-600`}
                                 disabled={!slot.id}
                             />
                         </div>

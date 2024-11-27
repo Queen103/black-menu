@@ -4,6 +4,8 @@ import { Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
 import { useEffect, useState, useMemo, useCallback } from "react";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import Card from "./components/Card";
+import Loading from "./components/Loading";
 
 interface Machine {
   id: number;
@@ -34,6 +36,7 @@ const HomePage = () => {
   const [cpuData, setCpuData] = useState<CpuData | null>(null);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [showPerformance, setShowPerformance] = useState(true);
   const [showActual, setShowActual] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -42,14 +45,13 @@ const HomePage = () => {
   // Optimized fetch functions with useCallback
   const fetchMachineData = useCallback(async () => {
     try {
-      const timeoutId = setTimeout(() => setIsLoading(false), LOADING_TIMEOUT);
+      if (isFirstLoad) {
+        setIsLoading(true);
+      }
       const response = await fetch("/api/machines");
-      clearTimeout(timeoutId);
-
       if (!response.ok) {
         throw new Error("API response not ok");
       }
-
       const data = await response.json();
       const updatedMachines = data.map((machine: Machine) => ({
         ...machine,
@@ -60,12 +62,17 @@ const HomePage = () => {
         performance: machine.isConnect && machine.enable ? machine.performance : 0,
       }));
       setMachines(updatedMachines);
-      if (isLoading) setIsLoading(false);
+      if (isFirstLoad) {
+        setIsFirstLoad(false);
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error("Lỗi khi gọi API:", error);
-      setIsLoading(false);
+      if (isFirstLoad) {
+        setIsLoading(false);
+      }
     }
-  }, [isLoading]);
+  }, [isLoading, isFirstLoad]);
 
   const fetchCpuData = useCallback(async () => {
     try {
@@ -171,16 +178,14 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchMachineData();
-    const interval = setInterval(fetchMachineData, 5000);
-
-    return () => clearInterval(interval);
   }, [fetchMachineData]);
 
   return (
     <>
+      {isLoading && <Loading isDarkMode={isDarkMode} />}
       <div className={`p-3 overflow-hidden ${isFullScreen ? "h-[92vh]" : "h-[91vh]"} relative flex flex-col justify-between w-full ${isDarkMode ? 'bg-bg-dark' : 'bg-bg-light'}`}>
         <div className="flex justify-between gap-3 py-2 scale-[100%]">
-          <div className={`flex-1 ${isDarkMode ? 'bg-[#1F2836] text-white' : 'bg-[#ffffff] text-black'} p-2 md:py-8 transition-transform shadow-[inset_0px_0px_4px_rgba(255,255,255,1)] rounded-lg ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
+          <div className={`flex-1 ${isDarkMode ? 'bg-secondary text-text-dark' : 'bg-bg-light text-text-light'} p-2 md:py-8 transition-transform shadow-[inset_0px_0px_4px_rgba(255,255,255,1)] rounded-lg ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-start item-center'>
               <div className="flex space-x-20 text-sm  text-center font-bold item-center gap-x-2 select-none">
                 MỤC TIÊU (PCS)
@@ -330,7 +335,7 @@ const HomePage = () => {
 
 
           {/* Biểu đồ Sản Lượng Thực Tế */}
-          <div className={`flex-1 ${isDarkMode ? 'bg-[#1F2836] text-white' : 'bg-[#ffffff] text-black'} rounded-lg p-2 md:py-8 transition-transform shadow-[inset_0px_0px_4px_rgba(255,255,255,1)] ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
+          <div className={`flex-1 ${isDarkMode ? 'bg-secondary text-text-dark' : 'bg-bg-light text-text-light'} rounded-lg p-2 md:py-8 transition-transform shadow-[inset_0px_0px_4px_rgba(255,255,255,1)] ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-between item-center' >
               <div className="flex space-x-20 text-sm text-center font-bold item-center gap-x-2 select-none" onClick={() => setShowPerformance((prev) => !prev)}>
                 HIỆU SUẤT (%)
@@ -445,34 +450,42 @@ const HomePage = () => {
                     display: false,
                   },
                   tooltip: {
+                    displayColors: false,
                     callbacks: {
+                      title: function (tooltipItems) {
+                        return tooltipItems[0].label;
+                      },
                       label: function (context) {
                         const filteredIndex = context.dataIndex;
-                        const machineName = filteredMachines[filteredIndex].name;
-
                         const performanceValue = filteredMachines[filteredIndex].performance || 0;
                         const actualValue = filteredMachines[filteredIndex].actual || 0;
                         const targetValue = filteredMachines[filteredIndex].dailyTarget || 0;
                         const remainValue = targetValue - actualValue;
 
-                        // Hàm để căn chỉnh số
-                        const padNumber = (num: number) => {
-                          return num.toString().padStart(6, ' ');
+                        // Hàm định dạng tooltip với label trái, giá trị và đơn vị phải
+                        const dinhDangTooltip = (nhan: string, giaTri: number, donVi: string) => {
+                          const tongDoDai = 25; // Độ dài cố định cho phần giữa
+                          const phanGiaTri = `${giaTri} ${donVi}`;
+                          const khoangTrang = ' '.repeat(Math.max(0, tongDoDai - nhan.length - phanGiaTri.length));
+                          return `${nhan}${khoangTrang}${phanGiaTri}`;
                         };
-                        const padNumber2 = (num: number) => {
-                          return num.toString().padStart(7, ' ');
+                        const dinhDangTooltip1 = (nhan: string, giaTri: number, donVi: string) => {
+                          const tongDoDai = 29; // Độ dài cố định cho phần giữa
+                          const phanGiaTri = `${giaTri} ${donVi}`;
+                          const khoangTrang = ' '.repeat(Math.max(0, tongDoDai - nhan.length - phanGiaTri.length));
+                          return `${nhan}${khoangTrang}${phanGiaTri}`;
                         };
+
                         return [
-                          `${machineName}:`,
-                          `Hiệu suất:      ${padNumber(performanceValue)}%`,
-                          `Thực hiện:      ${padNumber(actualValue)} PCS`,
-                          `Còn lại:         ${padNumber2(remainValue)} PCS`
+                          dinhDangTooltip('Hiệu suất:', performanceValue, '%'),
+                          dinhDangTooltip('Thực hiện:', actualValue, 'PCS'),
+                          dinhDangTooltip1('Còn lại:', remainValue, 'PCS')
                         ];
                       },
                     },
                   },
                   datalabels: {
-                    display: true,
+                    display: false,
                   },
                 },
               }}
@@ -483,7 +496,7 @@ const HomePage = () => {
 
         </div>
 
-        <div className={` font-semibold flex space-x-20 justify-between p-0 py-2 ${isDarkMode ? 'text-white' : 'text-[#333333]'}`}>
+        <div className={` font-semibold flex space-x-20 justify-between p-0 py-2 ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
           <div className=' flex justify-start'>
             <div className="select-none">
               Số Line đang hoạt động: {enabledCount}/{idCount}
@@ -495,7 +508,7 @@ const HomePage = () => {
                 <div className="select-none">
                   FPS: {cpuData.fps} |
                 </div>
-                <div className={`h-5 w-5 rounded-full ${cpuData.connection ? 'bg-green-500' : 'bg-gray-500'}`} />
+                <div className={`h-5 w-5 rounded-full ${cpuData.connection ? 'bg-connect' : 'bg-notConnect'}`} />
               </div>
             )}
           </div>
@@ -522,61 +535,14 @@ const HomePage = () => {
                 </div>
               ) : (
                 machines.map((machine) => (
-                  <div
-                    key={machine.id}
-                    className="block relative w-[calc(100%/5.08)] flex-shrink-0 hover:scale-[105%] transition-transform select-none "
-                  >
-                    <div
-                      className={`py-8 rounded-2xl ${isDarkMode ? 'text-white' : 'text-black'} shadow-inner shadow-[inset_0px_0px_15px_rgba(255,255,255,0.8)] flex flex-col items-center justify-between ${!machine.isConnect
-                        ? "bg-notConnect disabled shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]"
-                        : !machine.enable
-                          ? "bg-gray-400 text-gray-200 opacity-30"
-                          : "bg-connect shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]"
-                        }`}
-
-                    >
-                      <div className="text-xl md:text-2xl font-bold flex items-center justify-between w-full max-w-sm py-0 select-none">
-                        <div className="text-center w-2/5 text-base md:text-3xl">{String(machine.id).padStart(2, "0")}</div>
-                        <div className={`w-[2px] h-9 ${isDarkMode ? 'bg-white' : 'bg-black'}`}></div>
-                        <div className="text-center w-3/5 text-base md:text-3xl">{machine.name}</div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-y-12 text-center mt-10 gap-x-0">
-                        <div className="flex flex-col justify-center items-center">
-                          <div className="font-bold text-md md:text-md select-none">MỤC TIÊU NGÀY</div>
-                          <div className="text-md md:text-md select-none">(DAILY TARGET)</div>
-                        </div>
-                        <div className="text-4xl md:text-5xl font-bold select-none">{machine.dailyTarget}</div>
-
-                        <div className="flex flex-col justify-center items-center">
-                          <div className="font-bold text-md md:text-md select-none">MỤC TIÊU GIỜ</div>
-                          <div className="text-md md:text-md select-none">(HOURLY TARGET)</div>
-                        </div>
-                        <div className="text-4xl md:text-5xl font-bold select-none">{machine.hourTarget}</div>
-
-                        <div className={`flex flex-col justify-center items-center ${machine.is_Blink && machine.enable ? "blink" : ""}`}>
-                          <div className="font-bold text-md md:text-md select-none">THỰC HIỆN</div>
-                          <div className="text-md md:text-md select-none">(ACTUAL)</div>
-                        </div>
-                        <div className="text-4xl md:text-5xl font-bold select-none">
-                          <span className={machine.is_Blink && machine.enable ? "blink" : ""}>{machine.actual}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <Card key={machine.id} machine={machine} isDarkMode={isDarkMode} />
                 ))
               )
             )}
-
           </div>
-
-
-
-
-
         </div>
 
-        <div className={`${isDarkMode ? "text-white" : "text-[#333333]"} font-semibold flex flex-col justify-center items-center h-screen px-8 text-2xl relative`}>
+        <div className={`${isDarkMode ? "text-text-dark" : "text-text-light"} font-semibold flex flex-col justify-center items-center h-screen px-8 text-2xl relative`}>
           {/* Nội dung trạng thái */}
           <div className="space-x-20 flex items-center mb-0">
             <div className="flex items-center space-x-2">
@@ -596,14 +562,14 @@ const HomePage = () => {
           {/* Nút cuộn trước và sau */}
           <button
             onClick={handleScrollPrev}
-            className={`absolute left-5 top-[50%] transform -translate-y-[50%] ${isDarkMode ? 'text-white border-white' : 'text-black border-black'} border-2 rounded-xl bg-transparent text-[#333333] text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
+            className={`absolute left-5 top-[50%] transform -translate-y-[50%] ${isDarkMode ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} border-2 rounded-xl bg-transparen text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
           >
             &lt;
           </button>
 
           <button
             onClick={handleScrollNext}
-            className={`absolute right-5 top-[50%] transform -translate-y-[50%] ${isDarkMode ? 'text-white border-white' : 'text-black border-black'} border-2 rounded-xl bg-transparent text-[#333333] text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
+            className={`absolute right-5 top-[50%] transform -translate-y-[50%] ${isDarkMode ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} border-2 rounded-xl bg-transparent  text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
           >
             &gt;
           </button>

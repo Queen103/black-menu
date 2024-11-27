@@ -22,7 +22,6 @@ body {
 }
 
 @keyframes blink {
-
   0%,
   100% {
     opacity: 1;
@@ -51,15 +50,6 @@ body {
     /* Độ mờ 50% */
   }
 }
-
-
-/* Ẩn trang trên thiết bị di động */
-@media (max-width: 768px) {
-  .hidden-on-mobile {
-    display: none;
-  }
-}
-
 
 /* CSS for the switch */
 .switch input {

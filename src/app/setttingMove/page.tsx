@@ -1,7 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import { CustomToast } from "../components/CustomToast";
+import Loading from "../components/Loading";
 
 interface Machine {
     id: number;
@@ -22,177 +23,199 @@ const DetailPage = () => {
     const [editedMachines, setEditedMachines] = useState<{ [key: number]: Partial<Machine> }>([]);
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-    const fetchMachineData = async () => {
+    // Wrap fetchMachineData trong useCallback
+    const fetchMachineData = useCallback(async () => {
         try {
+            if (isFirstLoad) {
+                setIsLoading(true);
+            }
             const response = await fetch("/api/machines");
             if (!response.ok) {
                 throw new Error("API response not ok");
             }
             const data = await response.json();
             setMachines(data);
+            if (isFirstLoad) {
+                setIsFirstLoad(false);
+                setIsLoading(false);
+            }
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
+            if (isFirstLoad) {
+                setIsLoading(false);
+            }
         }
-    };
+    }, [isFirstLoad]); // Empty dependency array because it doesn't depend on any props or state
 
-    const checkFullScreen = () => {
+    const checkFullScreen = useCallback(() => {
         const isFullScreenNow = window.innerHeight === screen.height;
-        if (isFullScreenNow) {
-            setIsFullScreen(true);
-        } else {
-            setIsFullScreen(false);
-        }
-    };
+        setIsFullScreen(isFullScreenNow);
+    }, []);
 
-    useEffect(() => {
-        const savedTheme = localStorage.getItem("theme"); // Lấy giá trị từ localStorage
+    const initializeTheme = useCallback(() => {
+        const savedTheme = localStorage.getItem("theme");
         if (savedTheme) {
             setIsDarkMode(savedTheme === "dark");
         } else {
-            // Nếu không có giá trị, kiểm tra hệ thống của người dùng
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             setIsDarkMode(prefersDark);
         }
+    }, []);
+
+    const FETCH_INTERVAL = 1000; // 1 second for API calls
+    const UI_UPDATE_INTERVAL = 2000; // 5 seconds for UI updates
+
+    // Thiết lập các hiệu ứng UI
+    useEffect(() => {
+        // Initial setup
+        initializeTheme();
+        document.addEventListener("fullscreenchange", checkFullScreen);
+        checkFullScreen();
+
+        // Set up interval for UI updates
         const intervalId = setInterval(() => {
-            const savedTheme = localStorage.getItem("theme"); // Lấy giá trị từ localStorage
+            document.addEventListener("fullscreenchange", checkFullScreen);
+            checkFullScreen();
+
+            const savedTheme = localStorage.getItem("theme");
             if (savedTheme) {
                 setIsDarkMode(savedTheme === "dark");
             } else {
-                // Nếu không có giá trị, kiểm tra hệ thống của người dùng
                 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 setIsDarkMode(prefersDark);
             }
+        }, UI_UPDATE_INTERVAL);
 
-            fetchMachineData();
-            document.addEventListener("fullscreenchange", checkFullScreen);
-            checkFullScreen();
-        }, 1000);
-
+        // Cleanup
         return () => {
-            clearInterval(intervalId);
             document.removeEventListener("fullscreenchange", checkFullScreen);
+            clearInterval(intervalId);
         };
-    }, []);
+    }, [checkFullScreen]);
 
-    const handleChange = async (id: number, field: keyof Machine, value: any) => {
-        const machine = machines.find(m => m.id === id);
-        if (!machine) return;
+    // Fetch data effect
+    useEffect(() => {
+        fetchMachineData(); // Initial fetch
+        const fetchInterval = setInterval(fetchMachineData, FETCH_INTERVAL);
 
+        return () => clearInterval(fetchInterval);
+    }, [fetchMachineData]);
+
+    const handleChange = (machineId: number, field: keyof Machine, value: any) => {
         setEditedMachines(prev => ({
             ...prev,
-            [id]: {
-                ...prev[id],
+            [machineId]: {
+                ...prev[machineId],
                 [field]: value
             }
         }));
-
-        // Nếu thay đổi trường "enable", gửi yêu cầu cập nhật đến API
-        if (field === "enable") {
-            try {
-                const response = await fetch(`/api/machines/${id}`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        newEnable: value,
-                    }),
-                });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error?.error || "Cập nhật trạng thái không thành công");
-                }
-
-                // Hiển thị Toast khi cập nhật thành công
-                toast.success(`Cập nhật trạng thái thành công cho Line ID: ${id}`);
-
-                fetchMachineData(); // Cập nhật lại danh sách máy sau khi thay đổi
-            } catch (error) {
-                console.error("Lỗi khi cập nhật trạng thái:", error);
-                toast.error("Cập nhật trạng thái thất bại!");
-            }
-        }
     };
 
-    const handleUpdate = async (id: number) => {
-        const updatedMachine = editedMachines[id];
-        if (!updatedMachine) return;
-
-        const originalMachine = machines.find(m => m.id === id);
-        if (!originalMachine) return;
-
-        const { name, dailyTarget, enable, actual, morningTime, afternoonTime } = updatedMachine;
-
+    const handleChangeStateMachine = async (machineId: number, field: keyof Machine, value: any) => {
         try {
-            const response = await fetch(`/api/machines/${id}`, {
-                method: "PATCH",
+            // Cập nhật state local trước
+            setEditedMachines(prev => ({
+                ...prev,
+                [machineId]: {
+                    ...prev[machineId],
+                    [field]: value
+                }
+            }));
+
+            // Gọi API để cập nhật
+            const response = await fetch(`/api/machines/${machineId}`, {
+                method: 'PATCH',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    newName: name,
-                    newDailyTarget: dailyTarget,
-                    newEnable: enable,
-                    newActual: actual,
-                    newMorningTime: morningTime,
-                    newAfternoonTime: afternoonTime
+                    [field]: value
                 }),
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error?.error || "Cập nhật không thành công");
+                throw new Error('Failed to update machine status');
             }
 
-            // Tạo thông báo chi tiết về các thay đổi
-            const changes = [];
-            if (name !== undefined && name !== originalMachine.name)
-                changes.push(`Tên Line: ${originalMachine.name} → ${name}`);
-            if (dailyTarget !== undefined && dailyTarget !== originalMachine.dailyTarget)
-                changes.push(`Target ngày: ${originalMachine.dailyTarget} → ${dailyTarget}`);
-            if (actual !== undefined && actual !== originalMachine.actual)
-                changes.push(`Thực hiện: ${originalMachine.actual} → ${actual}`);
-            if (morningTime !== undefined && morningTime !== originalMachine.morningTime)
-                changes.push(`Giờ sáng: ${originalMachine.morningTime} → ${morningTime}`);
-            if (afternoonTime !== undefined && afternoonTime !== originalMachine.afternoonTime)
-                changes.push(`Giờ chiều: ${originalMachine.afternoonTime} → ${afternoonTime}`);
+            toast.success('Cập nhật trạng thái thành công!', {
+                position: "top-right",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
 
-            // Hiển thị Toast với thông tin chi tiết
-            toast.success(
-                <div>
-                    <p className="font-bold mb-2">Cập nhật thành công Line {name || `#${id}`}!</p>
-                    {changes.map((change, index) => (
-                        <p key={index} className="text-md">{change}</p>
-                    ))}
-                </div>,
-                {
+            // Cập nhật lại dữ liệu
+            fetchMachineData();
+        } catch (error) {
+            console.error('Error updating machine status:', error);
+            toast.error('Cập nhật trạng thái thất bại!', {
+                position: "top-right",
+                autoClose: 1000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
+            // Rollback state nếu API thất bại
+            setEditedMachines(prev => {
+                const newState = { ...prev };
+                delete newState[machineId];
+                return newState;
+            });
+        }
+    };
+
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>, machineId: number) => {
+        if (e.key === 'Enter') {
+            try {
+                const response = await fetch(`/api/machines/${machineId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(editedMachines[machineId]),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update machine');
+                }
+
+                // Xóa dữ liệu đã chỉnh sửa sau khi cập nhật thành công
+                setEditedMachines(prev => {
+                    const newState = { ...prev };
+                    delete newState[machineId];
+                    return newState;
+                });
+
+                toast.success('Cập nhật thành công!', {
                     position: "top-right",
-                    autoClose: 3000,
+                    autoClose: 1000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                }
-            );
-
-            setEditedMachines((prev) => {
-                const updated = { ...prev };
-                delete updated[id];
-                return updated;
-            });
-
-            fetchMachineData();
-        } catch (error) {
-            console.error("Lỗi khi cập nhật:", error);
-            toast.error("Cập nhật thất bại!");
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, id: number) => {
-        if (e.key === "Enter") {
-            handleUpdate(id);
+                    progress: undefined,
+                });
+            } catch (error) {
+                console.error('Error updating machine:', error);
+                toast.error('Cập nhật thất bại!', {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
         }
     };
 
@@ -200,25 +223,26 @@ const DetailPage = () => {
     const idCount = machines.filter((machine) => machine.id).length;
 
     return (
-        <div className={`px-2 h-full ${isDarkMode ? 'text-white bg-bg-dark' : 'text-[#333333] bg-bg-light'}`}>
+        <div className={`px-2 h-full ${isDarkMode ? 'text-text-dark bg-bg-dark' : 'text-text-light bg-bg-light'}`}>
+            {isFirstLoad && isLoading && <Loading isDarkMode={isDarkMode} />}
             <CustomToast isDarkMode={isDarkMode} />
             {/* Bảng 1: Trạng Thái */}
             <div>
                 <div className="flex justify-between items-center py-2 ">
-                    <div className={`text-lg select-none ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                    <div className={`text-lg select-none ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
                         Số Line đang hoạt động: {enabledCount}/{idCount}
                     </div>
-                    <h2 className={`text-xl font-bold select-none text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                    <h2 className={`text-xl ${isFullScreen ? "text-3xl" : "text-xl"} font-bold select-none text-center ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
                         Bảng Trạng Thái
                     </h2>
                     <div className="w-[250px]"></div>
                 </div>
                 <div className="overflow-x-auto mb-2 text-lg shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
-                    <table className={`table-auto w-full border-collapse border-2 border-white ${isDarkMode ? 'border-white' : 'border-black'}`}>
+                    <table className={`table-auto w-full border-collapse border-2 ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
                             <tr>
                                 {machines.slice(0, 15).map((machine) => (
-                                    <th key={machine.id} className={`border-2 text-white ${isDarkMode ? 'border-white' : 'border-black'} px-4 py-0 text-center ${machine.enable ? "bg-connect" : "bg-notConnect"}`}>
+                                    <th key={machine.id} className={`border-2 text-text-dark ${isDarkMode ? 'border-border-dark' : 'border-border-light'} px-4 py-0 text-center ${machine.enable ? "bg-connect" : "bg-notConnect"}`}>
                                         {machine.id}
                                     </th>
                                 ))}
@@ -229,14 +253,14 @@ const DetailPage = () => {
                                 {machines.slice(0, 15).map((machine) => (
                                     <td
                                         key={machine.id}
-                                        className={`border-2 ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-gray-200'} px-4 py-1 cursor-pointer`}
-                                        onClick={() => handleChange(machine.id, "enable", !(editedMachines[machine.id]?.enable ?? machine.enable))}
+                                        className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer`}
+                                        onClick={() => handleChangeStateMachine(machine.id, "enable", !(editedMachines[machine.id]?.enable ?? machine.enable))}
                                     >
                                         <div className="flex justify-center items-center h-full">
                                             <input
                                                 type="checkbox"
                                                 checked={editedMachines[machine.id]?.enable ?? machine.enable}
-                                                onChange={(e) => handleChange(machine.id, "enable", e.target.checked)}
+                                                onChange={(e) => handleChangeStateMachine(machine.id, "enable", e.target.checked)}
                                                 className="w-5 h-5"
                                                 onClick={(e) => e.stopPropagation()}
                                             />
@@ -251,20 +275,20 @@ const DetailPage = () => {
             </div>
             {/* Bảng 2: Cài Đặt */}
             <div>
-                <h2 className={`text-xl font-bold mb-2 select-none text-center ${isDarkMode ? 'text-white' : 'text-black'}`}>
+                <h2 className={` font-bold mb-2 select-none text-center ${isFullScreen ? "text-3xl" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
                     Bảng Cài Đặt
                 </h2>
                 <div className="overflow-x-auto text-lg shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
-                    <table className={`table-auto w-full border-collapse border-2 border-black ${isDarkMode ? 'border-white' : 'border-black'}`}>
+                    <table className={`table-auto w-full border-collapse border-2 ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
-                            <tr className={`${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-gray-200'}`}>
-                                <th className={`border-2 ${isDarkMode ? 'border-white' : 'border-black'} px-2 py-0.5 text-2xl`}>ID</th>
-                                <th className={`border-2 ${isDarkMode ? 'border-white' : 'border-black'} px-2 py-0.5 text-2xl`}>Tên</th>
-                                <th className={`border-2 ${isDarkMode ? 'border-white' : 'border-black'} px-2 py-0.5 text-2xl`}>Mục Tiêu Ngày</th>
-                                <th className={`border-2 ${isDarkMode ? 'border-white' : 'border-black'} px-2 py-0.5 text-2xl`}>Thực Hiện</th>
-                                <th className={`border-2 ${isDarkMode ? 'border-white' : 'border-black'} px-2 py-0.5 text-2xl`}>Ca Sáng</th>
-                                <th className={`border-2 ${isDarkMode ? 'border-white' : 'border-black'} px-2 py-0.5 text-2xl`}>Ca Chiều</th>
-                                <th className={`border-2 border-black py-0.5 text-2xl ${isDarkMode ? 'border-white' : 'border-black'}`}>Trạng Thái Kết Nối</th>
+                            <tr className={`${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>ID</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Tên</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Mục Tiêu Ngày</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Thực Hiện</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Ca Sáng</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Ca Chiều</th>
+                                <th className={`border-2 border-black text-2xl ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>Trạng Thái Kết Nối</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -280,12 +304,12 @@ const DetailPage = () => {
                                     }
 
                                     return (
-                                        <tr key={machine.id} className={` ${machine.isConnect ? isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black" : isDarkMode ? "bg-red-400 text-gray-300 blink" : "bg-red-300 text-black blink"}`}>
-                                            <td className={`border-2 border-black px-2 py-0.5 text-center text-xl ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                        <tr key={machine.id} className={` ${machine.isConnect ? isDarkMode ? "bg-secondary text-text-dark" : "bg-bg-light text-text-light" : isDarkMode ? "bg-error opacity-80 blink" : "bg-error opacity-80 blink"}`}>
+                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
                                                 {machine.id}
                                             </td>
                                             {/* Tên */}
-                                            <td className={`border-2 border-black text-center text-xl ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-semibold text-center w-1/2">{machine.name}</span>
                                                     <input
@@ -293,14 +317,14 @@ const DetailPage = () => {
                                                         value={editedMachines[machine.id]?.name ?? ""}
                                                         onChange={(e) => handleChange(machine.id, "name", e.target.value)}
                                                         onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                        className={`w-1/2 px-1 py-0.5 mr-10 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-600`}
+                                                        className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent`}
                                                         disabled={!machine.isConnect}
                                                     />
                                                 </div>
                                             </td>
 
                                             {/* Mục tiêu ngày */}
-                                            <td className={`border-2 border-black text-center text-xl ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-semibold px-2 text-center w-1/2">{machine.dailyTarget}</span>
                                                     <input
@@ -315,14 +339,14 @@ const DetailPage = () => {
                                                             }
                                                         }}
                                                         onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                        className={`w-1/2 px-1 py-0.5 mr-10 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-500`}
+                                                        className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent`}
                                                         disabled={!machine.isConnect}
                                                     />
                                                 </div>
                                             </td>
 
                                             {/* Thực hiện */}
-                                            <td className={`border-2 border-black text-center text-xl ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-semibold px-2 text-center w-1/2">{machine.actual}</span>
                                                     <input
@@ -337,13 +361,13 @@ const DetailPage = () => {
                                                             }
                                                         }}
                                                         onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                        className={`w-1/2 px-1 py-0.5 mr-10 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-500`}
+                                                        className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent`}
                                                         disabled={!machine.isConnect}
                                                     />
                                                 </div>
                                             </td>
 
-                                            <td className={`border-2 border-black text-center text-xl ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-semibold px-2 text-center w-1/2">{machine.morningTime}</span>
                                                     <div className="flex items-center w-1/2 mr-10">
@@ -358,7 +382,7 @@ const DetailPage = () => {
                                                                 const minutes = editedMachines[machine.id]?.morningTime?.split(":")[1] ?? "00";
                                                                 handleChange(machine.id, "morningTime", `${hours}:${minutes}`);
                                                             }}
-                                                            className={`w-12 px-1 py-0.5 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                                                             disabled={!machine.isConnect}
                                                         />
                                                         <span className="mx-1 font-bold">:</span>
@@ -373,14 +397,14 @@ const DetailPage = () => {
                                                                 const hours = editedMachines[machine.id]?.morningTime?.split(":")[0] ?? "00";
                                                                 handleChange(machine.id, "morningTime", `${hours}:${minutes}`);
                                                             }}
-                                                            className={`w-12 px-1 py-0.5 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                                                             disabled={!machine.isConnect}
                                                         />
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td className={`border-2 border-black text-center text-xl ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-semibold px-2 text-center w-1/2">{machine.afternoonTime}</span>
                                                     <div className="flex items-center w-1/2 mr-10">
@@ -394,7 +418,7 @@ const DetailPage = () => {
                                                                 const minutes = editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? "00";
                                                                 handleChange(machine.id, "afternoonTime", `${hours}:${minutes}`);
                                                             }}
-                                                            className={`w-12 px-1 py-0.5 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                                                             disabled={!machine.isConnect}
                                                         />
                                                         <span className="mx-1 font-bold">:</span>
@@ -408,7 +432,7 @@ const DetailPage = () => {
                                                                 const hours = editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? "00";
                                                                 handleChange(machine.id, "afternoonTime", `${hours}:${minutes}`);
                                                             }}
-                                                            className={`w-12 px-1 py-0.5 text-xl ${isDarkMode ? 'text-white' : 'text-black'} bg-transparent border-b border-white text-center focus:outline-none focus:border-b focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                                                             disabled={!machine.isConnect}
                                                         />
                                                     </div>
@@ -416,10 +440,10 @@ const DetailPage = () => {
                                             </td>
 
                                             {/* Trạng Thái Kết Nối */}
-                                            <td className={`border-2 text-center w-[25vh] ${isDarkMode ? 'border-white bg-tableIn' : 'border-black bg-white'}`}>
+                                            <td className={`border-2 text-center w-[25vh] ${isFullScreen ? " py-0.5 text-2xl" : " text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>
                                                 <div className="flex justify-center items-center h-full">
                                                     <span
-                                                        className={`p-1.5 font-semibold text-white w-full h-full flex items-center justify-center ${machine.isConnect ? "bg-connect" : "bg-notConnect"
+                                                        className={`p-1.5 font-semibold text-text-dark w-full h-full flex items-center justify-center ${machine.isConnect ? "bg-connect" : "bg-notConnect"
                                                             } shadow-inner shadow-[inset_0px_0px_10px_rgba(255,255,255,1)]`}
                                                     >
                                                         {machine.isConnect ? "Kết Nối" : "Mất Kết Nối"}

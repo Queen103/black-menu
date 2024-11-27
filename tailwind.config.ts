@@ -13,14 +13,38 @@ const config: Config = {
         none: 'none',
       },
       colors: {
-        'connect': '#00964d',
-        'notConnect': '#c40005',
-        'bg-light': '#e6e6e6',
-        'bg-dark': '#121C33',
-        'table': '#20335d',
-        'tableIn': '#041847',
-        'sideBar-dark': '#0E1626',
-        'sideBar-light': '#f5f5f5',
+        // Màu chính
+        'primary': '#00964d',      // Xanh lá cây chính
+        'secondary': '#1F2836',    // Xám đậm
+        'accent': '#2196F3',       // Xanh dương
+
+        // Màu trạng thái
+        'connect': '#00964d',      // Xanh lá - kết nối
+        'notConnect': '#c40005',   // Đỏ - mất kết nối
+        'warning': '#ff9800',      // Cam - cảnh báo
+        'error': '#f44336',        // Đỏ - lỗi
+
+        // Màu nền
+        'bg-dark': '#121C33',      // Nền tối
+        'bg-light': '#e6e6e6',     // Nền sáng
+        'bg-table': '#20335d',     // Nền bảng
+        'bg-tableIn': '#041847',   // Nền ô trong bảng
+
+        // Màu sidebar
+        'sideBar-dark': '#0E1626', // Sidebar tối
+        'sideBar-light': '#f5f5f5',// Sidebar sáng
+
+        // Màu text
+        'text-dark': '#ffffff',    // Text trên nền tối
+        'text-light': '#333333',   // Text trên nền sáng
+
+        // Màu border
+        'border-dark': '#ffffff',  // Viền trên nền tối
+        'border-light': '#000000', // Viền trên nền sáng
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },

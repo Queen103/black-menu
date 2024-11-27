@@ -9,7 +9,7 @@ export const Lines = [
         enable: true,
         is_Blink: false,
         performance: 85,
-        morningTime: '08:00',
+        morningTime: '05:00',
         afternoonTime: '13:00',
     },
     {
@@ -22,7 +22,7 @@ export const Lines = [
         enable: true,
         is_Blink: true,
         performance: 70,
-        morningTime: '08:30',
+        morningTime: '12:30',
         afternoonTime: '13:30',
     },
     {
@@ -32,7 +32,7 @@ export const Lines = [
         hourTarget: -15,
         actual: 75,
         isConnect: true,
-        enable: false,
+        enable: true,
         is_Blink: false,
         performance: 50,
         morningTime: '09:00',

@@ -99,7 +99,7 @@ export default function RootLayout({
     return (
       <html lang="vi">
         <body>
-          <div className="fixed inset-0 bg-red-500 text-white flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-error text-text-dark flex items-center justify-center p-4">
             <div className="text-center">
               <h1 className="text-2xl font-bold mb-4">Không hỗ trợ thiết bị di động</h1>
               <p className="text-lg">
@@ -125,7 +125,7 @@ export default function RootLayout({
             onClick={toggleSidebar}
             className="absolute top-2 left-5 rounded-md z-40 flex items-center bg-transparent"
           >
-            <IoMenuOutline className={`text-[50px] ${isDarkMode ? 'text-white' : 'text-black'}`} />
+            <IoMenuOutline className={`text-[50px] ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`} />
           </button>
 
           {/* Main content area */}

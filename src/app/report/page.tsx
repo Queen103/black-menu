@@ -9,8 +9,6 @@ import { useFullScreen } from '../context/FullScreenContext';
 import InputTime2Number from '../components/InputTime2Number';
 import { fetchReportSettings, updateReportTime, TimeSlot } from '@/services/api/report';
 
-interface ReportPageProps {
-}
 
 const ReportPage = () => {
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -58,6 +56,13 @@ const ReportPage = () => {
     const handleTimeUpdate = async (slotId: number) => {
         const hours = editedHours[slotId] || "";
         const minutes = editedMinutes[slotId] || "";
+        const currentSlot = timeSlots.find(slot => slot.id === slotId);
+
+        // Kiểm tra nếu không có time hiện tại và không có input mới
+        if (!currentSlot?.time && !hours && !minutes) {
+            toast.error("Không thể xóa thời gian không tồn tại");
+            return;
+        }
 
         // Nếu cả hai input đều rỗng thì gửi time rỗng
         const newTime = !hours && !minutes ? "" : `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;

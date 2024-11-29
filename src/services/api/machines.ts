@@ -10,10 +10,7 @@ export interface Machine {
     performance: number;
     morningTime: string;
     afternoonTime: string;
-    status: boolean;
-    runningTime?: string;
 }
-
 export const fetchMachines = async (): Promise<Machine[]> => {
     try {
         const response = await fetch("/api/machines");

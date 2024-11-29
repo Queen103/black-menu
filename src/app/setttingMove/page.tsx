@@ -4,21 +4,7 @@ import { toast } from "react-toastify";
 import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
 import { useTheme } from "../context/ThemeContext";
-import { fetchMachines, updateMachine } from '@/services/api';
-
-interface Machine {
-    id: number;
-    name: string;
-    dailyTarget: number;
-    hourTarget: number;
-    actual: number;
-    isConnect: boolean;
-    enable: boolean;
-    is_Blink: boolean;
-    performance: number;
-    morningTime: string;
-    afternoonTime: string;
-}
+import { fetchMachines, updateMachine, type Machine } from '@/services/api/machines';
 
 const DetailPage = () => {
     const [machines, setMachines] = useState<Machine[]>([]);
@@ -296,11 +282,8 @@ const DetailPage = () => {
                                     <td colSpan={7} className="text-center py-4">Không có dữ liệu</td>
                                 </tr>
                             ) : (
-                                machines.filter(machine => machine.enable).map((machine, index) => (
-                                    <tr key={machine.id} className={`${index % 2 === 0
-                                        ? isDark ? "bg-bg-tableIn text-text-dark" : "bg-gray-100 text-text-light"
-                                        : isDark ? "bg-bg-tableOut text-text-dark" : "bg-gray-300 text-text-light"} 
-                                ${!machine.isConnect ? "blink animate-blink opacity-60" : ""}`}>
+                                machines.filter(machine => machine.enable).map((machine) => (
+                                    <tr key={machine.id}>
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
                                             {machine.id}
                                         </td>
@@ -619,7 +602,8 @@ const DetailPage = () => {
                                         </td>
                                     </tr>
                                 ))
-                            )}
+                            )
+                            }
                         </tbody>
                     </table>
                 </div>

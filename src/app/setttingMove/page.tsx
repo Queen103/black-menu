@@ -355,6 +355,7 @@ const DetailPage = () => {
 
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-center">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.morningTime}</span>
                                                 <InputTime4Number
                                                     value={editedMachines[machine.id]?.morningTime ?? ""}
                                                     onChange={(value) => handleChange(machine.id, "morningTime", value)}
@@ -368,6 +369,7 @@ const DetailPage = () => {
 
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-center">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.afternoonTime}</span>
                                                 <InputTime4Number
                                                     value={editedMachines[machine.id]?.afternoonTime ?? ""}
                                                     onChange={(value) => handleChange(machine.id, "afternoonTime", value)}

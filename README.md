@@ -57,11 +57,8 @@ npm run build
 # hoặc
 yarn build
 
-# Chạy production
-npm start
-# hoặc
-yarn start
-```
+# Không build được do xung đột thư viện
+
 
 ## Cấu Trúc Thư Mục
 

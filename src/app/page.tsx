@@ -1,6 +1,6 @@
 "use client";
 
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
 import { useEffect, useState, useMemo, useCallback } from "react";
 import ChartDataLabels from 'chartjs-plugin-datalabels';

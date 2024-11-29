@@ -241,12 +241,12 @@ const DetailPage = () => {
                                         className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer`}
                                         onClick={() => handleChangeStateMachine(machine.id, "enable", !(editedMachines[machine.id]?.enable ?? machine.enable))}
                                     >
-                                        <div className="flex justify-center items-center h-full">
+                                        <div className="flex justify-center items-center h-full ">
                                             <input
                                                 type="checkbox"
                                                 checked={editedMachines[machine.id]?.enable ?? machine.enable}
                                                 onChange={(e) => handleChangeStateMachine(machine.id, "enable", e.target.checked)}
-                                                className="w-5 h-5"
+                                                className="w-5 h-5 cursor-pointer"
                                                 onClick={(e) => e.stopPropagation()}
                                             />
                                         </div>

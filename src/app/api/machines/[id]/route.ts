@@ -3,7 +3,7 @@ import { Lines } from "../db";
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
-    const { newName, newDailyTarget, newEnable, newActual, newMorningTime, newAfternoonTime } = await req.json();  // Extract newName, newDailyTarget, and newEnable from the request body
+    const { newName, newDailyTarget, newEnable, newActual,} = await req.json();  // Extract newName, newDailyTarget, and newEnable from the request body
 
     // Validation for name and dailyTarget
     if (newName && typeof newName !== 'string') {

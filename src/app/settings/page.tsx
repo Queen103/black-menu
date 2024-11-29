@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react';
 import * as echarts from 'echarts';
+import { fetchMachines } from '@/services/api';
 
 // Định nghĩa kiểu dữ liệu của một máy
 interface Machine {
@@ -21,20 +22,16 @@ const BarChart = () => {
 
     // Gọi API để lấy dữ liệu machines
     useEffect(() => {
-        const fetchMachines = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch('/api/machines');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch machines');
-                }
-                const data: Machine[] = await response.json(); // Gán kiểu dữ liệu cho dữ liệu trả về
+                const data = await fetchMachines();
                 setMachines(data);
             } catch (error) {
                 console.error('Error fetching machines:', error);
             }
         };
 
-        fetchMachines();
+        fetchData();
     }, []);
 
     // Vẽ biểu đồ khi dữ liệu machines thay đổi
@@ -117,7 +114,6 @@ const BarChart = () => {
                     containLabel: true,
                 },
             };
-
 
             chartInstance.setOption(options);
 

@@ -6,6 +6,9 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Card from "./components/Card";
 import Loading from "./components/Loading";
+import { useTheme } from './context/ThemeContext';
+import { fetchMachines } from '@/services/api';
+import { fetchCpuData, type CpuData } from '@/services/api/cpu';
 
 interface Machine {
   id: number;
@@ -19,17 +22,11 @@ interface Machine {
   performance: number;
 }
 
-interface CpuData {
-  fps: number;
-  connection: boolean;
-}
-
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, ChartDataLabels);
 
 // Constants
 const FETCH_INTERVAL = 1000;
 const SCROLL_INTERVAL = 10000;
-const LOADING_TIMEOUT = 5000;
 
 const HomePage = () => {
   const [machines, setMachines] = useState<Machine[]>([]);
@@ -39,29 +36,16 @@ const HomePage = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [showPerformance, setShowPerformance] = useState(true);
   const [showActual, setShowActual] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-
+  const { isDark } = useTheme();
   // Optimized fetch functions with useCallback
   const fetchMachineData = useCallback(async () => {
     try {
       if (isFirstLoad) {
         setIsLoading(true);
       }
-      const response = await fetch("/api/machines");
-      if (!response.ok) {
-        throw new Error("API response not ok");
-      }
-      const data = await response.json();
-      const updatedMachines = data.map((machine: Machine) => ({
-        ...machine,
-        enable: machine.isConnect ? machine.enable : false,
-        dailyTarget: machine.isConnect && machine.enable ? machine.dailyTarget : 0,
-        hourTarget: machine.isConnect && machine.enable ? machine.hourTarget : 0,
-        actual: machine.isConnect && machine.enable ? machine.actual : 0,
-        performance: machine.isConnect && machine.enable ? machine.performance : 0,
-      }));
-      setMachines(updatedMachines);
+      const data = await fetchMachines();
+      setMachines(data);
       if (isFirstLoad) {
         setIsFirstLoad(false);
         setIsLoading(false);
@@ -74,13 +58,9 @@ const HomePage = () => {
     }
   }, [isLoading, isFirstLoad]);
 
-  const fetchCpuData = useCallback(async () => {
+  const fetchCpuDataHandler = useCallback(async () => {
     try {
-      const response = await fetch("/api/cpu");
-      if (!response.ok) {
-        throw new Error("API response not ok");
-      }
-      const data = await response.json();
+      const data = await fetchCpuData();
       setCpuData(data);
     } catch (error) {
       console.error("Lỗi khi gọi API CPU:", error);
@@ -95,7 +75,7 @@ const HomePage = () => {
 
   // Optimized calculations with useMemo
   const enabledCount = useMemo(() =>
-    machines.filter((machine) => machine.enable || (!machine.isConnect)).length,
+    machines.filter((machine) => machine.enable).length,
     [machines]
   );
 
@@ -124,13 +104,6 @@ const HomePage = () => {
 
   // Effects
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark");
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(prefersDark);
-    }
     document.addEventListener("fullscreenchange", checkFullScreen);
     checkFullScreen();
 
@@ -146,16 +119,9 @@ const HomePage = () => {
     const intervalId = setInterval(() => {
       document.addEventListener("fullscreenchange", checkFullScreen);
       checkFullScreen();
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme) {
-        setIsDarkMode(savedTheme === "dark");
-      } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setIsDarkMode(prefersDark);
-      }
 
       fetchMachineData();
-      fetchCpuData();
+      fetchCpuDataHandler();
     }, FETCH_INTERVAL);
 
     return () => {
@@ -163,7 +129,7 @@ const HomePage = () => {
       document.removeEventListener("fullscreenchange", checkFullScreen);
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [fetchMachineData, fetchCpuData, checkFullScreen, handleScrollNext, handleScrollPrev]);
+  }, [fetchMachineData, fetchCpuDataHandler, checkFullScreen, handleScrollNext, handleScrollPrev]);
 
   useEffect(() => {
     const autoScrollInterval = setInterval(() => {
@@ -182,10 +148,10 @@ const HomePage = () => {
 
   return (
     <>
-      {isLoading && <Loading isDarkMode={isDarkMode} />}
-      <div className={`p-3 overflow-hidden ${isFullScreen ? "h-[92vh]" : "h-[91vh]"} relative flex flex-col justify-between w-full ${isDarkMode ? 'bg-bg-dark' : 'bg-bg-light'}`}>
+      {isLoading && <Loading isDarkMode={isDark} />}
+      <div className={`p-3 overflow-hidden ${isFullScreen ? "h-[92vh]" : "h-[91vh]"} relative flex flex-col justify-between w-full ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
         <div className="flex justify-between gap-3 py-2 scale-[100%]">
-          <div className={`flex-1 ${isDarkMode ? 'bg-secondary text-text-dark' : 'bg-bg-light text-text-light'} p-2 md:py-8 transition-transform shadow-[inset_0px_0px_4px_rgba(255,255,255,1)] rounded-lg ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
+          <div className={`flex-1 ${isDark ? 'bg-secondary text-text-dark shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]' : 'bg-gray-300 text-text-light shadow-[inset_0px_0px_4px_rgba(0,0,0,1)]'} p-2 md:py-8 transition-transform rounded-lg ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-start item-center'>
               <div className="flex space-x-20 text-sm  text-center font-bold item-center gap-x-2 select-none">
                 MỤC TIÊU (PCS)
@@ -198,16 +164,16 @@ const HomePage = () => {
             <Bar className='px-7'
               data={{
                 labels: machines
-                  .filter((machine) => machine.hourTarget !== 0)
+                  .filter((machine) => machine.hourTarget !== 0 && machine.enable)
                   .map((machine) => machine.name),
                 datasets: [
                   {
                     label: 'Mục Tiêu Giờ',
                     data: machines
-                      .filter((machine) => machine.hourTarget !== 0)
+                      .filter((machine) => machine.hourTarget !== 0 && machine.enable)
                       .map((machine) => machine.hourTarget),
                     backgroundColor: machines
-                      .filter((machine) => machine.hourTarget !== 0)
+                      .filter((machine) => machine.hourTarget !== 0 && machine.enable)
                       .map((machine) =>
                         machine.hourTarget < 0 ? '#c40005' : '#00964d'
                       ),
@@ -230,7 +196,7 @@ const HomePage = () => {
                       font: {
                         size: 18,
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
                   },
                   tooltip: {
@@ -242,7 +208,7 @@ const HomePage = () => {
                   },
                   datalabels: {
                     display: true,
-                    color: isDarkMode ? '#ffffff' : '#333333',
+                    color: isDark ? '#ffffff' : '#333333',
                     font: {
                       size: 14,
                       weight: 'bold',
@@ -266,7 +232,7 @@ const HomePage = () => {
                 scales: {
                   x: {
                     grid: {
-                      color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       lineWidth: 1
                     },
                     ticks: {
@@ -274,7 +240,7 @@ const HomePage = () => {
                         weight: 'bold',
                         size: 14,
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
                   },
                   y: {
@@ -285,10 +251,10 @@ const HomePage = () => {
                         size: 16,
                         weight: 'bold',
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
                     grid: {
-                      color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       lineWidth: 1
                     },
                     ticks: {
@@ -296,14 +262,14 @@ const HomePage = () => {
                         weight: 'bold',
                         size: 14,
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
                     min: Math.floor(
-                      Math.min(0, Math.min(...machines.filter((machine) => machine.hourTarget !== 0).map((machine) => machine.hourTarget)) * 1.2) / 5
+                      Math.min(0, Math.min(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2) / 5
                     ) * 5,
 
                     max: Math.ceil(
-                      Math.max(...machines.filter((machine) => machine.hourTarget !== 0).map((machine) => machine.hourTarget)) * 1.2 / 5
+                      Math.max(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2 / 5
                     ) * 5,
 
                   },
@@ -311,18 +277,18 @@ const HomePage = () => {
                     position: 'right',
                     display: true,
                     grid: {
-                      color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       lineWidth: 1
                     },
                     ticks: {
                       display: false,
                     },
                     min: Math.floor(
-                      Math.min(0, Math.min(...machines.filter((machine) => machine.hourTarget !== 0).map((machine) => machine.hourTarget)) * 1.2) / 5
+                      Math.min(0, Math.min(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2) / 5
                     ) * 5,
 
                     max: Math.ceil(
-                      Math.max(...machines.filter((machine) => machine.hourTarget !== 0).map((machine) => machine.hourTarget)) * 1.2 / 5
+                      Math.max(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2 / 5
                     ) * 5,
 
                   },
@@ -335,7 +301,7 @@ const HomePage = () => {
 
 
           {/* Biểu đồ Sản Lượng Thực Tế */}
-          <div className={`flex-1 ${isDarkMode ? 'bg-secondary text-text-dark' : 'bg-bg-light text-text-light'} rounded-lg p-2 md:py-8 transition-transform shadow-[inset_0px_0px_4px_rgba(255,255,255,1)] ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
+          <div className={`flex-1 ${isDark ? 'bg-secondary text-text-dark shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]' : 'bg-gray-300 text-text-light shadow-[inset_0px_0px_4px_rgba(0,0,0,1)]'} rounded-lg p-2 md:py-8 transition-transform ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-between item-center' >
               <div className="flex space-x-20 text-sm text-center font-bold item-center gap-x-2 select-none" onClick={() => setShowPerformance((prev) => !prev)}>
                 HIỆU SUẤT (%)
@@ -352,11 +318,11 @@ const HomePage = () => {
 
             <Bar className='px-7'
               data={{
-                labels: filteredMachines.map((machine) => machine.name),
+                labels: filteredMachines.filter(machine => machine.enable).map((machine) => machine.name),
                 datasets: [
                   showPerformance && {
                     label: 'Hiệu Suất',
-                    data: filteredMachines.map((machine) => machine.performance),
+                    data: filteredMachines.filter(machine => machine.enable).map((machine) => machine.performance),
                     borderColor: '#c40005',
                     backgroundColor: 'rgba(255, 99, 71, 0.2)',
                     type: 'line',
@@ -369,7 +335,7 @@ const HomePage = () => {
                   },
                   showActual && {
                     label: 'Thực Hiện',
-                    data: filteredMachines.map((machine) => machine.actual),
+                    data: filteredMachines.filter(machine => machine.enable).map((machine) => machine.actual),
                     backgroundColor: '#33cde5',
                     borderColor: '#111111',
                     borderWidth: 1,
@@ -381,14 +347,14 @@ const HomePage = () => {
                       align: 'start',
                       anchor: 'end',
                       offset: -20,
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                       font: {
                         size: 14,
                         weight: 'bold',
                       },
                     },
                   },
-                ].filter(Boolean),
+                ].filter(Boolean) as any,
               }}
               options={{
                 responsive: true,
@@ -397,7 +363,7 @@ const HomePage = () => {
                 scales: {
                   x: {
                     grid: {
-                      color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       lineWidth: 1
                     },
                     ticks: {
@@ -405,13 +371,13 @@ const HomePage = () => {
                         weight: 'bold',
                         size: 14,
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
                   },
                   y: {
                     stacked: true,
                     grid: {
-                      color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       lineWidth: 1
                     },
                     ticks: {
@@ -419,7 +385,7 @@ const HomePage = () => {
                         weight: 'bold',
                         size: 14,
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
                     min: 0,
                     max: 100,
@@ -428,7 +394,7 @@ const HomePage = () => {
                     stacked: false,
                     position: 'right',
                     grid: {
-                      color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                      color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                       lineWidth: 1
                     },
                     ticks: {
@@ -436,12 +402,12 @@ const HomePage = () => {
                         weight: 'bold',
                         size: 14,
                       },
-                      color: isDarkMode ? '#ffffff' : '#333333',
+                      color: isDark ? '#ffffff' : '#333333',
                     },
 
                     min: 0,
                     max: Math.ceil(
-                      Math.max(...filteredMachines.map((machine) => machine.actual)) * 1.2 / 50
+                      Math.max(...filteredMachines.filter(machine => machine.enable).map((machine) => machine.actual)) * 1.2 / 50
                     ) * 50,
                   },
                 },
@@ -496,7 +462,7 @@ const HomePage = () => {
 
         </div>
 
-        <div className={` font-semibold flex space-x-20 justify-between p-0 py-2 ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
+        <div className={` font-semibold flex space-x-20 justify-between p-0 py-2 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
           <div className=' flex justify-start'>
             <div className="select-none">
               Số Line đang hoạt động: {enabledCount}/{idCount}
@@ -535,14 +501,14 @@ const HomePage = () => {
                 </div>
               ) : (
                 machines.map((machine) => (
-                  <Card key={machine.id} machine={machine} isDarkMode={isDarkMode} />
+                  <Card key={machine.id} machine={machine} isDarkMode={isDark} />
                 ))
               )
             )}
           </div>
         </div>
 
-        <div className={`${isDarkMode ? "text-text-dark" : "text-text-light"} font-semibold flex flex-col justify-center items-center h-screen px-8 text-2xl relative`}>
+        <div className={`${isDark ? "text-text-dark" : "text-text-light"} font-semibold flex flex-col justify-center items-center h-screen px-8 text-2xl relative`}>
           {/* Nội dung trạng thái */}
           <div className="space-x-20 flex items-center mb-0">
             <div className="flex items-center space-x-2">
@@ -562,24 +528,18 @@ const HomePage = () => {
           {/* Nút cuộn trước và sau */}
           <button
             onClick={handleScrollPrev}
-            className={`absolute left-5 top-[50%] transform -translate-y-[50%] ${isDarkMode ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} border-2 rounded-xl bg-transparen text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
+            className={`absolute left-5 top-[50%] transform -translate-y-[50%] ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} border-2 rounded-xl bg-transparen text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
           >
             &lt;
           </button>
 
           <button
             onClick={handleScrollNext}
-            className={`absolute right-5 top-[50%] transform -translate-y-[50%] ${isDarkMode ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} border-2 rounded-xl bg-transparent  text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
+            className={`absolute right-5 top-[50%] transform -translate-y-[50%] ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} border-2 rounded-xl bg-transparent  text-2xl w-10 h-10 flex items-center justify-center hover:scale-[150%] transition-transform duration-300 z-10`}
           >
             &gt;
           </button>
         </div>
-
-
-
-
-
-
       </div >
     </>
   );

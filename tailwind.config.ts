@@ -27,8 +27,9 @@ const config: Config = {
         // Màu nền
         'bg-dark': '#121C33',      // Nền tối
         'bg-light': '#e6e6e6',     // Nền sáng
-        'bg-table': '#20335d',     // Nền bảng
-        'bg-tableIn': '#041847',   // Nền ô trong bảng
+        'bg-table': '#041847',     // Nền bảng
+        'bg-tableIn': '#20335d',   // Nền ô trong bảng
+        'bg-tableOut': '#163374',  // Nền ô ngoại bảng
 
         // Màu sidebar
         'sideBar-dark': '#0E1626', // Sidebar tối

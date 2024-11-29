@@ -3,6 +3,7 @@
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import React, { useEffect, useState } from 'react';
+import { fetchMachines } from '@/services/api';
 
 // Định nghĩa kiểu dữ liệu cho máy
 interface Machine {
@@ -21,17 +22,19 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, T
 const TargetChart: React.FC = () => {
     const [machines, setMachines] = useState<Machine[]>([]);
 
-    // Lấy dữ liệu máy từ API
     useEffect(() => {
-        const fetchMachines = async () => {
-            const response = await fetch('/api/machines');
-            const data = await response.json();
-            setMachines(data);
+        const fetchData = async () => {
+            try {
+                const data = await fetchMachines();
+                setMachines(data);
+            } catch (error) {
+                console.error('Error fetching machines:', error);
+            }
         };
 
-        fetchMachines();
-        const interval = setInterval(fetchMachines, 500); // Cập nhật mỗi 500ms
-        return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
+        fetchData();
+        const interval = setInterval(fetchData, 500);
+        return () => clearInterval(interval);
     }, []);
 
     // Tạo dữ liệu cho biểu đồ

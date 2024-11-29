@@ -1,33 +1,30 @@
-'use client'; // Đánh dấu đây là Client Component
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
-import Header from './components/Header'; // Import Header component
-import './globals.css'; // Nhập vào file CSS
-import Footer from './components/Footer'; // Import Footer component
+import Header from './components/Header';
+import './globals.css';
+import Footer from './components/Footer';
 import { IoMenuOutline } from "react-icons/io5";
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { isMobile, isTablet } from 'react-device-detect';
+import { ThemeProvider, useTheme } from './context/ThemeContext'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Quản lý trạng thái của Sidebar
-  const sidebarRef = useRef<HTMLDivElement>(null); // Tạo ref cho sidebar
-  const buttonRef = useRef<HTMLButtonElement>(null); // Ref cho nút bấm
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+// Component con sử dụng useTheme
+const MainContent = ({ children }: { children: React.ReactNode }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const [showError, setShowError] = useState(false);
+  const { isDark } = useTheme();
 
   useEffect(() => {
-    const isPhone = isMobile && !isTablet;
-    if (isPhone) {
-      setShowError(true);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // Hàm để toggle trạng thái của sidebar
@@ -79,20 +76,48 @@ export default function RootLayout({
     };
   }, [pathname, router]);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme"); // Lấy giá trị từ localStorage
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === "dark");
-    } else {
-      // Nếu không có giá trị, kiểm tra hệ thống của người dùng
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(prefersDark);
-    }
+  return (
+    <div className="flex flex-col flex-1 pb-[25px] relative">
+      {/* Truyền toggleSidebar vào Header */}
+      <Header toggleSidebar={toggleSidebar} />
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+      {/* Nút để điều khiển Sidebar */}
+      <button
+        ref={buttonRef}
+        onClick={toggleSidebar}
+        className="absolute top-2 left-5 rounded-md z-40 flex items-center bg-transparent"
+      >
+        <IoMenuOutline className={`text-[50px] ${isDark ? 'text-text-dark' : 'text-text-light'}`} />
+      </button>
+
+      {/* Main content area */}
+      <div className={`flex flex-1 transition-all`}>
+        {/* Sidebar */}
+        <div ref={sidebarRef}>
+          <Sidebar isOpen={sidebarOpen} />
+        </div>
+
+        {/* Nội dung chính */}
+        <main className={`flex-1 p-0 transition-all scrollbar-none scrollbar-hidden`}>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [showError, setShowError] = useState(false);
+
+  useEffect(() => {
+    const isPhone = isMobile && !isTablet;
+    if (isPhone) {
+      setShowError(true);
+    }
   }, []);
 
   if (showError) {
@@ -115,35 +140,12 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none">
-        <div className="flex flex-col flex-1 pb-[25px] relative">
-          {/* Truyền toggleSidebar vào Header */}
-          <Header toggleSidebar={toggleSidebar} />
-
-          {/* Nút để điều khiển Sidebar */}
-          <button
-            ref={buttonRef}
-            onClick={toggleSidebar}
-            className="absolute top-2 left-5 rounded-md z-40 flex items-center bg-transparent"
-          >
-            <IoMenuOutline className={`text-[50px] ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`} />
-          </button>
-
-          {/* Main content area */}
-          <div className={`flex flex-1 transition-all`}>
-            {/* Sidebar */}
-            <div ref={sidebarRef}>
-              <Sidebar isOpen={sidebarOpen} />
-            </div>
-
-            {/* Nội dung chính */}
-            <main className={`flex-1 p-0 transition-all scrollbar-none scrollbar-hidden`}>
-              {children}
-            </main>
-          </div>
-        </div>
-
-        {/* Footer bám dính dưới cùng */}
-        <Footer />
+        <ThemeProvider>
+          <MainContent>
+            {children}
+          </MainContent>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

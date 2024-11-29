@@ -1,8 +1,10 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
+import { useTheme } from "../context/ThemeContext";
+import { fetchMachines, updateMachine } from '@/services/api';
 
 interface Machine {
     id: number;
@@ -22,9 +24,25 @@ const DetailPage = () => {
     const [machines, setMachines] = useState<Machine[]>([]);
     const [editedMachines, setEditedMachines] = useState<{ [key: number]: Partial<Machine> }>([]);
     const [isFullScreen, setIsFullScreen] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
+    const { isDark } = useTheme();
+
+    // Refs for input fields
+    const inputRefs = {
+        morning: {
+            hour1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+            hour2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+            minute1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+            minute2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+        },
+        afternoon: {
+            hour1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+            hour2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+            minute1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+            minute2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
+        }
+    };
 
     // Wrap fetchMachineData trong useCallback
     const fetchMachineData = useCallback(async () => {
@@ -32,11 +50,7 @@ const DetailPage = () => {
             if (isFirstLoad) {
                 setIsLoading(true);
             }
-            const response = await fetch("/api/machines");
-            if (!response.ok) {
-                throw new Error("API response not ok");
-            }
-            const data = await response.json();
+            const data = await fetchMachines();
             setMachines(data);
             if (isFirstLoad) {
                 setIsFirstLoad(false);
@@ -48,21 +62,11 @@ const DetailPage = () => {
                 setIsLoading(false);
             }
         }
-    }, [isFirstLoad]); // Empty dependency array because it doesn't depend on any props or state
+    }, [isFirstLoad]);
 
     const checkFullScreen = useCallback(() => {
         const isFullScreenNow = window.innerHeight === screen.height;
         setIsFullScreen(isFullScreenNow);
-    }, []);
-
-    const initializeTheme = useCallback(() => {
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme) {
-            setIsDarkMode(savedTheme === "dark");
-        } else {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            setIsDarkMode(prefersDark);
-        }
     }, []);
 
     const FETCH_INTERVAL = 1000; // 1 second for API calls
@@ -71,7 +75,6 @@ const DetailPage = () => {
     // Thiết lập các hiệu ứng UI
     useEffect(() => {
         // Initial setup
-        initializeTheme();
         document.addEventListener("fullscreenchange", checkFullScreen);
         checkFullScreen();
 
@@ -79,14 +82,6 @@ const DetailPage = () => {
         const intervalId = setInterval(() => {
             document.addEventListener("fullscreenchange", checkFullScreen);
             checkFullScreen();
-
-            const savedTheme = localStorage.getItem("theme");
-            if (savedTheme) {
-                setIsDarkMode(savedTheme === "dark");
-            } else {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                setIsDarkMode(prefersDark);
-            }
         }, UI_UPDATE_INTERVAL);
 
         // Cleanup
@@ -116,7 +111,6 @@ const DetailPage = () => {
 
     const handleChangeStateMachine = async (machineId: number, field: keyof Machine, value: any) => {
         try {
-            // Cập nhật state local trước
             setEditedMachines(prev => ({
                 ...prev,
                 [machineId]: {
@@ -125,23 +119,10 @@ const DetailPage = () => {
                 }
             }));
 
-            // Gọi API để cập nhật
-            const response = await fetch(`/api/machines/${machineId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    [field]: value
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update machine status');
-            }
+            await updateMachine(machineId, { [field]: value });
 
             toast.success('Cập nhật trạng thái thành công!', {
-                position: "top-right",
+                position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -150,25 +131,17 @@ const DetailPage = () => {
                 progress: undefined,
             });
 
-            // Cập nhật lại dữ liệu
             fetchMachineData();
         } catch (error) {
             console.error('Error updating machine status:', error);
             toast.error('Cập nhật trạng thái thất bại!', {
-                position: "top-right",
+                position: "top-center",
                 autoClose: 1000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-            });
-
-            // Rollback state nếu API thất bại
-            setEditedMachines(prev => {
-                const newState = { ...prev };
-                delete newState[machineId];
-                return newState;
             });
         }
     };
@@ -176,17 +149,33 @@ const DetailPage = () => {
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>, machineId: number) => {
         if (e.key === 'Enter') {
             try {
-                const response = await fetch(`/api/machines/${machineId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(editedMachines[machineId]),
-                });
+                const editedMachine = editedMachines[machineId];
+                if (!editedMachine) return;
 
-                if (!response.ok) {
-                    throw new Error('Failed to update machine');
+                const originalMachine = machines.find(m => m.id === machineId);
+                if (!originalMachine) return;
+
+                // Tạo mảng lưu các thay đổi
+                const changes: string[] = [];
+
+                // So sánh và ghi nhận các thay đổi
+                if (editedMachine.name !== undefined && editedMachine.name !== originalMachine.name) {
+                    changes.push(`Tên: ${originalMachine.name} → ${editedMachine.name}`);
                 }
+                if (editedMachine.dailyTarget !== undefined && editedMachine.dailyTarget !== originalMachine.dailyTarget) {
+                    changes.push(`Mục tiêu ngày: ${originalMachine.dailyTarget} → ${editedMachine.dailyTarget}`);
+                }
+                if (editedMachine.actual !== undefined && editedMachine.actual !== originalMachine.actual) {
+                    changes.push(`Thực hiện: ${originalMachine.actual} → ${editedMachine.actual}`);
+                }
+                if (editedMachine.morningTime !== undefined && editedMachine.morningTime !== originalMachine.morningTime) {
+                    changes.push(`Ca sáng: ${originalMachine.morningTime} → ${editedMachine.morningTime}`);
+                }
+                if (editedMachine.afternoonTime !== undefined && editedMachine.afternoonTime !== originalMachine.afternoonTime) {
+                    changes.push(`Ca chiều: ${originalMachine.afternoonTime} → ${editedMachine.afternoonTime}`);
+                }
+
+                await updateMachine(machineId, editedMachine);
 
                 // Xóa dữ liệu đã chỉnh sửa sau khi cập nhật thành công
                 setEditedMachines(prev => {
@@ -195,54 +184,64 @@ const DetailPage = () => {
                     return newState;
                 });
 
-                toast.success('Cập nhật thành công!', {
-                    position: "top-right",
-                    autoClose: 1000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                // Hiển thị thông báo với chi tiết thay đổi
+                if (changes.length > 0) {
+                    toast.success(
+                        <div>
+                            <div className="font-bold mb-2">Cập nhật thành công Line {machineId}:</div>
+                            {changes.map((change, index) => (
+                                <div key={index} className="ml-2">• {change}</div>
+                            ))}
+                        </div>,
+                        {
+                            position: "top-center",
+                            autoClose: 3000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                        }
+                    );
+                }
+
             } catch (error) {
-                console.error('Error updating machine:', error);
-                toast.error('Cập nhật thất bại!', {
-                    position: "top-right",
-                    autoClose: 1000,
+                console.error('Error:', error);
+                toast.error('Có lỗi xảy ra khi cập nhật!', {
+                    position: "top-center",
+                    autoClose: 3000,
                     hideProgressBar: false,
                     closeOnClick: true,
                     pauseOnHover: true,
                     draggable: true,
-                    progress: undefined,
                 });
             }
         }
     };
 
-    const enabledCount = machines.filter((machine) => machine.enable || (!machine.isConnect)).length;
+    const enabledCount = machines.filter((machine) => machine.enable).length;
     const idCount = machines.filter((machine) => machine.id).length;
 
     return (
-        <div className={`px-2 h-full ${isDarkMode ? 'text-text-dark bg-bg-dark' : 'text-text-light bg-bg-light'}`}>
-            {isFirstLoad && isLoading && <Loading isDarkMode={isDarkMode} />}
-            <CustomToast isDarkMode={isDarkMode} />
+        <div className={`px-2 h-full ${isDark ? 'text-text-dark bg-bg-dark' : 'text-text-light bg-bg-light'}`}>
+            {isFirstLoad && isLoading && <Loading isDarkMode={isDark} />}
+            <CustomToast isDarkMode={isDark} />
             {/* Bảng 1: Trạng Thái */}
             <div>
                 <div className="flex justify-between items-center py-2 ">
-                    <div className={`text-lg select-none ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
+                    <div className={`text-lg select-none ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
                         Số Line đang hoạt động: {enabledCount}/{idCount}
                     </div>
-                    <h2 className={`text-xl ${isFullScreen ? "text-3xl" : "text-xl"} font-bold select-none text-center ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
+                    <h2 className={`text-xl ${isFullScreen ? "text-3xl" : "text-xl"} font-bold select-none text-center ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
                         Bảng Trạng Thái
                     </h2>
                     <div className="w-[250px]"></div>
                 </div>
                 <div className="overflow-x-auto mb-2 text-lg shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
-                    <table className={`table-auto w-full border-collapse border-2 ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>
+                    <table className={`table-auto w-full border-collapse border-2 ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
                             <tr>
                                 {machines.slice(0, 15).map((machine) => (
-                                    <th key={machine.id} className={`border-2 text-text-dark ${isDarkMode ? 'border-border-dark' : 'border-border-light'} px-4 py-0 text-center ${machine.enable ? "bg-connect" : "bg-notConnect"}`}>
+                                    <th key={machine.id} className={`border-2 text-text-dark ${isDark ? 'border-border-dark' : 'border-border-light'} px-4 py-0 text-center ${machine.enable ? "bg-connect" : "bg-notConnect"}`}>
                                         {machine.id}
                                     </th>
                                 ))}
@@ -253,7 +252,7 @@ const DetailPage = () => {
                                 {machines.slice(0, 15).map((machine) => (
                                     <td
                                         key={machine.id}
-                                        className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer`}
+                                        className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer`}
                                         onClick={() => handleChangeStateMachine(machine.id, "enable", !(editedMachines[machine.id]?.enable ?? machine.enable))}
                                     >
                                         <div className="flex justify-center items-center h-full">
@@ -275,20 +274,20 @@ const DetailPage = () => {
             </div>
             {/* Bảng 2: Cài Đặt */}
             <div>
-                <h2 className={` font-bold mb-2 select-none text-center ${isFullScreen ? "text-3xl" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
+                <h2 className={` font-bold mb-2 select-none text-center ${isFullScreen ? "text-3xl" : "text-xl"} ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
                     Bảng Cài Đặt
                 </h2>
                 <div className="overflow-x-auto text-lg shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
-                    <table className={`table-auto w-full border-collapse border-2 ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>
+                    <table className={`table-auto w-full border-collapse border-2 ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
-                            <tr className={`${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>ID</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Tên</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Mục Tiêu Ngày</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Thực Hiện</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Ca Sáng</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'} text-2xl`}>Ca Chiều</th>
-                                <th className={`border-2 border-black text-2xl ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>Trạng Thái Kết Nối</th>
+                            <tr className={`${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>ID</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Tên</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Mục Tiêu Ngày</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thực Hiện</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Sáng</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Chiều</th>
+                                <th className={`border-2 border-black ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Trạng Thái Kết Nối</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -297,162 +296,329 @@ const DetailPage = () => {
                                     <td colSpan={7} className="text-center py-4">Không có dữ liệu</td>
                                 </tr>
                             ) : (
-                                machines.map((machine) => {
-                                    // Nếu máy không được enable, trả về null để không hiển thị dòng
-                                    if (!machine.enable) {
-                                        return null;
-                                    }
+                                machines.filter(machine => machine.enable).map((machine, index) => (
+                                    <tr key={machine.id} className={`${index % 2 === 0
+                                        ? isDark ? "bg-bg-tableIn text-text-dark" : "bg-gray-100 text-text-light"
+                                        : isDark ? "bg-bg-tableOut text-text-dark" : "bg-gray-300 text-text-light"} 
+                                ${!machine.isConnect ? "blink animate-blink opacity-60" : ""}`}>
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
+                                            {machine.id}
+                                        </td>
+                                        {/* Tên */}
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold text-center w-1/2">{machine.name}</span>
+                                                <input
+                                                    type="text"
+                                                    value={editedMachines[machine.id]?.name ?? ""}
+                                                    onChange={(e) => handleChange(machine.id, "name", e.target.value)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
+                                                    disabled={!machine.isConnect}
+                                                />
+                                            </div>
+                                        </td>
 
-                                    return (
-                                        <tr key={machine.id} className={` ${machine.isConnect ? isDarkMode ? "bg-secondary text-text-dark" : "bg-bg-light text-text-light" : isDarkMode ? "bg-error opacity-80 blink" : "bg-error opacity-80 blink"}`}>
-                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                                {machine.id}
-                                            </td>
-                                            {/* Tên */}
-                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-semibold text-center w-1/2">{machine.name}</span>
-                                                    <input
-                                                        type="text"
-                                                        value={editedMachines[machine.id]?.name ?? ""}
-                                                        onChange={(e) => handleChange(machine.id, "name", e.target.value)}
-                                                        onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                        className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent`}
-                                                        disabled={!machine.isConnect}
-                                                    />
-                                                </div>
-                                            </td>
+                                        {/* Mục tiêu ngày */}
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.dailyTarget}</span>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="999"
+                                                    value={editedMachines[machine.id]?.dailyTarget ?? ""}
+                                                    onChange={(e) => {
+                                                        const value = Number(e.target.value);
+                                                        if (value >= 0 && value <= 999) {
+                                                            handleChange(machine.id, "dailyTarget", value);
+                                                        }
+                                                    }}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
+                                                    disabled={!machine.isConnect}
+                                                />
+                                            </div>
+                                        </td>
 
-                                            {/* Mục tiêu ngày */}
-                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-semibold px-2 text-center w-1/2">{machine.dailyTarget}</span>
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        max="999"
-                                                        value={editedMachines[machine.id]?.dailyTarget ?? ""}
-                                                        onChange={(e) => {
-                                                            const value = Number(e.target.value);
-                                                            if (value >= 0 && value <= 999) {
-                                                                handleChange(machine.id, "dailyTarget", value);
-                                                            }
-                                                        }}
-                                                        onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                        className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent`}
-                                                        disabled={!machine.isConnect}
-                                                    />
-                                                </div>
-                                            </td>
+                                        {/* Thực hiện */}
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.actual}</span>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="999"
+                                                    value={editedMachines[machine.id]?.actual ?? ""}
+                                                    onChange={(e) => {
+                                                        const value = Number(e.target.value);
+                                                        if (value >= 0 && value <= 999) {
+                                                            handleChange(machine.id, "actual", value);
+                                                        }
+                                                    }}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
+                                                    disabled={!machine.isConnect}
+                                                />
+                                            </div>
+                                        </td>
 
-                                            {/* Thực hiện */}
-                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-semibold px-2 text-center w-1/2">{machine.actual}</span>
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        max="999"
-                                                        value={editedMachines[machine.id]?.actual ?? ""}
-                                                        onChange={(e) => {
-                                                            const value = Number(e.target.value);
-                                                            if (value >= 0 && value <= 999) {
-                                                                handleChange(machine.id, "actual", value);
-                                                            }
-                                                        }}
-                                                        onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                        className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent`}
-                                                        disabled={!machine.isConnect}
-                                                    />
-                                                </div>
-                                            </td>
-
-                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-semibold px-2 text-center w-1/2">{machine.morningTime}</span>
-                                                    <div className="flex items-center w-1/2 mr-10">
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.morningTime}</span>
+                                                <div className="flex items-center w-1/2 mr-10">
+                                                    <div className="flex items-center gap-1">
                                                         <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="24"
-                                                            onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                            value={editedMachines[machine.id]?.morningTime?.split(":")[0] ?? ""}
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.morningTime?.split(":")[0]?.charAt(0) ?? ""}
                                                             onChange={(e) => {
-                                                                const hours = Math.min(24, Math.max(0, Number(e.target.value)));
-                                                                const minutes = editedMachines[machine.id]?.morningTime?.split(":")[1] ?? "00";
-                                                                handleChange(machine.id, "morningTime", `${hours}:${minutes}`);
+                                                                const value = e.target.value;
+                                                                if (/^[0-2]$/.test(value)) {
+                                                                    const currentHours = editedMachines[machine.id]?.morningTime?.split(":")[0] ?? "00";
+                                                                    const newHours = value + currentHours.charAt(1);
+                                                                    const minutes = editedMachines[machine.id]?.morningTime?.split(":")[1] ?? "00";
+                                                                    handleChange(machine.id, "morningTime", `${newHours}:${minutes}`);
+                                                                    inputRefs.morning.hour2[machine.id]?.focus();
+                                                                }
                                                             }}
-                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-2]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.morning.hour1[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
                                                             disabled={!machine.isConnect}
                                                         />
-                                                        <span className="mx-1 font-bold">:</span>
                                                         <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="59"
-                                                            onKeyDown={(e) => handleKeyDown(e, machine.id)}
-                                                            value={editedMachines[machine.id]?.morningTime?.split(":")[1] ?? ""}
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.morningTime?.split(":")[0]?.charAt(1) ?? ""}
                                                             onChange={(e) => {
-                                                                const minutes = Math.min(59, Math.max(0, Number(e.target.value)));
-                                                                const hours = editedMachines[machine.id]?.morningTime?.split(":")[0] ?? "00";
-                                                                handleChange(machine.id, "morningTime", `${hours}:${minutes}`);
+                                                                const value = e.target.value;
+                                                                if (/^[0-9]$/.test(value)) {
+                                                                    const currentHours = editedMachines[machine.id]?.morningTime?.split(":")[0] ?? "00";
+                                                                    const firstDigit = currentHours.charAt(0);
+                                                                    if ((firstDigit === "2" && parseInt(value) <= 4) || firstDigit !== "2") {
+                                                                        const newHours = currentHours.charAt(0) + value;
+                                                                        const minutes = editedMachines[machine.id]?.morningTime?.split(":")[1] ?? "00";
+                                                                        handleChange(machine.id, "morningTime", `${newHours}:${minutes}`);
+                                                                        inputRefs.morning.minute1[machine.id]?.focus();
+                                                                    }
+                                                                }
                                                             }}
-                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-9]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.morning.hour2[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
+                                                            disabled={!machine.isConnect}
+                                                        />
+                                                    </div>
+                                                    <span className="mx-1 font-bold">:</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <input
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.morningTime?.split(":")[1]?.charAt(0) ?? ""}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (/^[0-5]$/.test(value)) {
+                                                                    const currentMinutes = editedMachines[machine.id]?.morningTime?.split(":")[1] ?? "00";
+                                                                    const newMinutes = value + currentMinutes.charAt(1);
+                                                                    const hours = editedMachines[machine.id]?.morningTime?.split(":")[0] ?? "00";
+                                                                    handleChange(machine.id, "morningTime", `${hours}:${newMinutes}`);
+                                                                    inputRefs.morning.minute2[machine.id]?.focus();
+                                                                }
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-5]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.morning.minute1[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
+                                                            disabled={!machine.isConnect}
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.morningTime?.split(":")[1]?.charAt(1) ?? ""}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (/^[0-9]$/.test(value)) {
+                                                                    const currentMinutes = editedMachines[machine.id]?.morningTime?.split(":")[1] ?? "00";
+                                                                    const newMinutes = currentMinutes.charAt(0) + value;
+                                                                    const hours = editedMachines[machine.id]?.morningTime?.split(":")[0] ?? "00";
+                                                                    handleChange(machine.id, "morningTime", `${hours}:${newMinutes}`);
+                                                                }
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-9]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.morning.minute2[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
                                                             disabled={!machine.isConnect}
                                                         />
                                                     </div>
                                                 </div>
-                                            </td>
+                                            </div>
+                                        </td>
 
-                                            <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDarkMode ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'}`}>
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-semibold px-2 text-center w-1/2">{machine.afternoonTime}</span>
-                                                    <div className="flex items-center w-1/2 mr-10">
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.afternoonTime}</span>
+                                                <div className="flex items-center w-1/2 mr-10">
+                                                    <div className="flex items-center gap-1">
                                                         <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="24"
-                                                            value={editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? ""}
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.afternoonTime?.split(":")[0]?.charAt(0) ?? ""}
                                                             onChange={(e) => {
-                                                                const hours = Math.min(24, Math.max(0, Number(e.target.value)));
-                                                                const minutes = editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? "00";
-                                                                handleChange(machine.id, "afternoonTime", `${hours}:${minutes}`);
+                                                                const value = e.target.value;
+                                                                if (/^[0-2]$/.test(value)) {
+                                                                    const currentHours = editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? "00";
+                                                                    const newHours = value + currentHours.charAt(1);
+                                                                    const minutes = editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? "00";
+                                                                    handleChange(machine.id, "afternoonTime", `${newHours}:${minutes}`);
+                                                                    inputRefs.afternoon.hour2[machine.id]?.focus();
+                                                                }
                                                             }}
-                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-2]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.afternoon.hour1[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
                                                             disabled={!machine.isConnect}
                                                         />
-                                                        <span className="mx-1 font-bold">:</span>
                                                         <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="59"
-                                                            value={editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? ""}
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.afternoonTime?.split(":")[0]?.charAt(1) ?? ""}
                                                             onChange={(e) => {
-                                                                const minutes = Math.min(59, Math.max(0, Number(e.target.value)));
-                                                                const hours = editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? "00";
-                                                                handleChange(machine.id, "afternoonTime", `${hours}:${minutes}`);
+                                                                const value = e.target.value;
+                                                                if (/^[0-9]$/.test(value)) {
+                                                                    const currentHours = editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? "00";
+                                                                    const firstDigit = currentHours.charAt(0);
+                                                                    if ((firstDigit === "2" && parseInt(value) <= 4) || firstDigit !== "2") {
+                                                                        const newHours = currentHours.charAt(0) + value;
+                                                                        const minutes = editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? "00";
+                                                                        handleChange(machine.id, "afternoonTime", `${newHours}:${minutes}`);
+                                                                        inputRefs.afternoon.minute1[machine.id]?.focus();
+                                                                    }
+                                                                }
                                                             }}
-                                                            className={`w-12 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDarkMode ? 'text-text-dark' : 'text-text-light'} bg-transparent border-b border-border-dark text-center focus:outline-none focus:border-b focus:border-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-9]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.afternoon.hour2[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
+                                                            disabled={!machine.isConnect}
+                                                        />
+                                                    </div>
+                                                    <span className="mx-1 font-bold">:</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <input
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.afternoonTime?.split(":")[1]?.charAt(0) ?? ""}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (/^[0-5]$/.test(value)) {
+                                                                    const currentMinutes = editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? "00";
+                                                                    const newMinutes = value + currentMinutes.charAt(1);
+                                                                    const hours = editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? "00";
+                                                                    handleChange(machine.id, "afternoonTime", `${hours}:${newMinutes}`);
+                                                                    inputRefs.afternoon.minute2[machine.id]?.focus();
+                                                                }
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-5]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.afternoon.minute1[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
+                                                            disabled={!machine.isConnect}
+                                                        />
+                                                        <input
+                                                            type="text"
+                                                            maxLength={1}
+                                                            value={editedMachines[machine.id]?.afternoonTime?.split(":")[1]?.charAt(1) ?? ""}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (/^[0-9]$/.test(value)) {
+                                                                    const currentMinutes = editedMachines[machine.id]?.afternoonTime?.split(":")[1] ?? "00";
+                                                                    const newMinutes = currentMinutes.charAt(0) + value;
+                                                                    const hours = editedMachines[machine.id]?.afternoonTime?.split(":")[0] ?? "00";
+                                                                    handleChange(machine.id, "afternoonTime", `${hours}:${newMinutes}`);
+                                                                }
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    handleKeyDown(e, machine.id);
+                                                                } else if (/^[0-9]$/.test(e.key)) {
+                                                                    e.currentTarget.select();
+                                                                }
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) inputRefs.afternoon.minute2[machine.id] = el;
+                                                            }}
+                                                            className={`w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`}
                                                             disabled={!machine.isConnect}
                                                         />
                                                     </div>
                                                 </div>
-                                            </td>
+                                            </div>
+                                        </td>
 
-                                            {/* Trạng Thái Kết Nối */}
-                                            <td className={`border-2 text-center w-[25vh] ${isFullScreen ? " py-0.5 text-2xl" : " text-xl"} ${isDarkMode ? 'border-border-dark' : 'border-border-light'}`}>
-                                                <div className="flex justify-center items-center h-full">
-                                                    <span
-                                                        className={`p-1.5 font-semibold text-text-dark w-full h-full flex items-center justify-center ${machine.isConnect ? "bg-connect" : "bg-notConnect"
-                                                            } shadow-inner shadow-[inset_0px_0px_10px_rgba(255,255,255,1)]`}
-                                                    >
-                                                        {machine.isConnect ? "Kết Nối" : "Mất Kết Nối"}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
+                                        {/* Trạng Thái Kết Nối */}
+                                        <td className={`border-2 text-center w-[25vh] ${isFullScreen ? " py-0.5 text-2xl" : " text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                            <div className="flex justify-center items-center h-full">
+                                                <span className={`p-1.5 font-semibold text-text-dark w-full h-full flex items-center justify-center ${machine.isConnect ? "bg-connect" : "bg-error opacity-80 blink"}`}>
+                                                    {machine.isConnect ? "Kết Nối" : "Mất Kết Nối"}
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>

@@ -19,10 +19,10 @@ const Card = ({ machine, isDarkMode }: CardProps) => {
     <div className="block relative w-[calc(100%/5.08)] flex-shrink-0 hover:scale-[105%] transition-transform select-none">
       <div
         className={`py-8 rounded-2xl ${isDarkMode ? 'text-white' : 'text-black'} shadow-inner shadow-[inset_0px_0px_15px_rgba(255,255,255,0.8)] flex flex-col items-center justify-between ${
-          !machine.isConnect
-            ? "bg-notConnect disabled shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]"
-            : !machine.enable
-              ? "bg-gray-400 text-gray-200 opacity-30"
+          !machine.enable
+            ? "bg-gray-400 text-gray-200 opacity-30"
+            : !machine.isConnect
+              ? "bg-notConnect disabled shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]"
               : "bg-connect shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]"
         }`}
       >

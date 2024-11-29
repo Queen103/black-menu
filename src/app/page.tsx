@@ -7,6 +7,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Card from "./components/Card";
 import Loading from "./components/Loading";
 import { useTheme } from './context/ThemeContext';
+import { useFullScreen } from './context/FullScreenContext';
 import { fetchMachines } from '@/services/api';
 import { fetchCpuData, type CpuData } from '@/services/api/cpu';
 
@@ -36,8 +37,9 @@ const HomePage = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [showPerformance, setShowPerformance] = useState(true);
   const [showActual, setShowActual] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const { isDark } = useTheme();
+  const { isFullScreen } = useFullScreen();
+
   // Optimized fetch functions with useCallback
   const fetchMachineData = useCallback(async () => {
     try {
@@ -65,12 +67,6 @@ const HomePage = () => {
     } catch (error) {
       console.error("Lỗi khi gọi API CPU:", error);
     }
-  }, []);
-
-  // Optimized fullscreen check with useCallback
-  const checkFullScreen = useCallback(() => {
-    const isFullScreenNow = window.innerHeight === screen.height;
-    setIsFullScreen(isFullScreenNow);
   }, []);
 
   // Optimized calculations with useMemo
@@ -104,9 +100,6 @@ const HomePage = () => {
 
   // Effects
   useEffect(() => {
-    document.addEventListener("fullscreenchange", checkFullScreen);
-    checkFullScreen();
-
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "ArrowLeft") {
         handleScrollPrev();
@@ -117,19 +110,15 @@ const HomePage = () => {
     document.addEventListener("keydown", handleKeyPress);
 
     const intervalId = setInterval(() => {
-      document.addEventListener("fullscreenchange", checkFullScreen);
-      checkFullScreen();
-
       fetchMachineData();
       fetchCpuDataHandler();
     }, FETCH_INTERVAL);
 
     return () => {
       clearInterval(intervalId);
-      document.removeEventListener("fullscreenchange", checkFullScreen);
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [fetchMachineData, fetchCpuDataHandler, checkFullScreen, handleScrollNext, handleScrollPrev]);
+  }, [fetchMachineData, fetchCpuDataHandler, handleScrollNext, handleScrollPrev]);
 
   useEffect(() => {
     const autoScrollInterval = setInterval(() => {
@@ -149,7 +138,7 @@ const HomePage = () => {
   return (
     <>
       {isLoading && <Loading isDarkMode={isDark} />}
-      <div className={`p-3 overflow-hidden ${isFullScreen ? "h-[92vh]" : "h-[91vh]"} relative flex flex-col justify-between w-full ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
+      <div className={`p-3 overflow-hidden ${isFullScreen ? "h-[93vh]" : "h-[91vh]"} relative flex flex-col justify-between w-full ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
         <div className="flex justify-between gap-3 py-2 scale-[100%]">
           <div className={`flex-1 ${isDark ? 'bg-secondary text-text-dark shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]' : 'bg-gray-300 text-text-light shadow-[inset_0px_0px_4px_rgba(0,0,0,1)]'} p-2 md:py-8 transition-transform rounded-lg ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-start item-center'>

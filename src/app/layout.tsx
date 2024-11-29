@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { isMobile, isTablet } from 'react-device-detect';
 import { ThemeProvider, useTheme } from './context/ThemeContext'
+import { FullScreenProvider } from './context/FullScreenContext'
 
 // Component con sử dụng useTheme
 const MainContent = ({ children }: { children: React.ReactNode }) => {
@@ -141,10 +142,12 @@ export default function RootLayout({
     <html lang="vi">
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none">
         <ThemeProvider>
-          <MainContent>
-            {children}
-          </MainContent>
-          <Footer />
+          <FullScreenProvider>
+            <MainContent>
+              {children}
+            </MainContent>
+            <Footer />
+          </FullScreenProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,10 +1,24 @@
-import { Machine } from '@/api/machines';
+export interface Machine {
+    id: number;
+    name: string;
+    dailyTarget: number;
+    hourTarget: number;
+    actual: number;
+    isConnect: boolean;
+    enable: boolean;
+    is_Blink: boolean;
+    performance: number;
+    morningTime: string;
+    afternoonTime: string;
+    status: boolean;
+    runningTime?: string;
+}
 
 export const fetchMachines = async (): Promise<Machine[]> => {
     try {
-        const response = await fetch('/api/machines');
+        const response = await fetch("/api/machines");
         if (!response.ok) {
-            throw new Error('Failed to fetch machines');
+            throw new Error("Không thể tải dữ liệu máy từ API");
         }
         return await response.json();
     } catch (error) {
@@ -16,15 +30,16 @@ export const fetchMachines = async (): Promise<Machine[]> => {
 export const updateMachine = async (machineId: number, data: Partial<Machine>): Promise<Machine> => {
     try {
         const response = await fetch(`/api/machines/${machineId}`, {
-            method: 'PATCH',
+            method: "PATCH",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
         });
 
         if (!response.ok) {
-            throw new Error('Failed to update machine');
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật thông tin máy");
         }
 
         return await response.json();

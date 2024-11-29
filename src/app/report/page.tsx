@@ -5,19 +5,20 @@ import "react-toastify/dist/ReactToastify.css"; // Import CSS của Toastify
 import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
 import { useTheme } from "../context/ThemeContext";
+import { useFullScreen } from '../context/FullScreenContext';
+import InputTime2Number from '../components/InputTime2Number';
+import { fetchReportSettings, updateReportTime, TimeSlot } from '@/services/api/report';
 
-interface TimeSlot {
-    id: number;
-    time?: string | null; // Sử dụng kiểu Date
+interface ReportPageProps {
 }
 
 const ReportPage = () => {
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
     const [error, setError] = useState<string | null>(null);
-    const [isFullScreen, setIsFullScreen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
     const { isDark } = useTheme();
+    const { isFullScreen } = useFullScreen();
     // State for hours and minutes
     const [editedHours, setEditedHours] = useState<{ [key: number]: string }>({});
     const [editedMinutes, setEditedMinutes] = useState<{ [key: number]: string }>({});
@@ -62,45 +63,28 @@ const ReportPage = () => {
         const newTime = !hours && !minutes ? "" : `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
 
         try {
-            const response = await fetch("/api/report-settings", {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ id: slotId, time: newTime }),
-            });
-
-            if (response.ok) {
-                const updatedSlot = await response.json();
-                setTimeSlots((prevSlots) =>
-                    prevSlots.map((slot) =>
-                        slot.id === updatedSlot.id ? { ...slot, time: updatedSlot.time } : slot
-                    )
-                );
-                setEditedHours(prev => ({ ...prev, [slotId]: "" }));
-                setEditedMinutes(prev => ({ ...prev, [slotId]: "" }));
-                toast.success(newTime ? `Cập nhật thởi gian thành công: ${updatedSlot.time}` : "Đã xóa thởi gian thành công");
-            } else {
-                const errorData = await response.json();
-                toast.error(errorData.error || `Lỗi khi ${newTime ? "cập nhật" : "xóa"} thởi gian`);
-            }
-        } catch (error) {
+            const updatedSlot = await updateReportTime(slotId, newTime);
+            setTimeSlots((prevSlots) =>
+                prevSlots.map((slot) =>
+                    slot.id === updatedSlot.id ? { ...slot, time: updatedSlot.time } : slot
+                )
+            );
+            setEditedHours(prev => ({ ...prev, [slotId]: "" }));
+            setEditedMinutes(prev => ({ ...prev, [slotId]: "" }));
+            toast.success(newTime ? `Cập nhật thởi gian thành công: ${updatedSlot.time}` : "Đã xóa thởi gian thành công");
+        } catch (error: any) {
             console.error("Lỗi:", error);
-            toast.error(`Có lỗi xảy ra trong quá trình ${newTime ? "cập nhật" : "xóa"}`);
+            toast.error(error.message || `Có lỗi xảy ra trong quá trình ${newTime ? "cập nhật" : "xóa"}`);
         }
     };
 
     // Lấy dữ liệu từ API
-    const fetchReportSettings = async () => {
+    const getReportSettings = async () => {
         try {
             if (isFirstLoad) {
                 setIsLoading(true);
             }
-            const response = await fetch("/api/report-settings");
-            if (!response.ok) {
-                throw new Error("Không thể tải dữ liệu từ API");
-            }
-            const data = await response.json();
+            const data = await fetchReportSettings();
             setTimeSlots(data);
             if (isFirstLoad) {
                 setIsFirstLoad(false);
@@ -114,32 +98,22 @@ const ReportPage = () => {
         }
     };
 
-    const checkFullScreen = () => {
-        const isFullScreenNow = window.innerHeight === screen.height;
-        setIsFullScreen(isFullScreenNow);
-    };
+    useEffect(() => {
+        getReportSettings();
+    }, []);
 
     const INTERVAL_TIME = 1000; // 1 second
 
     // Thiết lập các hiệu ứng
     useEffect(() => {
-        // Initial setup
-        document.addEventListener("fullscreenchange", checkFullScreen);
-        checkFullScreen();
-        fetchReportSettings();
-
-        // Set up intervals
         const intervals = [
             setInterval(() => {
-                document.addEventListener("fullscreenchange", checkFullScreen);
-                checkFullScreen();
-                fetchReportSettings();
+                getReportSettings();
             }, INTERVAL_TIME)
         ];
 
         // Cleanup
         return () => {
-            document.removeEventListener("fullscreenchange", checkFullScreen);
             intervals.forEach(clearInterval);
         };
     }, []);
@@ -180,105 +154,16 @@ const ReportPage = () => {
                             </span>
 
                             {/* Input chỉnh sửa thởi gian */}
-                            <div className="bg-bg-light py-1 w-full">
-                                <div className="flex items-center justify-center space-x-1 text-text-light">
-                                    <div className="flex items-center gap-1">
-                                        <input
-                                            type="text"
-                                            maxLength={1}
-                                            value={editedHours[slot.id]?.toString().charAt(0) || ''}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (/^[0-2]$/.test(value)) {
-                                                    const currentHours = editedHours[slot.id]?.toString() || "00";
-                                                    const newHours = value + currentHours.charAt(1);
-                                                    handleHourChange(slot.id, newHours);
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    handleTimeUpdate(slot.id);
-                                                } else if (/^[0-2]$/.test(e.key)) {
-                                                    e.currentTarget.select();
-                                                }
-                                            }}
-                                            className={`w-6 h-[4vh] text-text-light text-2xl ${isFullScreen ? "py-3" : "py-1"} border-b-2 border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-accent bg-transparent mx-0.5`}
-                                            disabled={!slot.id}
-                                        />
-                                        <input
-                                            type="text"
-                                            maxLength={1}
-                                            value={editedHours[slot.id]?.toString().charAt(1) || ''}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (/^[0-9]$/.test(value)) {
-                                                    const currentHours = editedHours[slot.id]?.toString() || "00";
-                                                    const firstDigit = currentHours.charAt(0);
-                                                    if ((firstDigit === "2" && parseInt(value) <= 3) || firstDigit !== "2") {
-                                                        const newHours = currentHours.charAt(0) + value;
-                                                        handleHourChange(slot.id, newHours);
-                                                    }
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    handleTimeUpdate(slot.id);
-                                                } else if (/^[0-9]$/.test(e.key)) {
-                                                    e.currentTarget.select();
-                                                }
-                                            }}
-                                            className={`w-6 h-[4vh] text-text-light text-2xl ${isFullScreen ? "py-3" : "py-1"} border-b-2 border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-accent bg-transparent mx-0.5`}
-                                            disabled={!slot.id}
-                                        />
-                                    </div>
-                                    <span className="text-2xl font-bold mx-1">:</span>
-                                    <div className="flex items-center gap-1">
-                                        <input
-                                            type="text"
-                                            maxLength={1}
-                                            value={editedMinutes[slot.id]?.toString().charAt(0) || ''}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (/^[0-5]$/.test(value)) {
-                                                    const currentMinutes = editedMinutes[slot.id]?.toString() || "00";
-                                                    const newMinutes = value + currentMinutes.charAt(1);
-                                                    handleMinuteChange(slot.id, newMinutes);
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    handleTimeUpdate(slot.id);
-                                                } else if (/^[0-5]$/.test(e.key)) {
-                                                    e.currentTarget.select();
-                                                }
-                                            }}
-                                            className={`w-6 h-[4vh] text-text-light text-2xl ${isFullScreen ? "py-3" : "py-1"} border-b-2 border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-accent bg-transparent mx-0.5`}
-                                            disabled={!slot.id}
-                                        />
-                                        <input
-                                            type="text"
-                                            maxLength={1}
-                                            value={editedMinutes[slot.id]?.toString().charAt(1) || ''}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (/^[0-9]$/.test(value)) {
-                                                    const currentMinutes = editedMinutes[slot.id]?.toString() || "00";
-                                                    const newMinutes = currentMinutes.charAt(0) + value;
-                                                    handleMinuteChange(slot.id, newMinutes);
-                                                }
-                                            }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    handleTimeUpdate(slot.id);
-                                                } else if (/^[0-9]$/.test(e.key)) {
-                                                    e.currentTarget.select();
-                                                }
-                                            }}
-                                            className={`w-6 h-[4vh] text-text-light text-2xl ${isFullScreen ? "py-3" : "py-1"} border-b-2 border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-accent bg-transparent mx-0.5`}
-                                            disabled={!slot.id}
-                                        />
-                                    </div>
-                                </div>
+                            <div className="bg-bg-light py-1 w-full flex items-center justify-center">
+                                <InputTime2Number
+                                    hours={editedHours[slot.id]?.toString() || ""}
+                                    minutes={editedMinutes[slot.id]?.toString() || ""}
+                                    onHourChange={(value) => handleHourChange(slot.id, value)}
+                                    onMinuteChange={(value) => handleMinuteChange(slot.id, value)}
+                                    onEnter={() => handleTimeUpdate(slot.id)}
+                                    isFullScreen={isFullScreen}
+                                    disabled={!slot.id}
+                                />
                             </div>
                         </div>
                     </div>

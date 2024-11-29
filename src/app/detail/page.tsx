@@ -3,20 +3,8 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import Loading from "../components/Loading";
 import CardDetail from '../components/CardDetail';
 import { useTheme } from "../context/ThemeContext";
-import { fetchMachines } from '@/services/api';
-
-// Định nghĩa kiểu dữ liệu cho máy
-interface Machine {
-    id: number;
-    name: string;
-    dailyTarget: number;
-    hourTarget: number;
-    actual: number;
-    isConnect: boolean;
-    enable: boolean;
-    is_Blink: boolean;
-    performance: number;
-}
+import { useFullScreen } from '../context/FullScreenContext';
+import { Machine, fetchMachines } from '@/services/api/machines';
 
 // Props cho component chỉ thị trạng thái
 interface StatusIndicatorProps {
@@ -46,10 +34,11 @@ const StatusIndicator = ({ label, color }: StatusIndicatorProps) => (
 // Component chính của trang chi tiết
 const DetailPage = () => {
     const [machines, setMachines] = useState<Machine[]>([]);
-    const [isFullScreen, setIsFullScreen] = useState(false);
     const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState(true);
     const { isDark } = useTheme();
+    const { isFullScreen } = useFullScreen();
+
     // Hàm lấy dữ liệu máy từ API
     const fetchMachineData = useCallback(async () => {
         try {
@@ -70,29 +59,15 @@ const DetailPage = () => {
         }
     }, [isFirstLoad]);
 
-    // Kiểm tra trạng thái màn hình đầy
-    const checkFullScreen = useCallback(() => {
-        const isFullScreenNow = window.innerHeight === screen.height;
-        setIsFullScreen(isFullScreenNow);
-    }, []);
-
-
     // Thiết lập các hiệu ứng
     useEffect(() => {
-        document.addEventListener("fullscreenchange", checkFullScreen);
-        checkFullScreen();
         fetchMachineData(); // Gọi lần đầu ngay lập tức
-
-        const interval = setInterval(() => {
-            fetchMachineData();
-            checkFullScreen();
-        }, 1000); // Cập nhật mỗi 1 giây
+        const interval = setInterval(fetchMachineData, 1000); // Cập nhật mỗi 1 giây
 
         return () => {
             clearInterval(interval);
-            document.removeEventListener("fullscreenchange", checkFullScreen);
         };
-    }, [checkFullScreen, fetchMachineData]);
+    }, [fetchMachineData]);
 
     // Tính toán số lượng máy hoạt động và tổng số máy
     const { enabledCount, totalCount } = useMemo(() => ({

@@ -72,7 +72,7 @@ const DetailPage = () => {
     // Tính toán số lượng máy hoạt động và tổng số máy
     const { enabledCount, totalCount } = useMemo(() => ({
         enabledCount: machines.filter((machine) => machine.enable).length,
-        totalCount: machines.filter((machine) => machine.id).length
+        totalCount: machines.filter((machine) => machine.device_id).length
     }), [machines]);
 
     // Nếu đang tải lần đầu, hiển thị loading
@@ -104,7 +104,7 @@ const DetailPage = () => {
                 ) : (
                     machines.map((machine) => (
                         <CardDetail
-                            key={machine.id}
+                            key={machine.device_id}
                             machine={machine}
                             isDarkMode={isDark}
                             isFullScreen={isFullScreen}

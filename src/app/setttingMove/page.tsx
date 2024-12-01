@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
 import { useTheme } from "../context/ThemeContext";
-import { fetchMachines, updateMachine, type Machine } from '@/services/api/machines';
+import { fetchMachines, updateMachine, setDeviceEnable, type Machine } from '@/services/api/machines';
 import InputTime4Number from '../components/InputTime4Number';
 
 const DetailPage = () => {
@@ -66,7 +66,7 @@ const DetailPage = () => {
         checkFullScreen();
 
         // Set up interval for UI updates
-        const intervalId = setInterval(() => {
+        const intervaldevice_id = setInterval(() => {
             document.addEventListener("fullscreenchange", checkFullScreen);
             checkFullScreen();
         }, UI_UPDATE_INTERVAL);
@@ -74,7 +74,7 @@ const DetailPage = () => {
         // Cleanup
         return () => {
             document.removeEventListener("fullscreenchange", checkFullScreen);
-            clearInterval(intervalId);
+            clearInterval(intervaldevice_id);
         };
     }, [checkFullScreen]);
 
@@ -86,60 +86,67 @@ const DetailPage = () => {
         return () => clearInterval(fetchInterval);
     }, [fetchMachineData]);
 
-    const handleChange = (machineId: number, field: keyof Machine, value: any) => {
+    const handleChange = (machinedevice_id: number, field: keyof Machine, value: any) => {
         setEditedMachines(prev => ({
             ...prev,
-            [machineId]: {
-                ...prev[machineId],
+            [machinedevice_id]: {
+                ...prev[machinedevice_id],
                 [field]: value
             }
         }));
     };
 
-    const handleChangeStateMachine = async (machineId: number, field: keyof Machine, value: any) => {
+    const handleChangeStateMachine = async (device_id: number, field: keyof Machine, value: any) => {
         try {
             setEditedMachines(prev => ({
                 ...prev,
-                [machineId]: {
-                    ...prev[machineId],
+                [device_id]: {
+                    ...prev[device_id],
                     [field]: value
                 }
             }));
 
-            await updateMachine(machineId, { [field]: value });
+            if (field === "enable") {
+                await setDeviceEnable(device_id, value);
+            } else {
+                await updateMachine(device_id, { [field]: value });
+            }
 
             toast.success('Cập nhật trạng thái thành công!', {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
+                theme: "light",
             });
 
+            // Refresh data after successful update
             fetchMachineData();
         } catch (error) {
-            console.error('Error updating machine status:', error);
-            toast.error('Cập nhật trạng thái thất bại!', {
+            console.error('Error updating machine state:', error);
+            toast.error('Lỗi khi cập nhật trạng thái!', {
                 position: "top-center",
-                autoClose: 1000,
+                autoClose: 2000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
+                theme: "light",
             });
         }
     };
 
-    const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>, machineId: number) => {
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>, machinedevice_id: number) => {
         if (e.key === 'Enter') {
             try {
-                const editedMachine = editedMachines[machineId];
+                const editedMachine = editedMachines[machinedevice_id];
                 if (!editedMachine) return;
 
-                const originalMachine = machines.find(m => m.id === machineId);
+                const originalMachine = machines.find(m => m.device_id === machinedevice_id);
                 if (!originalMachine) return;
 
                 // Tạo mảng lưu các thay đổi
@@ -149,25 +156,25 @@ const DetailPage = () => {
                 if (editedMachine.name !== undefined && editedMachine.name !== originalMachine.name) {
                     changes.push(`Tên: ${originalMachine.name} → ${editedMachine.name}`);
                 }
-                if (editedMachine.dailyTarget !== undefined && editedMachine.dailyTarget !== originalMachine.dailyTarget) {
-                    changes.push(`Mục tiêu ngày: ${originalMachine.dailyTarget} → ${editedMachine.dailyTarget}`);
+                if (editedMachine.target !== undefined && editedMachine.target !== originalMachine.target) {
+                    changes.push(`Mục tiêu ngày: ${originalMachine.target} → ${editedMachine.target}`);
                 }
                 if (editedMachine.actual !== undefined && editedMachine.actual !== originalMachine.actual) {
                     changes.push(`Thực hiện: ${originalMachine.actual} → ${editedMachine.actual}`);
                 }
-                if (editedMachine.morningTime !== undefined && editedMachine.morningTime !== originalMachine.morningTime) {
-                    changes.push(`Ca sáng: ${originalMachine.morningTime} → ${editedMachine.morningTime}`);
+                if (editedMachine.shift_1 !== undefined && editedMachine.shift_1 !== originalMachine.shift_1) {
+                    changes.push(`Ca sáng: ${originalMachine.shift_1} → ${editedMachine.shift_1}`);
                 }
-                if (editedMachine.afternoonTime !== undefined && editedMachine.afternoonTime !== originalMachine.afternoonTime) {
-                    changes.push(`Ca chiều: ${originalMachine.afternoonTime} → ${editedMachine.afternoonTime}`);
+                if (editedMachine.shift_2 !== undefined && editedMachine.shift_2 !== originalMachine.shift_2) {
+                    changes.push(`Ca chiều: ${originalMachine.shift_2} → ${editedMachine.shift_2}`);
                 }
 
-                await updateMachine(machineId, editedMachine);
+                await updateMachine(machinedevice_id, editedMachine);
 
                 // Xóa dữ liệu đã chỉnh sửa sau khi cập nhật thành công
                 setEditedMachines(prev => {
                     const newState = { ...prev };
-                    delete newState[machineId];
+                    delete newState[machinedevice_id];
                     return newState;
                 });
 
@@ -175,7 +182,7 @@ const DetailPage = () => {
                 if (changes.length > 0) {
                     toast.success(
                         <div>
-                            <div className="font-bold mb-2">Cập nhật thành công Line {machineId}:</div>
+                            <div className="font-bold mb-2">Cập nhật thành công Line {machinedevice_id}:</div>
                             {changes.map((change, index) => (
                                 <div key={index} className="ml-2">• {change}</div>
                             ))}
@@ -206,7 +213,7 @@ const DetailPage = () => {
     };
 
     const enabledCount = machines.filter((machine) => machine.enable).length;
-    const idCount = machines.filter((machine) => machine.id).length;
+    const device_idCount = machines.filter((machine) => machine.device_id).length;
 
     return (
         <div className={`px-2 h-full ${isDark ? 'text-text-dark bg-bg-dark' : 'text-text-light bg-bg-light'}`}>
@@ -216,7 +223,7 @@ const DetailPage = () => {
             <div>
                 <div className="flex justify-between items-center py-2 ">
                     <div className={`text-lg select-none ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                        Số Line đang hoạt động: {enabledCount}/{idCount}
+                        Số Line đang hoạt động: {enabledCount}/{device_idCount}
                     </div>
                     <h2 className={`text-xl ${isFullScreen ? "text-3xl" : "text-xl"} font-bold select-none text-center ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
                         Bảng Trạng Thái
@@ -228,8 +235,8 @@ const DetailPage = () => {
                         <thead>
                             <tr>
                                 {machines.slice(0, 15).map((machine) => (
-                                    <th key={machine.id} className={`border-2 text-text-dark ${isDark ? 'border-border-dark' : 'border-border-light'} px-4 py-0 text-center ${machine.enable ? "bg-connect" : "bg-notConnect"}`}>
-                                        {machine.id}
+                                    <th key={machine.device_id} className={`border-2 text-text-dark ${isDark ? 'border-border-dark' : 'border-border-light'} px-4 py-0 text-center ${machine.enable ? "bg-connect" : "bg-notConnect"}`}>
+                                        {machine.device_id}
                                     </th>
                                 ))}
                             </tr>
@@ -238,15 +245,15 @@ const DetailPage = () => {
                             <tr>
                                 {machines.slice(0, 15).map((machine) => (
                                     <td
-                                        key={machine.id}
+                                        key={machine.device_id}
                                         className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer`}
-                                        onClick={() => handleChangeStateMachine(machine.id, "enable", !(editedMachines[machine.id]?.enable ?? machine.enable))}
+                                        onClick={() => handleChangeStateMachine(machine.device_id, "enable", !(editedMachines[machine.device_id]?.enable ?? machine.enable))}
                                     >
                                         <div className="flex justify-center items-center h-full ">
                                             <input
                                                 type="checkbox"
-                                                checked={editedMachines[machine.id]?.enable ?? machine.enable}
-                                                onChange={(e) => handleChangeStateMachine(machine.id, "enable", e.target.checked)}
+                                                checked={editedMachines[machine.device_id]?.enable ?? machine.enable}
+                                                onChange={(e) => handleChangeStateMachine(machine.device_id, "enable", e.target.checked)}
                                                 className="w-5 h-5 cursor-pointer"
                                                 onClick={(e) => e.stopPropagation()}
                                             />
@@ -268,7 +275,7 @@ const DetailPage = () => {
                     <table className={`table-auto w-full border-collapse border-2 ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
                             <tr className={`${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>ID</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>device_id</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Tên</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Mục Tiêu Ngày</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thực Hiện</th>
@@ -284,9 +291,9 @@ const DetailPage = () => {
                                 </tr>
                             ) : (
                                 machines.filter(machine => machine.enable).map((machine) => (
-                                    <tr key={machine.id}>
+                                    <tr key={machine.device_id}>
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
-                                            {machine.id}
+                                            {machine.device_id}
                                         </td>
                                         {/* Tên */}
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
@@ -294,11 +301,11 @@ const DetailPage = () => {
                                                 <span className="font-semibold text-center w-1/2">{machine.name}</span>
                                                 <input
                                                     type="text"
-                                                    value={editedMachines[machine.id]?.name ?? ""}
-                                                    onChange={(e) => handleChange(machine.id, "name", e.target.value)}
-                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    value={editedMachines[machine.device_id]?.name ?? ""}
+                                                    onChange={(e) => handleChange(machine.device_id, "name", e.target.value)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
-                                                    disabled={!machine.isConnect}
+                                                    disabled={!machine.connection}
                                                 />
                                             </div>
                                         </td>
@@ -306,21 +313,21 @@ const DetailPage = () => {
                                         {/* Mục tiêu ngày */}
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-between">
-                                                <span className="font-semibold px-2 text-center w-1/2">{machine.dailyTarget}</span>
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.target}</span>
                                                 <input
                                                     type="number"
                                                     min="0"
                                                     max="999"
-                                                    value={editedMachines[machine.id]?.dailyTarget ?? ""}
+                                                    value={editedMachines[machine.device_id]?.target ?? ""}
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value);
                                                         if (value >= 0 && value <= 999) {
-                                                            handleChange(machine.id, "dailyTarget", value);
+                                                            handleChange(machine.device_id, "target", value);
                                                         }
                                                     }}
-                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
-                                                    disabled={!machine.isConnect}
+                                                    disabled={!machine.connection}
                                                     style={{
                                                         MozAppearance: 'textfield',
                                                     }}
@@ -336,16 +343,16 @@ const DetailPage = () => {
                                                     type="number"
                                                     min="0"
                                                     max="999"
-                                                    value={editedMachines[machine.id]?.actual ?? ""}
+                                                    value={editedMachines[machine.device_id]?.actual ?? ""}
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value);
                                                         if (value >= 0 && value <= 999) {
-                                                            handleChange(machine.id, "actual", value);
+                                                            handleChange(machine.device_id, "actual", value);
                                                         }
                                                     }}
-                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
-                                                    disabled={!machine.isConnect}
+                                                    disabled={!machine.connection}
                                                     style={{
                                                         MozAppearance: 'textfield',
                                                     }}
@@ -355,28 +362,28 @@ const DetailPage = () => {
 
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-center">
-                                                <span className="font-semibold px-2 text-center w-1/2">{machine.morningTime}</span>
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.shift_1}</span>
                                                 <InputTime4Number
-                                                    value={editedMachines[machine.id]?.morningTime ?? ""}
-                                                    onChange={(value) => handleChange(machine.id, "morningTime", value)}
-                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    value={editedMachines[machine.device_id]?.shift_1 ?? ""}
+                                                    onChange={(value) => handleChange(machine.device_id, "shift_1", value)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     isFullScreen={isFullScreen}
                                                     isDark={isDark}
-                                                    disabled={!machine.isConnect}
+                                                    disabled={!machine.connection}
                                                 />
                                             </div>
                                         </td>
 
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-center">
-                                                <span className="font-semibold px-2 text-center w-1/2">{machine.afternoonTime}</span>
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.shift_2}</span>
                                                 <InputTime4Number
-                                                    value={editedMachines[machine.id]?.afternoonTime ?? ""}
-                                                    onChange={(value) => handleChange(machine.id, "afternoonTime", value)}
-                                                    onKeyDown={(e) => handleKeyDown(e, machine.id)}
+                                                    value={editedMachines[machine.device_id]?.shift_2 ?? ""}
+                                                    onChange={(value) => handleChange(machine.device_id, "shift_2", value)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     isFullScreen={isFullScreen}
                                                     isDark={isDark}
-                                                    disabled={!machine.isConnect}
+                                                    disabled={!machine.connection}
                                                 />
                                             </div>
                                         </td>
@@ -384,8 +391,8 @@ const DetailPage = () => {
                                         {/* Trạng Thái Kết Nối */}
                                         <td className={`border-2 text-center w-[25vh] ${isFullScreen ? " py-0.5 text-2xl" : " text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                             <div className="flex justify-center items-center h-full">
-                                                <span className={`p-1.5 font-semibold text-text-dark w-full h-full flex items-center justify-center ${machine.isConnect ? "bg-connect" : "bg-error opacity-80 blink"}`}>
-                                                    {machine.isConnect ? "Kết Nối" : "Mất Kết Nối"}
+                                                <span className={`p-1.5 font-semibold text-text-dark w-full h-full flex items-center justify-center ${machine.connection ? "bg-connect" : "bg-error opacity-80 blink"}`}>
+                                                    {machine.connection ? "Kết Nối" : "Mất Kết Nối"}
                                                 </span>
                                             </div>
                                         </td>

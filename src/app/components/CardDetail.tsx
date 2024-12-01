@@ -1,13 +1,20 @@
 interface Machine {
-    id: number;
-    name: string;
-    dailyTarget: number;
-    hourTarget: number;
+    device_id: number;
+    target: number;
+    mtg: number;
     actual: number;
-    isConnect: boolean;
+    wait_time: number;
+    total_min: number;
+    shift_1: string;
+    shift_2: string;
+    temp: number;
+    actual_delta_seconds: number;
+    device_total_seconds: number;
+    connection: boolean;
+    ts: number;
+    dt: string;
+    name?: string; // This will be populated from cpu.ts device list
     enable: boolean;
-    is_Blink: boolean;
-    performance: number;
 }
 
 interface CardDetailProps {
@@ -18,11 +25,11 @@ interface CardDetailProps {
 
 const CardDetail: React.FC<CardDetailProps> = ({ machine, isDarkMode, isFullScreen }) => {
     // Tính toán màu sắc dựa trên trạng thái
-    const bgColor = machine.isConnect ? "bg-connect" : "bg-notConnect";
+    const bgColor = machine.connection ? "bg-connect" : "bg-notConnect";
     const isDisabled = !machine.enable;
     const borderColor = isDisabled
         ? "border-gray-400"
-        : machine.isConnect
+        : machine.connection
             ? isDarkMode
                 ? "border-connect"
                 : "border-connect"
@@ -37,13 +44,13 @@ const CardDetail: React.FC<CardDetailProps> = ({ machine, isDarkMode, isFullScre
             </h3>
             <div className={`mb-3 grid grid-cols-2 gap-y-2 p-1 item-center px-3 ${isDisabled ? 'text-gray-700' : ''}`}>
                 <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Mục Tiêu Ngày</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.dailyTarget}</span>
+                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.target}</span>
                 <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Mục Tiêu Giờ</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.hourTarget}</span>
+                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.mtg}</span>
                 <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Thực Hiện</strong>
                 <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.actual}</span>
                 <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Hiệu Suất</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.performance}</span>
+                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.target - machine.actual}</span>
             </div>
         </div>
     );

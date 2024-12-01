@@ -67,6 +67,29 @@ export const fetchMachines = async (): Promise<Machine[]> => {
     }
 };
 
+export const setDeviceEnable = async (device_id: number, enable: boolean): Promise<void> => {
+    try {
+        const response = await fetch(
+            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_enable?device_id=${device_id}&enable=${enable}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật trạng thái thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device enable:', error);
+        throw error;
+    }
+};
+
 export const updateMachine = async (machineId: number, data: Partial<Machine>): Promise<Machine> => {
     try {
         const response = await fetch(`http://123.16.53.91:23456/api/nam_co_london/v1/api_update_machine/${machineId}`, {
@@ -82,7 +105,11 @@ export const updateMachine = async (machineId: number, data: Partial<Machine>): 
             throw new Error(errorData.error || "Lỗi khi cập nhật thông tin máy");
         }
 
-        return await response.json();
+        const updatedMachine = await response.json();
+        if (data.enable !== undefined) {
+            await setDeviceEnable(machineId, data.enable);
+        }
+        return updatedMachine;
     } catch (error) {
         console.error('Error updating machine:', error);
         throw error;

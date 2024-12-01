@@ -4,7 +4,16 @@ import { toast } from "react-toastify";
 import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
 import { useTheme } from "../context/ThemeContext";
-import { fetchMachines, updateMachine, setDeviceEnable, type Machine } from '@/services/api/machines';
+import {
+    fetchMachines,
+    setDeviceEnable,
+    setDeviceName,
+    setDeviceTarget,
+    setDeviceStartShift1,
+    setDeviceStartShift2,
+    setDeviceActual,
+    type Machine
+} from '@/services/api/machines';
 import InputTime4Number from '../components/InputTime4Number';
 
 const DetailPage = () => {
@@ -109,7 +118,6 @@ const DetailPage = () => {
             if (field === "enable") {
                 await setDeviceEnable(device_id, value);
             } else {
-                await updateMachine(device_id, { [field]: value });
             }
 
             toast.success('Cập nhật trạng thái thành công!', {
@@ -155,21 +163,24 @@ const DetailPage = () => {
                 // So sánh và ghi nhận các thay đổi
                 if (editedMachine.name !== undefined && editedMachine.name !== originalMachine.name) {
                     changes.push(`Tên: ${originalMachine.name} → ${editedMachine.name}`);
+                    await setDeviceName(machinedevice_id, editedMachine.name);
                 }
                 if (editedMachine.target !== undefined && editedMachine.target !== originalMachine.target) {
                     changes.push(`Mục tiêu ngày: ${originalMachine.target} → ${editedMachine.target}`);
-                }
-                if (editedMachine.actual !== undefined && editedMachine.actual !== originalMachine.actual) {
-                    changes.push(`Thực hiện: ${originalMachine.actual} → ${editedMachine.actual}`);
+                    await setDeviceTarget(machinedevice_id, editedMachine.target);
                 }
                 if (editedMachine.shift_1 !== undefined && editedMachine.shift_1 !== originalMachine.shift_1) {
                     changes.push(`Ca sáng: ${originalMachine.shift_1} → ${editedMachine.shift_1}`);
+                    await setDeviceStartShift1(machinedevice_id, editedMachine.shift_1);
+                }
+                if (editedMachine.actual !== undefined && editedMachine.actual !== originalMachine.actual) {
+                    changes.push(`Thực hiện: ${originalMachine.actual} → ${editedMachine.actual}`);
+                    await setDeviceActual(machinedevice_id, editedMachine.actual);
                 }
                 if (editedMachine.shift_2 !== undefined && editedMachine.shift_2 !== originalMachine.shift_2) {
                     changes.push(`Ca chiều: ${originalMachine.shift_2} → ${editedMachine.shift_2}`);
+                    await setDeviceStartShift2(machinedevice_id, editedMachine.shift_2);
                 }
-
-                await updateMachine(machinedevice_id, editedMachine);
 
                 // Xóa dữ liệu đã chỉnh sửa sau khi cập nhật thành công
                 setEditedMachines(prev => {
@@ -317,11 +328,11 @@ const DetailPage = () => {
                                                 <input
                                                     type="number"
                                                     min="0"
-                                                    max="999"
+                                                    max="9999"
                                                     value={editedMachines[machine.device_id]?.target ?? ""}
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value);
-                                                        if (value >= 0 && value <= 999) {
+                                                        if (value >= 0 && value <= 9999) {
                                                             handleChange(machine.device_id, "target", value);
                                                         }
                                                     }}
@@ -342,11 +353,11 @@ const DetailPage = () => {
                                                 <input
                                                     type="number"
                                                     min="0"
-                                                    max="999"
+                                                    max="9999"
                                                     value={editedMachines[machine.device_id]?.actual ?? ""}
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value);
-                                                        if (value >= 0 && value <= 999) {
+                                                        if (value >= 0 && value <= 9999) {
                                                             handleChange(machine.device_id, "actual", value);
                                                         }
                                                     }}

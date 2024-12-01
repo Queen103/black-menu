@@ -90,28 +90,117 @@ export const setDeviceEnable = async (device_id: number, enable: boolean): Promi
     }
 };
 
-export const updateMachine = async (machineId: number, data: Partial<Machine>): Promise<Machine> => {
+export const setDeviceName = async (device_id: number, name: string): Promise<void> => {
     try {
-        const response = await fetch(`http://123.16.53.91:23456/api/nam_co_london/v1/api_update_machine/${machineId}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
+        const response = await fetch(
+            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_name?device_id=${device_id}&name=${encodeURIComponent(name)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật tên thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device name:', error);
+        throw error;
+    }
+};
+
+export const setDeviceTarget = async (device_id: number, target: number): Promise<void> => {
+    try {
+        const response = await fetch(
+            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_target?device_id=${device_id}&target=${target}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || "Lỗi khi cập nhật thông tin máy");
+            throw new Error(errorData.error || "Lỗi khi cập nhật mục tiêu thiết bị");
         }
-
-        const updatedMachine = await response.json();
-        if (data.enable !== undefined) {
-            await setDeviceEnable(machineId, data.enable);
-        }
-        return updatedMachine;
     } catch (error) {
-        console.error('Error updating machine:', error);
+        console.error('Error setting device target:', error);
+        throw error;
+    }
+};
+
+export const setDeviceStartShift1 = async (device_id: number, start_shift_1: string): Promise<void> => {
+    try {
+        const response = await fetch(
+            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_start_shift_1?device_id=${device_id}&start_shift_1=${encodeURIComponent(start_shift_1)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật thời gian ca 1");
+        }
+    } catch (error) {
+        console.error('Error setting device shift 1:', error);
+        throw error;
+    }
+};
+
+export const setDeviceStartShift2 = async (device_id: number, start_shift_2: string): Promise<void> => {
+    try {
+        const response = await fetch(
+            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_start_shift_2?device_id=${device_id}&start_shift_2=${encodeURIComponent(start_shift_2)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật thời gian ca 2");
+        }
+    } catch (error) {
+        console.error('Error setting device shift 2:', error);
+        throw error;
+    }
+};
+
+export const setDeviceActual = async (device_id: number, actual: number): Promise<void> => {
+    try {
+        const response = await fetch(
+            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_actual?device_id=${device_id}&actual=${actual}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật thực hiện");
+        }
+    } catch (error) {
+        console.error('Error setting device actual:', error);
         throw error;
     }
 };

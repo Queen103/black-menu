@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = () => {
         PHẦN MỀM QUẢN LÝ NĂNG SUẤT
       </div>
 
-      <div className="ml-auto flex items-center h-full gap-4 pr-4">
+      <div className="ml-auto flex items-center h-full gap-4 pr-2">
         <button
           onClick={toggleTheme}
           className="p-2 rounded-lg transition-colors hover:bg-opacity-80"

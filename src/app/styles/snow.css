@@ -1,0 +1,33 @@
+.snow-container {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.snowflake {
+  position: absolute;
+  font-size: var(--size);
+  color: white;
+  text-shadow: 
+    0 0 5px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(255, 255, 255, 0.5);
+  opacity: var(--opacity);
+  left: var(--left);
+  will-change: transform;
+  animation: 
+    snowfall var(--duration) linear var(--delay) infinite;
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translate(0, -10px);
+  }
+  100% {
+    transform: translate(0, 100vh);
+  }
+}

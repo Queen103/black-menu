@@ -1,142 +1,78 @@
-"use client"
-import React, { useEffect, useState, useRef } from 'react';
-import * as echarts from 'echarts';
-import { fetchMachines } from '@/services/api';
+'use client';
 
-// Định nghĩa kiểu dữ liệu của một máy
-interface Machine {
-    id: number;
-    name: string;
-    dailyTarget: number;
-    hourTarget: number;
-    actual: number;
-    isConnect: boolean;
-    enable: boolean;
-    is_Blink: boolean;
-    performance: number;
-}
+import React, { useEffect, useState } from 'react';
+import { Switch } from '@headlessui/react';
+import { useTheme } from '../context/ThemeContext';
 
-const BarChart = () => {
-    const [machines, setMachines] = useState<Machine[]>([]); // Xác định kiểu dữ liệu của machines
-    const chartRef = useRef<HTMLDivElement | null>(null);
+const SettingsPage = () => {
+    const [snowEnabled, setSnowEnabled] = useState(true);
+    const { isDark, toggleTheme } = useTheme();
 
-    // Gọi API để lấy dữ liệu machines
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await fetchMachines();
-                setMachines(data);
-            } catch (error) {
-                console.error('Error fetching machines:', error);
-            }
-        };
-
-        fetchData();
+        // Load initial state from localStorage
+        const savedState = localStorage.getItem('snowEnabled');
+        if (savedState !== null) {
+            setSnowEnabled(JSON.parse(savedState));
+        }
     }, []);
 
-    // Vẽ biểu đồ khi dữ liệu machines thay đổi
-    useEffect(() => {
-        if (chartRef.current && machines.length > 0) {
-            const chartInstance = echarts.init(chartRef.current);
+    const handleSnowToggle = (checked: boolean) => {
+        setSnowEnabled(checked);
+        localStorage.setItem('snowEnabled', JSON.stringify(checked));
+        // Dispatch a custom event to notify other components
+        const event = new Event('snowSettingChanged');
+        window.dispatchEvent(event);
+    };
 
-            // Lọc dữ liệu
-            const filteredMachines = machines.filter((machine) => machine.hourTarget !== 0);
-
-            const names = filteredMachines.map((machine) => machine.name);
-            const hourTargets = filteredMachines.map((machine) => machine.hourTarget);
-            const barColors = filteredMachines.map((machine) =>
-                machine.hourTarget < 0 ? '#ff6347' : 'connect'
-            );
-
-            const options = {
-                title: {
-                    text: 'Biểu Đồ Thể Hiện Mục Tiêu Giờ Của Từng Chuyền',
-                    left: 'center',
-                    textStyle: {
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                    },
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: { type: 'shadow' },
-                    formatter: '{b}: {c} PCS',
-                },
-                xAxis: {
-                    type: 'category',
-                    data: names,
-                    axisLabel: {
-                        fontSize: 12,
-                        fontWeight: 'bold',
-                        color: '#333333',
-                    },
-                },
-                yAxis: {
-                    type: 'value',
-                    name: 'Mục Tiêu (PCS)',
-                    nameTextStyle: {
-                        fontSize: 14,
-                        fontWeight: 'bold',
-                    },
-                    axisLabel: {
-                        fontSize: 12,
-                        fontWeight: 'bold',
-                        color: '#333333',
-                    },
-                    min: Math.floor(Math.min(0, ...hourTargets) * 1.2 / 5) * 5, // Bao gồm giá trị âm
-                    max: Math.ceil(Math.max(...hourTargets) * 1.2 / 5) * 5,
-                },
-                series: [
-                    {
-                        name: 'Mục Tiêu Giờ',
-                        type: 'bar',
-                        data: hourTargets,
-                        barWidth: 30,
-                        itemStyle: {
-                            color: (params: any) => (params.value < 0 ? '#ff6347' : 'connect'), // Cột đỏ cho giá trị âm, xanh cho dương
-                        },
-                        label: {
-                            show: true,
-                            position: (params: any) =>
-                                params.value < 0 ? 'outsideBottom' : 'insideTop', // Dương trên hẳn cột, âm dưới hẳn cột
-                            distance: 10, // Khoảng cách giữa nhãn và cột
-                            formatter: '{c}', // Hiển thị giá trị
-                            fontSize: 12,
-                            fontWeight: 'bold',
-                            color: '#000', // Màu chữ nhãn
-                        },
-                    },
-                ],
-                grid: {
-                    left: '5%',
-                    right: '5%',
-                    bottom: '10%',
-                    containLabel: true,
-                },
-            };
-
-            chartInstance.setOption(options);
-
-            // Cleanup chart instance on unmount
-            return () => {
-                chartInstance.dispose();
-            };
-        }
-    }, [machines]);
 
     return (
-        <div
-            ref={chartRef}
-            style={{
-                width: '100%',
-                height: '400px',
-                background: '#ffffff',
-                padding: '20px',
-                borderRadius: '8px',
-                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.8)',
-            }}
-        />
+        <div className={`min-h-screen bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-white p-6`}>
+            <div className="max-w-2xl mx-auto">
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-medium dark:text-gray-100">Hiệu ứng tuyết rơi</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Bật tắt hiệu ứng tuyết rơi
+                            </p>
+                        </div>
+                        <Switch
+                            checked={snowEnabled}
+                            onChange={handleSnowToggle}
+                            className={`${snowEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900`}
+                        >
+                            <span className="sr-only">Bật tắt hiệu ứng tuyết rơi</span>
+                            <span
+                                className={`${snowEnabled ? 'translate-x-6' : 'translate-x-1'
+                                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                            />
+                        </Switch>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-medium dark:text-gray-100">Dark Mode</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Bật tắt chế độ tối
+                            </p>
+                        </div>
+                        <Switch
+                            checked={isDark}
+                            onChange={toggleTheme}
+                            className={`${isDark ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                                } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900`}
+                        >
+                            <span className="sr-only">Bật tắt chế độ tối</span>
+                            <span
+                                className={`${isDark ? 'translate-x-6' : 'translate-x-1'
+                                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                            />
+                        </Switch>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
-export default BarChart;
+export default SettingsPage;

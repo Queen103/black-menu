@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import './globals.css';
+import './styles/snow.css';
 import Footer from './components/Footer';
 import { IoMenuOutline } from "react-icons/io5";
 import { usePathname } from 'next/navigation';
@@ -11,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { isMobile, isTablet } from 'react-device-detect';
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { FullScreenProvider } from './context/FullScreenContext'
+import SnowEffect from './components/SnowEffect';
 
 // Component con sử dụng useTheme
 const MainContent = ({ children }: { children: React.ReactNode }) => {
@@ -143,6 +145,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none">
         <ThemeProvider>
           <FullScreenProvider>
+            <SnowEffect />
             <MainContent>
               {children}
             </MainContent>

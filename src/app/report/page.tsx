@@ -56,11 +56,11 @@ const ReportPage = () => {
     const handleTimeUpdate = async (slotId: number) => {
         const hours = editedHours[slotId] || "";
         const minutes = editedMinutes[slotId] || "";
-        const currentSlot = timeSlots.find(slot => slot.id === slotId);
+        const currentSlot = timeSlots.find(slot => slot.index === slotId);
 
         // Kiểm tra nếu không có time hiện tại và không có input mới
         if (!currentSlot?.time && !hours && !minutes) {
-            toast.error("Không thể xóa thời gian không tồn tại");
+            toast.error("Không thể xóa thởi gian không tồn tại");
             return;
         }
 
@@ -71,7 +71,7 @@ const ReportPage = () => {
             const updatedSlot = await updateReportTime(slotId, newTime);
             setTimeSlots((prevSlots) =>
                 prevSlots.map((slot) =>
-                    slot.id === updatedSlot.id ? { ...slot, time: updatedSlot.time } : slot
+                    slot.index === updatedSlot.index ? { ...slot, time: updatedSlot.time } : slot
                 )
             );
             setEditedHours(prev => ({ ...prev, [slotId]: "" }));
@@ -90,12 +90,14 @@ const ReportPage = () => {
                 setIsLoading(true);
             }
             const data = await fetchReportSettings();
+            console.log('API Response:', data);
             setTimeSlots(data);
             if (isFirstLoad) {
                 setIsFirstLoad(false);
                 setIsLoading(false);
             }
         } catch (error: any) {
+            console.error('Error in getReportSettings:', error);
             setError(error.message);
             if (isFirstLoad) {
                 setIsLoading(false);
@@ -123,56 +125,63 @@ const ReportPage = () => {
         };
     }, []);
 
-    if (error) {
-        return <div className="text-center text-xl text-error">{error}</div>;
-    }
-
     return (
         <div className={`min-h-screen ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
             {isFirstLoad && isLoading && <Loading isDarkMode={isDark} />}
             <CustomToast isDarkMode={isDark} />
+            {error && (
+                <div className="text-center text-xl text-error p-4">
+                    Lỗi: {error}
+                </div>
+            )}
             {/* Grid Layout */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-5 px-4">
-                {timeSlots.map((slot) => (
-                    <div
-                        key={slot.id}
-                        className={`border border-connect border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center ${isDark ? 'bg-secondary text-text-dark' : 'bg-gray-300 text-text-light'}`}
-                    >
-                        <div className="bg-connect">
-                            <h2 className={`text-2xl font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"}`}>
-                                THỜI ĐIỂM THỨ {slot.id}
-                            </h2>
-                        </div>
+                {Array.isArray(timeSlots) && timeSlots.length > 0 ? (
+                    timeSlots.map((slot) => (
+                        <div
+                            key={slot.index}
+                            className={`border border-connect border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center ${isDark ? 'bg-secondary text-text-dark' : 'bg-gray-300 text-text-light'}`}
+                        >
+                            <div className="bg-connect">
+                                <h2 className={`text-2xl font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"}`}>
+                                    THỜI ĐIỂM THỨ {slot.index}
+                                </h2>
+                            </div>
 
-                        <div className={`py-0 flex flex-col items-center`}>
-                            <span className="font-semibold text-center mb-2 py-3 text-3xl">
-                                {/* Hiển thị thởi gian hoặc thông báo chưa cài đặt */}
-                                {slot.time ? (
-                                    <>
-                                        <span>{slot.time}</span>
-                                    </>
-                                ) : (
-                                    <div className="w-full text-transparent">
-                                        .
-                                    </div>
-                                )}
-                            </span>
+                            <div className={`py-0 flex flex-col items-center`}>
+                                <span className="font-semibold text-center mb-2 py-3 text-3xl">
+                                    {/* Hiển thị thởi gian hoặc thông báo chưa cài đặt */}
+                                    {slot.time ? (
+                                        <>
+                                            <span>{slot.time}</span>
+                                        </>
+                                    ) : (
+                                        <div className="w-full text-transparent">
+                                            .
+                                        </div>
+                                    )}
+                                </span>
 
-                            {/* Input chỉnh sửa thởi gian */}
-                            <div className="bg-bg-light py-1 w-full flex items-center justify-center">
-                                <InputTime2Number
-                                    hours={editedHours[slot.id]?.toString() || ""}
-                                    minutes={editedMinutes[slot.id]?.toString() || ""}
-                                    onHourChange={(value) => handleHourChange(slot.id, value)}
-                                    onMinuteChange={(value) => handleMinuteChange(slot.id, value)}
-                                    onEnter={() => handleTimeUpdate(slot.id)}
-                                    isFullScreen={isFullScreen}
-                                    disabled={!slot.id}
-                                />
+                                {/* Input chỉnh sửa thởi gian */}
+                                <div className="bg-bg-light py-1 w-full flex items-center justify-center">
+                                    <InputTime2Number
+                                        hours={editedHours[slot.index]?.toString() || ""}
+                                        minutes={editedMinutes[slot.index]?.toString() || ""}
+                                        onHourChange={(value) => handleHourChange(slot.index, value)}
+                                        onMinuteChange={(value) => handleMinuteChange(slot.index, value)}
+                                        onEnter={() => handleTimeUpdate(slot.index)}
+                                        isFullScreen={isFullScreen}
+                                        disabled={!slot.index}
+                                    />
+                                </div>
                             </div>
                         </div>
+                    ))
+                ) : (
+                    <div className="text-center text-xl text-error p-4 justify-center">
+                        Không có dữ liệu
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );

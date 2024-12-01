@@ -21,7 +21,7 @@ const Logo = ({ className = '' }: LogoProps) => {
                 />
             </div>
             <div className="text-center">
-                <p className={`text-white font-['Arial'] tracking-[0.3em] ${isPhone ? 'text-[6px]' : 'text-[8px]'}`}>
+                <p className={`text-white font-bold font-['Arial'] tracking-[0.1em] ${isPhone ? 'text-[8px]' : 'text-[10px]'}`}>
                     Technology  For  Future
                 </p>
             </div>

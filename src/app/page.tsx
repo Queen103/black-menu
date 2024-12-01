@@ -12,15 +12,22 @@ import { fetchMachines } from '@/services/api';
 import { fetchCpuData, type CpuData } from '@/services/api/cpu';
 
 interface Machine {
-  id: number;
-  name: string;
-  dailyTarget: number;
-  hourTarget: number;
+  device_id: number;
+  target: number;
+  mtg: number;
   actual: number;
-  isConnect: boolean;
+  wait_time: number;
+  total_min: number;
+  shift_1: string;
+  shift_2: string;
+  temp: number;
+  actual_delta_seconds: number;
+  device_total_seconds: number;
+  connection: boolean;
+  ts: number;
+  dt: string;
+  name?: string;
   enable: boolean;
-  is_Blink: boolean;
-  performance: number;
 }
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, ChartDataLabels);
@@ -76,12 +83,12 @@ const HomePage = () => {
   );
 
   const idCount = useMemo(() =>
-    machines.filter((machine) => machine.id).length,
+    machines.filter((machine) => machine.device_id).length,
     [machines]
   );
 
   const filteredMachines = useMemo(() =>
-    machines.filter((machine) => machine.performance !== 0 && machine.actual !== 0),
+    machines.filter((machine) => machine.actual !== 0 && machine.actual !== 0),
     [machines]
   );
 
@@ -153,18 +160,18 @@ const HomePage = () => {
             <Bar className='px-7'
               data={{
                 labels: machines
-                  .filter((machine) => machine.hourTarget !== 0 && machine.enable)
+                  .filter((machine) => machine.mtg !== 0 && machine.enable && machine.connection)
                   .map((machine) => machine.name),
                 datasets: [
                   {
                     label: 'Mục Tiêu Giờ',
                     data: machines
-                      .filter((machine) => machine.hourTarget !== 0 && machine.enable)
-                      .map((machine) => machine.hourTarget),
+                      .filter((machine) => machine.mtg !== 0 && machine.enable && machine.connection)
+                      .map((machine) => machine.mtg),
                     backgroundColor: machines
-                      .filter((machine) => machine.hourTarget !== 0 && machine.enable)
+                      .filter((machine) => machine.mtg !== 0 && machine.enable && machine.connection)
                       .map((machine) =>
-                        machine.hourTarget < 0 ? '#c40005' : '#00964d'
+                        machine.mtg < 0 ? '#c40005' : '#00964d'
                       ),
                     borderColor: '#111111',
                     borderWidth: 1,
@@ -254,11 +261,11 @@ const HomePage = () => {
                       color: isDark ? '#ffffff' : '#333333',
                     },
                     min: Math.floor(
-                      Math.min(0, Math.min(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2) / 5
+                      Math.min(0, Math.min(...machines.filter((machine) => machine.mtg !== 0 && machine.enable).map((machine) => machine.mtg)) * 1.2) / 5
                     ) * 5,
 
                     max: Math.ceil(
-                      Math.max(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2 / 5
+                      Math.max(...machines.filter((machine) => machine.mtg !== 0 && machine.enable).map((machine) => machine.mtg)) * 1.2 / 5
                     ) * 5,
 
                   },
@@ -273,11 +280,11 @@ const HomePage = () => {
                       display: false,
                     },
                     min: Math.floor(
-                      Math.min(0, Math.min(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2) / 5
+                      Math.min(0, Math.min(...machines.filter((machine) => machine.mtg !== 0 && machine.enable).map((machine) => machine.mtg)) * 1.2) / 5
                     ) * 5,
 
                     max: Math.ceil(
-                      Math.max(...machines.filter((machine) => machine.hourTarget !== 0 && machine.enable).map((machine) => machine.hourTarget)) * 1.2 / 5
+                      Math.max(...machines.filter((machine) => machine.mtg !== 0 && machine.enable).map((machine) => machine.mtg)) * 1.2 / 5
                     ) * 5,
 
                   },
@@ -307,11 +314,11 @@ const HomePage = () => {
 
             <Bar className='px-7'
               data={{
-                labels: filteredMachines.filter(machine => machine.enable).map((machine) => machine.name),
+                labels: filteredMachines.filter(machine => machine.enable && machine.connection).map((machine) => machine.name),
                 datasets: [
                   showPerformance && {
                     label: 'Hiệu Suất',
-                    data: filteredMachines.filter(machine => machine.enable).map((machine) => machine.performance),
+                    data: filteredMachines.filter(machine => machine.enable && machine.connection).map((machine) => (machine.target - machine.actual)),
                     borderColor: '#c40005',
                     backgroundColor: 'rgba(255, 99, 71, 0.2)',
                     type: 'line',
@@ -412,9 +419,9 @@ const HomePage = () => {
                       },
                       label: function (context) {
                         const filteredIndex = context.dataIndex;
-                        const performanceValue = filteredMachines[filteredIndex].performance || 0;
+                        const performanceValue = filteredMachines[filteredIndex].target - filteredMachines[filteredIndex].actual || 0;
                         const actualValue = filteredMachines[filteredIndex].actual || 0;
-                        const targetValue = filteredMachines[filteredIndex].dailyTarget || 0;
+                        const targetValue = filteredMachines[filteredIndex].target || 0;
                         const remainValue = targetValue - actualValue;
 
                         // Hàm định dạng tooltip với label trái, giá trị và đơn vị phải
@@ -490,7 +497,7 @@ const HomePage = () => {
                 </div>
               ) : (
                 machines.map((machine) => (
-                  <Card key={machine.id} machine={machine} isDarkMode={isDark} />
+                  <Card key={machine.device_id} machine={machine} isDarkMode={isDark} />
                 ))
               )
             )}

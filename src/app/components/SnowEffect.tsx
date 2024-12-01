@@ -29,7 +29,7 @@ const SnowEffect: React.FC = () => {
 
     window.addEventListener('snowSettingChanged', handleSettingChange);
     window.addEventListener('storage', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('snowSettingChanged', handleSettingChange);
       window.removeEventListener('storage', handleStorageChange);
@@ -39,7 +39,7 @@ const SnowEffect: React.FC = () => {
   if (!isEnabled) return null;
 
   // Tạo mảng các ký tự bông tuyết khác nhau
-  const snowflakeChars = ['', '❆', '❄'];
+  const snowflakeChars = ['❆', '❄'];
 
   const snowflakes = Array.from({ length: 80 }, (_, index) => {
     const randomChar = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];

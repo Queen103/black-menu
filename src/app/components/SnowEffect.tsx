@@ -4,6 +4,42 @@ import React, { useEffect, useState } from 'react';
 
 const SnowEffect: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
+  const [snowflakes, setSnowflakes] = useState<React.ReactNode[]>([]);
+
+  // Hàm tạo một bông tuyết
+  const createSnowflake = (index: number) => {
+    const snowflakeChars = ['❆', '❄'];
+    const randomChar = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+    const size = Math.random() * 0.6 + 0.3;
+    const duration = Math.random() * 5 + 10; // 10-15s
+    const startPosition = Math.random() * 100;
+
+    return (
+      <div
+        key={`snow-${index}-${Date.now()}`}
+        style={{
+          position: 'fixed',
+          color: 'white',
+          fontSize: `${size}rem`,
+          left: `${startPosition}%`,
+          top: '-20px',
+          opacity: Math.random() * 0.7 + 0.3,
+          animation: `snowfall ${duration}s linear`,
+          textShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
+          zIndex: 1000,
+          pointerEvents: 'none',
+        }}
+        onAnimationEnd={(e) => {
+          // Xóa bông tuyết khi animation kết thúc
+          if (e.currentTarget.parentNode) {
+            e.currentTarget.parentNode.removeChild(e.currentTarget);
+          }
+        }}
+      >
+        {randomChar}
+      </div>
+    );
+  };
 
   useEffect(() => {
     // Load initial state from localStorage
@@ -36,36 +72,51 @@ const SnowEffect: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isEnabled) return;
+
+    // Tạo bông tuyết ban đầu
+    const initialFlakes = Array.from({ length: 30 }, (_, index) => createSnowflake(index));
+    setSnowflakes(initialFlakes);
+
+    // Tạo bông tuyết mới mỗi 200ms
+    const interval = setInterval(() => {
+      setSnowflakes(prev => [...prev, createSnowflake(prev.length)]);
+    }, 200);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isEnabled]);
+
   if (!isEnabled) return null;
 
-  // Tạo mảng các ký tự bông tuyết khác nhau
-  const snowflakeChars = ['❆', '❄'];
-
-  const snowflakes = Array.from({ length: 80 }, (_, index) => {
-    const randomChar = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
-    const size = Math.random() * 0.6 + 0.3; // 0.3rem to 0.9rem
-    const duration = Math.random() * 5 + 8; // 8s to 13s
-    const swayAmount = Math.random() * 30 + 20; // 20px to 50px sway
-
-    return (
-      <div
-        key={index}
-        className="snowflake"
-        style={{
-          '--size': `${size}rem`,
-          '--left': `${Math.random() * 100}%`,
-          '--opacity': Math.random() * 0.3 + 0.3, // 0.3 to 0.6
-          '--duration': `${duration}s`,
-          '--delay': `${Math.random() * 3}s`, // giảm delay để tuyết xuất hiện nhanh hơn
-          '--sway-amount': `${swayAmount}px`,
-        } as React.CSSProperties}
-      >
-        {randomChar}
+  return (
+    <>
+      <style jsx global>{`
+        @keyframes snowfall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+          }
+          100% {
+            transform: translateY(100vh) rotate(360deg);
+          }
+        }
+      `}</style>
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        pointerEvents: 'none',
+        zIndex: 100,
+        overflow: 'hidden',
+      }}>
+        {snowflakes}
       </div>
-    );
-  });
-
-  return <div className="snow-container">{snowflakes}</div>;
+    </>
+  );
 };
 
 export default SnowEffect;

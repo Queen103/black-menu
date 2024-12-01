@@ -18,16 +18,27 @@
     0 0 10px rgba(255, 255, 255, 0.5);
   opacity: var(--opacity);
   left: var(--left);
+  top: -20px;
   will-change: transform;
   animation: 
-    snowfall var(--duration) linear var(--delay) infinite;
+    snowfall var(--duration) ease-in-out var(--delay) infinite,
+    sway calc(var(--duration) / 2) ease-in-out alternate infinite;
 }
 
 @keyframes snowfall {
   0% {
-    transform: translate(0, -10px);
+    transform: translateY(-10px);
   }
   100% {
-    transform: translate(0, 100vh);
+    transform: translateY(105vh);
+  }
+}
+
+@keyframes sway {
+  0% {
+    transform: translateX(calc(var(--sway-amount) * -1));
+  }
+  100% {
+    transform: translateX(var(--sway-amount));
   }
 }

@@ -472,7 +472,12 @@ const HomePage = () => {
                 <div className="select-none">
                   FPS: {cpuData.fps} |
                 </div>
-                <div className={`h-5 w-5 rounded-full ${cpuData.connection ? 'bg-connect' : 'bg-notConnect'}`} />
+                <div className="flex items-center gap-2">
+                  <div className={`h-5 w-5 rounded-full ${cpuData.connection ? 'bg-connect' : 'bg-notConnect'}`} />
+                  <span className={`${cpuData.connection ? 'text-connect' : 'text-notConnect'}`}>
+                    {cpuData.connection ? 'Có kết nối' : 'Mất kết nối'}
+                  </span>
+                </div>
               </div>
             )}
           </div>

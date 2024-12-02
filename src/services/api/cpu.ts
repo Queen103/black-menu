@@ -6,6 +6,7 @@ interface DeviceStatus {
 }
 
 interface CpuData {
+    devices: any;
     fps: number;
     port: string;
     connection: boolean;

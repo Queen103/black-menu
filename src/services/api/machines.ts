@@ -54,6 +54,9 @@ export const fetchMachines = async (): Promise<Machine[]> => {
                 );
                 return {
                     ...machine,
+                    actual: machine.actual < 0 ? 0 : machine.actual,
+                    target: machine.target < 0 ? 0 : machine.target,
+                    mtg: machine.mtg < 0 ? 0 : machine.mtg,
                     name: deviceStatus?.name || `Device ${machine.device_id}`,
                     enable: deviceStatus?.enable || false
                 };
@@ -102,7 +105,7 @@ export const setDeviceName = async (device_id: number, name: string): Promise<vo
                 body: ''
             }
         );
-        
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || "Lỗi khi cập nhật tên thiết bị");

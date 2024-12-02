@@ -30,6 +30,7 @@ const config: Config = {
         'bg-table': '#041847',     // Nền bảng
         'bg-tableIn': '#20335d',   // Nền ô trong bảng
         'bg-tableOut': '#163374',  // Nền ô ngoại bảng
+        'report': '#00964d',
 
         // Màu sidebar
         'sideBar-dark': '#0E1626', // Sidebar tối

@@ -50,12 +50,13 @@ const Card = ({ machine, isDarkMode }: CardProps) => {
             <div className="font-bold text-md md:text-md select-none">MỤC TIÊU GIỜ</div>
             <div className="text-md md:text-md select-none">(HOURLY TARGET)</div>
           </div>
-          <div className="text-4xl md:text-5xl font-bold select-none">{machine.mtg}</div>
+          <div className="text-4xl md:text-5xl font-bold select-none">{machine.actual - machine.mtg}</div>
 
           <div className={`flex flex-col justify-center items-center `}>
             <div className="font-bold text-md md:text-md select-none">THỰC HIỆN</div>
             <div className="text-md md:text-md select-none">(ACTUAL)</div>
           </div>
+          <div className="text-4xl md:text-5xl font-bold select-none">{machine.actual}</div>
         </div>
       </div>
     </div>

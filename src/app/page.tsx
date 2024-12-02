@@ -419,11 +419,13 @@ const HomePage = () => {
                       },
                       label: function (context) {
                         const filteredIndex = context.dataIndex;
-                        const performanceValue = filteredMachines[filteredIndex].target - filteredMachines[filteredIndex].actual || 0;
+                        let performanceValue = (filteredMachines[filteredIndex].actual / filteredMachines[filteredIndex].target) * 100 || 0;
                         const actualValue = filteredMachines[filteredIndex].actual || 0;
                         const targetValue = filteredMachines[filteredIndex].target || 0;
                         const remainValue = targetValue - actualValue;
-
+                        if (targetValue < 0) {
+                          performanceValue = 100;
+                        }
                         // Hàm định dạng tooltip với label trái, giá trị và đơn vị phải
                         const dinhDangTooltip = (nhan: string, giaTri: number, donVi: string) => {
                           const tongDoDai = 25; // Độ dài cố định cho phần giữa

@@ -49,8 +49,10 @@ const CardDetail: React.FC<CardDetailProps> = ({ machine, isDarkMode, isFullScre
                 <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.mtg}</span>
                 <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Thực Hiện</strong>
                 <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.actual}</span>
-                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Hiệu Suất</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.target - machine.actual}</span>
+                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Hiệu Suất (%)</strong>
+                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
+                    {(machine.mtg <= 0 || machine.actual < 0) ? "-" : ((machine.actual / machine.mtg) * 100).toFixed(1)}
+                </span>
             </div>
         </div>
     );

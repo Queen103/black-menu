@@ -6,6 +6,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Card from "./components/Card";
 import Loading from "./components/Loading";
+import ReconnectModal from "./components/ReconnectModal";
 import { useTheme } from './context/ThemeContext';
 import { useFullScreen } from './context/FullScreenContext';
 import { fetchMachines } from '@/services/api';
@@ -44,6 +45,8 @@ const HomePage = () => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [showPerformance, setShowPerformance] = useState(true);
   const [showActual, setShowActual] = useState(true);
+  const [isCpuDisconnected, setIsCpuDisconnected] = useState(false);
+  const [isDisconnected, setIsDisconnected] = useState(false);
   const { isDark } = useTheme();
   const { isFullScreen } = useFullScreen();
 
@@ -55,12 +58,14 @@ const HomePage = () => {
       }
       const data = await fetchMachines();
       setMachines(data);
+      setIsDisconnected(false);
       if (isFirstLoad) {
         setIsFirstLoad(false);
         setIsLoading(false);
       }
     } catch (error) {
       console.error("Lỗi khi gọi API:", error);
+      setIsDisconnected(true);
       if (isFirstLoad) {
         setIsLoading(false);
       }
@@ -71,9 +76,15 @@ const HomePage = () => {
     try {
       const data = await fetchCpuData();
       setCpuData(data);
+      setIsCpuDisconnected(!data.connection);
     } catch (error) {
       console.error("Lỗi khi gọi API CPU:", error);
+      setIsCpuDisconnected(true);
     }
+  }, []);
+
+  const handleReconnect = useCallback(() => {
+    window.location.reload();
   }, []);
 
   // Optimized calculations with useMemo
@@ -143,7 +154,12 @@ const HomePage = () => {
   }, [fetchMachineData]);
 
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <ReconnectModal 
+        isOpen={isCpuDisconnected} 
+        onReconnect={handleReconnect} 
+      />
+      <ReconnectModal isOpen={isDisconnected} onReconnect={fetchMachineData} />
       {isLoading && <Loading isDarkMode={isDark} />}
       <div className={`p-3 overflow-hidden ${isFullScreen ? "h-[93vh]" : "h-[91vh]"} relative flex flex-col justify-between w-full ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
         <div className="flex justify-between gap-3 py-2 scale-[100%]">
@@ -153,7 +169,8 @@ const HomePage = () => {
                 MỤC TIÊU (PCS)
               </div>
               <div className="text-lg  text-center font-bold select-none">
-                BIỂU ĐỒ THỂ HIỆN MỤC TIÊU GIỜ CỦA TỪNG CHUYỀN </div>
+                BIỂU ĐỒ THỂ HIỆN MỤC TIÊU GIỜ CỦA TỪNG CHUYỀN 
+              </div>
               <div className=" flex space-x-20 text-sm  text-center font-bold gap-x-2 select-none" >
               </div>
             </div>
@@ -487,6 +504,7 @@ const HomePage = () => {
 
         <div className="flex items-center justify-between p-2.5">
 
+
           <div
             className="flex transition-transform gap-x-3"
             style={{
@@ -544,7 +562,7 @@ const HomePage = () => {
           </button>
         </div>
       </div >
-    </>
+    </div>
   );
 };
 

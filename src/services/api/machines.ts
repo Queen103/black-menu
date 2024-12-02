@@ -204,3 +204,17 @@ export const setDeviceActual = async (device_id: number, actual: number): Promis
         throw error;
     }
 };
+
+export const setDeviceTotalMin = async (device_id: number, total_mins: number): Promise<void> => {
+    const response = await fetch(`http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_total_min?device_id=${device_id}&total_mins=${total_mins}`, {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+        },
+        body: ''
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update total minutes');
+    }
+};

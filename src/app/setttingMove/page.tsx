@@ -12,6 +12,7 @@ import {
     setDeviceStartShift1,
     setDeviceStartShift2,
     setDeviceActual,
+    setDeviceTotalMin,
     type Machine
 } from '@/services/api/machines';
 import InputTime4Number from '../components/InputTime4Number';
@@ -181,6 +182,15 @@ const DetailPage = () => {
                     changes.push(`Ca chiều: ${originalMachine.shift_2} → ${editedMachine.shift_2}`);
                     await setDeviceStartShift2(machinedevice_id, editedMachine.shift_2);
                 }
+                if (editedMachine.total_min !== undefined && editedMachine.total_min !== originalMachine.total_min) {
+                    // Validate total_min range
+                    const totalMin = Number(editedMachine.total_min);
+                    if (totalMin < 1 || totalMin > 1440) {
+                        throw new Error('Thời gian làm việc phải từ 1 đến 1440 phút');
+                    }
+                    changes.push(`Thời gian làm việc: ${originalMachine.total_min} → ${totalMin} phút`);
+                    await setDeviceTotalMin(machinedevice_id, totalMin);
+                }
 
                 // Xóa dữ liệu đã chỉnh sửa sau khi cập nhật thành công
                 setEditedMachines(prev => {
@@ -292,17 +302,18 @@ const DetailPage = () => {
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thực Hiện</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Sáng</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Chiều</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thời Gian Làm Việc</th>
                                 <th className={`border-2 border-black ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Trạng Thái Kết Nối</th>
                             </tr>
                         </thead>
                         <tbody>
                             {machines.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-4">Không có dữ liệu</td>
+                                    <td colSpan={8} className="text-center py-4">Không có dữ liệu</td>
                                 </tr>
                             ) : (
                                 machines.filter(machine => machine.enable).map((machine) => (
-                                    <tr key={machine.device_id}>
+                                    <tr key={machine.device_id} className={`${machine.connection ? "" : " opacity-80 blink"}`}>
                                         <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
                                             {machine.device_id}
                                         </td>
@@ -395,6 +406,25 @@ const DetailPage = () => {
                                                     isFullScreen={isFullScreen}
                                                     isDark={isDark}
                                                     disabled={!machine.connection}
+                                                />
+                                            </div>
+                                        </td>
+
+                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold px-2 text-center w-1/2">{machine.total_min}</span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="1440"
+                                                    value={editedMachines[machine.device_id]?.total_min ?? ""}
+                                                    onChange={(e) => handleChange(machine.device_id, "total_min", e.target.value)}
+                                                    onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
+                                                    className={`w-1/2 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
+                                                    disabled={!machine.connection}
+                                                    style={{
+                                                        MozAppearance: 'textfield',
+                                                    }}
                                                 />
                                             </div>
                                         </td>

@@ -302,7 +302,7 @@ const DetailPage = () => {
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thực Hiện</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Sáng</th>
                                 <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Chiều</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thời Gian Làm Việc</th>
+                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Tổng thời Gian Làm Việc</th>
                                 <th className={`border-2 border-black ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Trạng Thái Kết Nối</th>
                             </tr>
                         </thead>

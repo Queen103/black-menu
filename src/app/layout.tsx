@@ -13,6 +13,7 @@ import { isMobile, isTablet } from 'react-device-detect';
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { FullScreenProvider } from './context/FullScreenContext'
 import SnowEffect from './components/SnowEffect';
+import { SettingsProvider } from './context/SettingsContext'
 
 // Component con sử dụng useTheme
 const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, ref) => {
@@ -56,6 +57,7 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
         "/detail",
         "/setttingMove",
         "/report",
+        "/gmailSettings",
         "/settings",
         "/account",
       ];
@@ -86,7 +88,7 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
           <Sidebar isOpen={sidebarOpen} ref={sidebarRef} />
           <button
             ref={buttonRef}
-            className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            className="fixed top-2 left-2 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
             onClick={toggleSidebar}
           >
             <IoMenuOutline className="w-6 h-6 text-gray-600 dark:text-gray-300" />
@@ -139,12 +141,14 @@ export default function RootLayout({
     <html lang="vi">
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none ">
         <ThemeProvider>
-          <FullScreenProvider>
-            <SnowEffect />
-            <MainContent>
-              {children}
-            </MainContent>
-          </FullScreenProvider>
+          <SettingsProvider>
+            <FullScreenProvider>
+              <SnowEffect />
+              <MainContent>
+                {children}
+              </MainContent>
+            </FullScreenProvider>
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

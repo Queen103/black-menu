@@ -24,6 +24,7 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
         { href: "/detail", icon: <LuEye className="text-[26px]" />, label: "GIAO DIỆN CHI TIẾT" },
         { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: "CÀI ĐẶT CHUYỀN" },
         { href: "/report", icon: <MdOutlineEmail className="text-[26px]" />, label: "CÀI ĐẶT BÁO CÁO" },
+        { href: "/gmailSettings", icon: <LuPhoneCall className="text-[26px]" />, label: "CÀI ĐẶT GMAIL" },
         { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: "CÀI ĐẶT CHUNG" },
         { href: "/account", icon: <IoPersonOutline className="text-[26px]" />, label: "TÀI KHOẢN" },
     ];

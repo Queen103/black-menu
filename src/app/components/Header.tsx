@@ -12,7 +12,7 @@ const Header: React.FC<HeaderProps> = () => {
   return (
     <header className={`w-full h-[65px] text-white flex items-center px-0 top-0 left-0 transition-colors duration-200 relative
       ${isDark ? 'bg-gray-900' : 'bg-[#4a4a4a]'}`}>
-      <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[40px] text-white text-center tracking-[0.2em]">
+      <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[4vh] text-white text-center tracking-[0.2em]">
         PHẦN MỀM QUẢN LÝ NĂNG SUẤT
       </div>
 

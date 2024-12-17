@@ -1,10 +1,33 @@
 'use client';
 
+import { useSettings } from '../context/SettingsContext';
 import React, { useEffect, useState } from 'react';
 
 const SnowEffect: React.FC = () => {
-  const [isEnabled, setIsEnabled] = useState(true);
+  const { settings } = useSettings();
+  const [mounted, setMounted] = useState(false);
   const [snowflakes, setSnowflakes] = useState<React.ReactNode[]>([]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !settings.effect) return;
+
+    // Tạo bông tuyết ban đầu
+    const initialFlakes = Array.from({ length: 30 }, (_, index) => createSnowflake(index));
+    setSnowflakes(initialFlakes);
+
+    // Tạo bông tuyết mới mỗi 200ms
+    const interval = setInterval(() => {
+      setSnowflakes(prev => [...prev, createSnowflake(prev.length)]);
+    }, 200);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [mounted, settings.effect]);
 
   // Hàm tạo một bông tuyết
   const createSnowflake = (index: number) => {
@@ -41,55 +64,7 @@ const SnowEffect: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    // Load initial state from localStorage
-    const checkSnowEnabled = () => {
-      const savedState = localStorage.getItem('snowEnabled');
-      setIsEnabled(savedState === null ? true : JSON.parse(savedState));
-    };
-
-    // Check initial state
-    checkSnowEnabled();
-
-    // Listen for changes from settings page
-    const handleSettingChange = () => {
-      checkSnowEnabled();
-    };
-
-    // Listen for storage changes (for cross-tab sync)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'snowEnabled') {
-        checkSnowEnabled();
-      }
-    };
-
-    window.addEventListener('snowSettingChanged', handleSettingChange);
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('snowSettingChanged', handleSettingChange);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isEnabled) return;
-
-    // Tạo bông tuyết ban đầu
-    const initialFlakes = Array.from({ length: 30 }, (_, index) => createSnowflake(index));
-    setSnowflakes(initialFlakes);
-
-    // Tạo bông tuyết mới mỗi 200ms
-    const interval = setInterval(() => {
-      setSnowflakes(prev => [...prev, createSnowflake(prev.length)]);
-    }, 200);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [isEnabled]);
-
-  if (!isEnabled) return null;
+  if (!mounted || !settings.effect) return null;
 
   return (
     <>

@@ -7,8 +7,11 @@ import { BiHomeAlt } from "react-icons/bi";
 import { MdOutlineEmail } from "react-icons/md";
 import { FiSettings } from "react-icons/fi";
 import { IoPersonOutline } from "react-icons/io5";
+import { IoLogOutOutline } from 'react-icons/io5';
 import { useTheme } from '../context/ThemeContext';
 import { forwardRef, ForwardedRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { logout } from '@/services/api/user';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -17,6 +20,12 @@ interface SidebarProps {
 const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivElement>) => {
     const pathname = usePathname();
     const { isDark } = useTheme();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logout();
+        router.push('/login');
+    };
 
     // Danh sách menu
     const menuItems = [
@@ -57,6 +66,15 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
                     </li>
                 ))}
             </ul>
+            <div className="px-4 pb-10">
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center justify-center w-full px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                    <IoLogOutOutline className="w-5 h-5 mr-3" />
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
         </div>
     );
 });

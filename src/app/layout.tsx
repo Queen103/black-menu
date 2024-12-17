@@ -82,7 +82,7 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   }, [pathname, router]);
 
   return (
-    <div ref={ref} className={`flex h-screen ${isDark ? 'dark' : ''}`}>
+    <div ref={ref} className={`notranslate flex h-screen ${isDark ? 'dark' : ''}`}>
       {!isLoginPage && (
         <>
           <Sidebar isOpen={sidebarOpen} ref={sidebarRef} />
@@ -106,11 +106,13 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   );
 });
 
-export default function RootLayout({
-  children,
-}: {
+MainContent.displayName = 'MainContent';
+
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export function RootLayout({ children }: RootLayoutProps) {
   const [showError, setShowError] = useState(false);
 
   useEffect(() => {
@@ -122,7 +124,7 @@ export default function RootLayout({
 
   if (showError) {
     return (
-      <html lang="vi">
+      <html translate="no" className="notranslate" lang="vi">
         <body>
           <div className="fixed inset-0 bg-error text-text-dark flex items-center justify-center p-4">
             <div className="text-center">
@@ -138,7 +140,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="vi">
+    <html translate="no" className="notranslate" lang="vi">
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none ">
         <ThemeProvider>
           <SettingsProvider>
@@ -154,3 +156,7 @@ export default function RootLayout({
     </html>
   );
 }
+
+RootLayout.displayName = 'RootLayout';
+
+export default RootLayout;

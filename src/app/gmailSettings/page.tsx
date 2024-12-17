@@ -27,8 +27,12 @@ const GmailSettingsPage = () => {
     };
 
     const handleEmailUpdate = async (slotId: number) => {
+        console.log('Updating email for slot:', slotId);
         const email = editedEmails[slotId] || "";
         const currentSlot = emailSlots.find(slot => slot.index === slotId);
+        
+        console.log('Current slot:', currentSlot);
+        console.log('All slots:', emailSlots);
 
         // Kiểm tra nếu không có email hiện tại và không có input mới
         if (!currentSlot?.email && !email) {
@@ -43,12 +47,21 @@ const GmailSettingsPage = () => {
         }
 
         try {
-            const updatedSlot = await updateGmailSettings(slotId, email);
-            setEmailSlots((prevSlots) =>
-                prevSlots.map((slot) =>
-                    slot.index === updatedSlot.index ? { ...slot, email: updatedSlot.email } : slot
-                )
-            );
+            // Điều chỉnh index trước khi gửi đến API
+            const apiIndex = slotId - 1;
+            console.log('Sending to API with index:', apiIndex);
+            
+            const updatedSlot = await updateGmailSettings(apiIndex, email);
+            console.log('API response:', updatedSlot);
+
+            setEmailSlots((prevSlots) => {
+                const newSlots = prevSlots.map((slot) =>
+                    slot.index === slotId ? { ...slot, email } : slot
+                );
+                console.log('New email slots:', newSlots);
+                return newSlots;
+            });
+            
             setEditedEmails(prev => ({ ...prev, [slotId]: "" }));
             toast.success(email ? `Cập nhật email thành công: ${email}` : "Đã xóa email thành công");
         } catch (error: any) {
@@ -110,7 +123,7 @@ const GmailSettingsPage = () => {
                         >
                             <div className="bg-report">
                                 <h2 className={`text-2xl w-full font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"} truncate`}>
-                                    EMAIL {typeof slot.index === 'number' ? slot.index + 1 : 1}
+                                    EMAIL THỨ {slot.index}
                                 </h2>
                             </div>
 
@@ -145,11 +158,7 @@ const GmailSettingsPage = () => {
                             </div>
                         </div>
                     ))
-                ) : (
-                    <div className="text-center text-xl text-error p-4 justify-center">
-                        Không có dữ liệu
-                    </div>
-                )}
+                ) : null}
             </div>
         </div>
     );

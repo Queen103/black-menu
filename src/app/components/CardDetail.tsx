@@ -38,23 +38,23 @@ const CardDetail: React.FC<CardDetailProps> = ({ machine, isDarkMode, isFullScre
                 : "border-notConnect";
 
     return (
-        <div className={`text-center border-4 rounded-lg h-5vh transition-transform hover:scale-[102%] ${borderColor} ${isDisabled ? 'opacity-40 bg-gray-400' : isDarkMode ? 'bg-secondary' : 'bg-bg-light'}`}>
-            <h3 className={`text-text-dark ${isFullScreen ? "py-3 text-3xl" : "py-2 text-2xl"} rounded-t-sm font-semibold justify-center ${isDisabled ? 'bg-gray-500' : bgColor} ${isFullScreen ? "mb-4" : "mb-2"}`}>
+        <div className={`text-center border-2 rounded-lg h-[27vh] transition-transform hover:scale-[102%] ${borderColor} ${isDisabled ? 'opacity-40 bg-gray-400' : isDarkMode ? 'bg-secondary' : 'bg-bg-light'}`}>
+            <h3 className={`text-text-dark ${isFullScreen ? "py-0 text-2xl" : "py-1 text-xl"} rounded-t-sm font-semibold justify-center ${isDisabled ? 'bg-gray-500' : bgColor} ${isFullScreen ? "mb-1" : "mb-0"}`}>
                 {machine.name}
             </h3>
-            <div className={`mb-3 grid grid-cols-2 gap-y-2 p-1 item-between px-3 ${isDisabled ? 'text-gray-700' : ''}`}>
-                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Mục Tiêu Ngày</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.target}</span>
-                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Mục Tiêu Giờ</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.mtg}</span>
-                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Thực Hiện</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.actual}</span>
-                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Chênh Lệch</strong>
-                <span className={`text-3xl text-end ${(machine.actual - machine.mtg) > 0 ? 'text-green-500' : 'text-red-500'} `}>
+            <div className={`h-[calc(27vh-3rem)] grid grid-cols-2 gap-y-0 items-center px-2 ${isDisabled ? 'text-gray-700' : ''}`}>
+                <strong className={`text-start text-base leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Mục Tiêu Ngày</strong>
+                <span className={`text-3xl text-end leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.target}</span>
+                <strong className={`text-start text-base leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Mục Tiêu Giờ</strong>
+                <span className={`text-3xl text-end leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.mtg}</span>
+                <strong className={`text-start text-base leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Thực Hiện</strong>
+                <span className={`text-3xl text-end leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>{machine.actual}</span>
+                <strong className={`text-start text-base leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Chênh Lệch</strong>
+                <span className={`text-3xl text-end leading-none ${(machine.actual - machine.mtg) > 0 ? 'text-green-500' : 'text-red-500'} `}>
                     {(machine.actual - machine.mtg).toFixed(0)}
                 </span>
-                <strong className={`text-start text-xl ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Hiệu Suất (%)</strong>
-                <span className={`text-3xl text-end ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
+                <strong className={`text-start text-base leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>Hiệu Suất (%)</strong>
+                <span className={`text-3xl text-end leading-none ${isDisabled ? 'text-gray-700' : isDarkMode ? 'text-text-dark' : 'text-text-light'}`}>
                     {(machine.mtg <= 0 || machine.actual < 0) ? "-" : ((machine.actual / machine.mtg) * 100).toFixed(1)}
                 </span>
             </div>

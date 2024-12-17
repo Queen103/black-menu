@@ -34,7 +34,7 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
     return (
         <div
             ref={ref}
-            className={`w-55 pt-[60px] ${bgClass} fixed z-30 top-0 left-0 h-screen font-semibold p-0 flex flex-col transition-all ${isOpen ? "transform-none" : "-translate-x-full"}`}
+            className={`w-[220px] pt-[60px] ${bgClass} fixed z-30 top-0 left-0 h-screen font-semibold p-0 flex flex-col transition-all duration-300 ${isOpen ? "transform-none" : "-translate-x-full"}`}
         >
             <ul className="list-none space-y-0 flex-grow">
                 {menuItems.map(({ href, icon, label }) => (

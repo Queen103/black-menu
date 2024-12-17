@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, forwardRef } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import './globals.css';
-import './styles/snow.css';
+import '../styles/snow.css';
 import Footer from './components/Footer';
 import { IoMenuOutline } from "react-icons/io5";
 import { usePathname } from 'next/navigation';

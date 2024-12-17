@@ -70,7 +70,11 @@ const SettingsPage = () => {
                         </div>
                         <Switch
                             checked={isDark}
-                            onChange={toggleTheme}
+                            onChange={(checked: boolean) => {
+                                toggleTheme();
+                                const newSettings = { ...settings, dark_mode: checked };
+                                handleSettingChange(newSettings);
+                            }}
                         />
                     </div>
 

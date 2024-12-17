@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import './globals.css';
@@ -15,13 +15,14 @@ import { FullScreenProvider } from './context/FullScreenContext'
 import SnowEffect from './components/SnowEffect';
 
 // Component con sử dụng useTheme
-const MainContent = ({ children }: { children: React.ReactNode }) => {
+const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, ref) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { isDark } = useTheme();
+  const isLoginPage = pathname === '/login';
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -51,13 +52,12 @@ const MainContent = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       const menuItems = [
-        "/",
+        "/home",
         "/detail",
         "/setttingMove",
         "/report",
         "/settings",
         "/account",
-        "/contact"
       ];
 
       const currentIndex = menuItems.findIndex(path => path === pathname);
@@ -80,34 +80,29 @@ const MainContent = ({ children }: { children: React.ReactNode }) => {
   }, [pathname, router]);
 
   return (
-    <div className="flex flex-col flex-1 pb-[25px] relative">
-      {/* Truyền toggleSidebar vào Header */}
-      <Header toggleSidebar={toggleSidebar} />
-
-      {/* Nút để điều khiển Sidebar */}
-      <button
-        ref={buttonRef}
-        onClick={toggleSidebar}
-        className="absolute top-2 left-5 rounded-md z-40 flex items-center bg-transparent"
-      >
-        <IoMenuOutline className={`text-[50px] ${isDark ? 'text-text-dark' : 'text-text-light'}`} />
-      </button>
-
-      {/* Main content area */}
-      <div className={`flex flex-1 transition-all`}>
-        {/* Sidebar */}
-        <div ref={sidebarRef}>
-          <Sidebar isOpen={sidebarOpen} />
-        </div>
-
-        {/* Nội dung chính */}
-        <main className={`flex-1 p-0 transition-all scrollbar-none scrollbar-hidden`}>
-          {children}
+    <div ref={ref} className={`flex h-screen ${isDark ? 'dark' : ''}`}>
+      {!isLoginPage && (
+        <>
+          <Sidebar isOpen={sidebarOpen} ref={sidebarRef} />
+          <button
+            ref={buttonRef}
+            className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            onClick={toggleSidebar}
+          >
+            <IoMenuOutline className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+          </button>
+        </>
+      )}
+      <div className={`flex flex-col flex-grow `}>
+        { <Header />}
+        <main className={`flex-grow`}>
+          {props.children}
         </main>
+        { <Footer />}
       </div>
     </div>
   );
-};
+});
 
 export default function RootLayout({
   children,
@@ -142,14 +137,13 @@ export default function RootLayout({
 
   return (
     <html lang="vi">
-      <body className="min-h-screen flex flex-col hidden-on-mobile select-none">
+      <body className="min-h-screen flex flex-col hidden-on-mobile select-none ">
         <ThemeProvider>
           <FullScreenProvider>
             <SnowEffect />
             <MainContent>
               {children}
             </MainContent>
-            <Footer />
           </FullScreenProvider>
         </ThemeProvider>
       </body>

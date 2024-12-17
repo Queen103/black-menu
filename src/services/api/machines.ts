@@ -21,7 +21,7 @@ export interface Machine {
 
 export const fetchMachines = async (): Promise<Machine[]> => {
     try {
-        const response = await fetch("http://123.16.53.91:23456/api/nam_co_london/v1/api_get_devices_info", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_GET_DEVICES_INFO}`, {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
@@ -37,7 +37,7 @@ export const fetchMachines = async (): Promise<Machine[]> => {
         const machineData: Machine[] = await response.json();
 
         // Fetch CPU data to get device names
-        const cpuResponse = await fetch("http://123.16.53.91:23456/api/nam_co_london/v1/api_get_cpu_info", {
+        const cpuResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_GET_CPU_INFO}`, {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
@@ -73,7 +73,7 @@ export const fetchMachines = async (): Promise<Machine[]> => {
 export const setDeviceEnable = async (device_id: number, enable: boolean): Promise<void> => {
     try {
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_enable?device_id=${device_id}&enable=${enable}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_ENABLE}?device_id=${device_id}&enable=${enable}`,
             {
                 method: 'POST',
                 headers: {
@@ -96,7 +96,7 @@ export const setDeviceEnable = async (device_id: number, enable: boolean): Promi
 export const setDeviceName = async (device_id: number, name: string): Promise<void> => {
     try {
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_name?device_id=${device_id}&name=${encodeURIComponent(name)}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_NAME}?device_id=${device_id}&name=${encodeURIComponent(name)}`,
             {
                 method: 'POST',
                 headers: {
@@ -118,12 +118,15 @@ export const setDeviceName = async (device_id: number, name: string): Promise<vo
 
 export const setDeviceTarget = async (device_id: number, target: number): Promise<void> => {
     try {
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_TARGET}`;
+        console.log('API URL:', url); // Debug log
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_target?device_id=${device_id}&target=${target}`,
+            url + `?device_id=${device_id}&target=${target}`,
             {
                 method: 'POST',
                 headers: {
-                    'accept': 'application/json'
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: ''
             }
@@ -131,7 +134,7 @@ export const setDeviceTarget = async (device_id: number, target: number): Promis
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || "Lỗi khi cập nhật mục tiêu thiết bị");
+            throw new Error(errorData.error || "Lỗi khi cập nhật target thiết bị");
         }
     } catch (error) {
         console.error('Error setting device target:', error);
@@ -142,7 +145,7 @@ export const setDeviceTarget = async (device_id: number, target: number): Promis
 export const setDeviceStartShift1 = async (device_id: number, start_shift_1: string): Promise<void> => {
     try {
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_start_shift_1?device_id=${device_id}&start_shift_1=${encodeURIComponent(start_shift_1)}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_START_SHIFT_1}?device_id=${device_id}&start_shift_1=${encodeURIComponent(start_shift_1)}`,
             {
                 method: 'POST',
                 headers: {
@@ -165,7 +168,7 @@ export const setDeviceStartShift1 = async (device_id: number, start_shift_1: str
 export const setDeviceStartShift2 = async (device_id: number, start_shift_2: string): Promise<void> => {
     try {
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_start_shift_2?device_id=${device_id}&start_shift_2=${encodeURIComponent(start_shift_2)}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_START_SHIFT_2}?device_id=${device_id}&start_shift_2=${encodeURIComponent(start_shift_2)}`,
             {
                 method: 'POST',
                 headers: {
@@ -188,7 +191,7 @@ export const setDeviceStartShift2 = async (device_id: number, start_shift_2: str
 export const setDeviceActual = async (device_id: number, actual: number): Promise<void> => {
     try {
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_actual?device_id=${device_id}&actual=${actual}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_ACTUAL}?device_id=${device_id}&actual=${actual}`,
             {
                 method: 'POST',
                 headers: {
@@ -209,7 +212,7 @@ export const setDeviceActual = async (device_id: number, actual: number): Promis
 };
 
 export const setDeviceTotalMin = async (device_id: number, total_mins: number): Promise<void> => {
-    const response = await fetch(`http://123.16.53.91:23456/api/nam_co_london/v1/api_set_device_total_min?device_id=${device_id}&total_mins=${total_mins}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_TOTAL_MIN}?device_id=${device_id}&total_mins=${total_mins}`, {
         method: 'POST',
         headers: {
             'accept': 'application/json',

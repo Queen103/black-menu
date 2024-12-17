@@ -6,7 +6,7 @@ export interface TimeSlot {
 export const fetchReportSettings = async (): Promise<TimeSlot[]> => {
     try {
         const response = await fetch(
-            'http://123.16.53.91:23456/api/nam_co_london/v1/api_get_reports_config',
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_GET_REPORTS_CONFIG}`,
             {
                 method: 'POST',
                 headers: {
@@ -38,7 +38,7 @@ export const fetchReportSettings = async (): Promise<TimeSlot[]> => {
 export const updateReportTime = async (index: number, time: string): Promise<TimeSlot> => {
     try {
         const response = await fetch(
-            `http://123.16.53.91:23456/api/nam_co_london/v1/api_set_reports_config?index=${index}&time=${encodeURIComponent(time)}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_REPORTS_CONFIG}?index=${index}&time=${encodeURIComponent(time)}`,
             {
                 method: 'POST',
                 headers: {

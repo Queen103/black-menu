@@ -8,24 +8,24 @@ import { MdOutlineEmail } from "react-icons/md";
 import { FiSettings } from "react-icons/fi";
 import { IoPersonOutline } from "react-icons/io5";
 import { useTheme } from '../context/ThemeContext';
+import { forwardRef, ForwardedRef } from 'react';
 
 interface SidebarProps {
     isOpen: boolean;
 }
 
-const Sidebar = ({ isOpen }: SidebarProps) => {
+const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivElement>) => {
     const pathname = usePathname();
     const { isDark } = useTheme();
 
     // Danh sách menu
     const menuItems = [
-        { href: "/", icon: <BiHomeAlt className="text-[26px]" />, label: "GIAO DIỆN CHÍNH" },
+        { href: "/home", icon: <BiHomeAlt className="text-[26px]" />, label: "GIAO DIỆN CHÍNH" },
         { href: "/detail", icon: <LuEye className="text-[26px]" />, label: "GIAO DIỆN CHI TIẾT" },
         { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: "CÀI ĐẶT CHUYỀN" },
         { href: "/report", icon: <MdOutlineEmail className="text-[26px]" />, label: "CÀI ĐẶT BÁO CÁO" },
         { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: "CÀI ĐẶT CHUNG" },
         { href: "/account", icon: <IoPersonOutline className="text-[26px]" />, label: "TÀI KHOẢN" },
-        { href: "/contact", icon: <LuPhoneCall className="text-[26px]" />, label: "LIÊN HỆ" },
     ];
 
     // Màu nền và chữ dựa trên chế độ sáng/tối
@@ -33,8 +33,8 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
 
     return (
         <div
-            className={`w-55 pt-[60px] ${bgClass} fixed z-30 top-0 left-0 h-screen font-semibold p-0 flex flex-col transition-all ${isOpen ? "transform-none" : "-translate-x-full"
-                }`}
+            ref={ref}
+            className={`w-55 pt-[60px] ${bgClass} fixed z-30 top-0 left-0 h-screen font-semibold p-0 flex flex-col transition-all ${isOpen ? "transform-none" : "-translate-x-full"}`}
         >
             <ul className="list-none space-y-0 flex-grow">
                 {menuItems.map(({ href, icon, label }) => (
@@ -58,6 +58,8 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
             </ul>
         </div>
     );
-};
+});
+
+Sidebar.displayName = 'Sidebar';
 
 export default Sidebar;

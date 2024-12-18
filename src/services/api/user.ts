@@ -68,3 +68,71 @@ export const logout = () => {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('user');
 };
+
+export const createUser = async (userData: {
+    account: string;
+    password: string;
+    is_admin: boolean;
+    is_valid: boolean;
+    is_writer: boolean;
+    date_created: string;
+    create_by: string;
+    info: string;
+}): Promise<User> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_create_account`, {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error creating user:', error);
+        throw error;
+    }
+};
+
+export const deleteUser = async (account: string): Promise<void> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_delete_account?account=${account}`, {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete account');
+        }
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        throw error;
+    }
+};
+
+export const changeUserPassword = async (account: string, password: string): Promise<void> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_set_user_password?account=${account}&password=${password}`, {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to change password');
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw error;
+    }
+};

@@ -1,7 +1,7 @@
 "use client";
 
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, LineController } from 'chart.js';
 import { useEffect, useState, useMemo, useCallback } from "react";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import Card from "../components/Card";
@@ -31,7 +31,18 @@ interface Machine {
   enable: boolean;
 }
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement, ChartDataLabels);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  PointElement,
+  LineController,
+  ChartDataLabels
+);
 
 // Constants
 const FETCH_INTERVAL = 1000;

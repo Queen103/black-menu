@@ -178,7 +178,7 @@ const ReportPage = () => {
                                     </span>
 
                                     {/* Input chỉnh sửa thởi gian */}
-                                    <div className="bg-bg-light py-1 w-full flex items-center justify-center">
+                                    <div className="bg-bg-light py-3 h-full w-full flex items-end justify-center">
                                         <InputTime2Number
                                             hours={editedHours[slot.index]?.toString() || ""}
                                             minutes={editedMinutes[slot.index]?.toString() || ""}

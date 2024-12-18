@@ -17,7 +17,7 @@ interface CpuData {
 
 export const fetchCpuData = async (): Promise<CpuData> => {
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ;
         const endpoint = process.env.NEXT_PUBLIC_API_GET_CPU_INFO || '/api/nam_co_london/v1/api_get_cpu_info';
         const url = baseUrl + endpoint;
         console.log('Calling API:', url);

@@ -145,7 +145,7 @@ export const setDeviceTarget = async (device_id: number, target: number): Promis
 export const setDeviceStartShift1 = async (device_id: number, start_shift_1: string): Promise<void> => {
     try {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_START_SHIFT_1}?device_id=${device_id}&start_shift_1=${encodeURIComponent(start_shift_1)}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_START_SHIFT_1}?device_id=${device_id}&shift_1=${encodeURIComponent(start_shift_1)}`,
             {
                 method: 'POST',
                 headers: {
@@ -168,7 +168,7 @@ export const setDeviceStartShift1 = async (device_id: number, start_shift_1: str
 export const setDeviceStartShift2 = async (device_id: number, start_shift_2: string): Promise<void> => {
     try {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_START_SHIFT_2}?device_id=${device_id}&start_shift_2=${encodeURIComponent(start_shift_2)}`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_START_SHIFT_2}?device_id=${device_id}&shift_2=${encodeURIComponent(start_shift_2)}`,
             {
                 method: 'POST',
                 headers: {

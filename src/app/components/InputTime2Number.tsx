@@ -46,7 +46,7 @@ const InputTime2Number: React.FC<InputTime2NumberProps> = ({
         type: "text",
         maxLength: 1,
         disabled,
-        className: `w-6 h-[4vh] text-text-light text-2xl ${isFullScreen ? "py-3" : "py-1"} border-b-2 border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-accent bg-transparent mx-0.5`
+        className: `w-6 h-full text-text-light text-2xl ${isFullScreen ? "py-3" : "py-1"} border-b-2 border-gray-600 text-center focus:outline-none focus:ring-2 focus:ring-accent bg-transparent mx-0.5`
     };
 
     const handleHourChange = (
@@ -115,7 +115,7 @@ const InputTime2Number: React.FC<InputTime2NumberProps> = ({
     };
 
     return (
-        <div className="flex items-center">
+        <div className="flex items-center h-full">
             <div className="flex items-center gap-1 ">
                 <input
                     {...commonInputProps}

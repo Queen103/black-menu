@@ -119,9 +119,9 @@ const GmailSettingsPage = () => {
                     emailSlots.map((slot) => (
                         <div
                             key={slot.index}
-                            className={`border h-[21vh] border-report border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center ${isDark ? 'bg-secondary text-text-dark' : 'bg-gray-300 text-text-light'} h-[20vh] min-h-[180px] flex flex-col`}
+                            className={`border h-[21vh] border-blue-500 border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center ${isDark ? 'bg-secondary text-text-dark' : 'bg-gray-300 text-text-light'} h-[20vh] min-h-[180px] flex flex-col`}
                         >
-                            <div className="bg-report">
+                            <div className="bg-blue-500">
                                 <h2 className={`text-2xl w-full font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"} truncate`}>
                                     EMAIL THỨ {slot.index}
                                 </h2>

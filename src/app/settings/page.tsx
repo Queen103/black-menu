@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { useSettings } from "../context/SettingsContext";
 import { Switch } from "../components/Switch";
 import { toast } from "react-toastify";
@@ -9,6 +10,7 @@ import { Settings, updateSettings } from "@/services/api/settings";
 
 const SettingsPage = () => {
     const { isDark, toggleTheme } = useTheme();
+    const { language, setLanguage } = useLanguage();
     const { settings, updateSettings: updateContextSettings, isLoading, error } = useSettings();
 
     const handleTimeChange = (value: string) => {
@@ -70,10 +72,20 @@ const SettingsPage = () => {
                         </div>
                         <Switch
                             checked={isDark}
-                            onChange={(checked: boolean) => {
+                            onChange={async (checked: boolean) => {
+                                // First update the theme in context and localStorage
                                 toggleTheme();
-                                const newSettings = { ...settings, dark_mode: checked };
-                                handleSettingChange(newSettings);
+                                // Then update the backend settings
+                                try {
+                                    const newSettings = { ...settings, dark_mode: !settings.dark_mode };
+                                    await updateSettings(newSettings);
+                                    updateContextSettings(newSettings);
+                                    toast.success("Cập nhật giao diện thành công");
+                                } catch (error) {
+                                    toast.error("Có lỗi xảy ra khi cập nhật giao diện");
+                                    // Revert theme if settings update fails
+                                    toggleTheme();
+                                }
                             }}
                         />
                     </div>
@@ -85,19 +97,30 @@ const SettingsPage = () => {
                             <p className="text-sm text-gray-500 dark:text-gray-400">Chọn ngôn ngữ hiển thị</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <span className={`text-sm ${settings.is_vietnamese ? 'text-blue-500 font-medium' : ''}`}>Tiếng Việt</span>
+                            <span className={`text-sm ${language === 'vi' ? 'text-blue-500 font-medium' : ''}`}>Tiếng Việt</span>
                             <Switch
-                                checked={settings.is_vietnamese}
-                                onChange={(checked: boolean) => {
-                                    const newSettings = {
-                                        ...settings,
-                                        is_vietnamese: checked,
-                                        is_english: !checked
-                                    };
-                                    handleSettingChange(newSettings);
+                                checked={language === 'vi'}
+                                onChange={async (checked: boolean) => {
+                                    const newLang = checked ? 'vi' : 'en';
+                                    setLanguage(newLang);
+                                    
+                                    try {
+                                        const newSettings = {
+                                            ...settings,
+                                            is_vietnamese: checked,
+                                            is_english: !checked
+                                        };
+                                        await updateSettings(newSettings);
+                                        updateContextSettings(newSettings);
+                                        toast.success("Cập nhật ngôn ngữ thành công");
+                                    } catch (error) {
+                                        toast.error("Có lỗi xảy ra khi cập nhật ngôn ngữ");
+                                        // Revert language if settings update fails
+                                        setLanguage(language);
+                                    }
                                 }}
                             />
-                            <span className={`text-sm ${!settings.is_vietnamese ? 'text-blue-500 font-medium' : ''}`}>English</span>
+                            <span className={`text-sm ${language === 'en' ? 'text-blue-500 font-medium' : ''}`}>English</span>
                         </div>
                     </div>
 

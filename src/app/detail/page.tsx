@@ -5,39 +5,18 @@ import CardDetail from '../components/CardDetail';
 import { useTheme } from "../context/ThemeContext";
 import { useFullScreen } from '../context/FullScreenContext';
 import { Machine, fetchMachines } from '@/services/api/machines';
-
-// Props cho component chỉ thị trạng thái
-interface StatusIndicatorProps {
-    label: string;
-    color: string;
-}
-
-// Component loading spinner
-const LoadingSpinner = () => (
-    <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="relative">
-            <div className="w-20 h-20 border-4 border-gray-300 rounded-full"></div>
-            <div className="w-20 h-20 border-t-4 border-blue-500 animate-spin rounded-full absolute left-0 top-0"></div>
-        </div>
-        <div className="ml-4 text-xl font-semibold">Đang tải dữ liệu...</div>
-    </div>
-);
-
-// Component hiển thị trạng thái kết nối
-const StatusIndicator = ({ label, color }: StatusIndicatorProps) => (
-    <div className="flex items-center space-x-2">
-        <div>{label}</div>
-        <div className={`h-5 w-5 rounded-lg ${color}`} />
-    </div>
-);
+import { useLanguage } from '../context/LanguageContext';
+import messages from '@/messages';
 
 // Component chính của trang chi tiết
 const DetailPage = () => {
     const [machines, setMachines] = useState<Machine[]>([]);
     const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const { isDark } = useTheme();
     const { isFullScreen } = useFullScreen();
+    const { language } = useLanguage();
+    const t = messages[language].home;
 
     // Hàm lấy dữ liệu máy từ API
     const fetchMachineData = useCallback(async () => {
@@ -79,7 +58,7 @@ const DetailPage = () => {
     if (isFirstLoad) {
         return (
             <div className={`px-5 h-[100vh] ${isDark ? 'text-white bg-bg-dark' : 'text-[#333333] bg-bg-light'}`}>
-                <LoadingSpinner />
+                <Loading isDarkMode={isDark} />
             </div>
         );
     }
@@ -89,12 +68,12 @@ const DetailPage = () => {
             {isLoading && <Loading isDarkMode={isDark} />}
             <div className={`${isDark ? 'text-white' : 'text-[#333333]'} text-2xl font-semibold flex items-center space-x-4 justify-between px-2 ${isFullScreen ? "py-8" : "py-3"}`}>
                 <div>
-                    Số Line đang hoạt động: {enabledCount}/{totalCount}
+                    {t.footer.line_count} {enabledCount}/{totalCount}
                 </div>
                 <div className="text-2xl font-semibold flex items-center space-x-4 justify-start gap-x-10">
-                    <StatusIndicator label="Có Kết Nối" color="bg-connect" />
-                    <StatusIndicator label="Không Hoạt Động" color="bg-gray-400" />
-                    <StatusIndicator label="Mất Kết Nối" color="bg-notConnect" />
+                    <StatusIndicator label={t.footer.connected} color="bg-connect" />
+                    <StatusIndicator label={t.footer.not_operating} color="bg-gray-400" />
+                    <StatusIndicator label={t.footer.disconnected} color="bg-notConnect" />
                 </div>
             </div>
 
@@ -115,5 +94,13 @@ const DetailPage = () => {
         </div>
     );
 };
+
+// Component hiển thị trạng thái kết nối
+const StatusIndicator = ({ label, color }: { label: string; color: string }) => (
+    <div className="flex items-center space-x-2">
+        <div>{label}</div>
+        <div className={`h-5 w-5 rounded-lg ${color}`} />
+    </div>
+);
 
 export default DetailPage;

@@ -1,0 +1,80 @@
+{
+  "login": {
+    "title": "Đăng Nhập",
+    "username": "Tài khoản",
+    "username_placeholder": "Nhập tài khoản",
+    "password": "Mật khẩu",
+    "password_placeholder": "Nhập mật khẩu",
+    "button": "Đăng nhập",
+    "loading": "Đang đăng nhập...",
+    "error": {
+      "invalid_credentials": "Tài khoản hoặc mật khẩu không đúng",
+      "general": "Có lỗi xảy ra khi đăng nhập"
+    }
+  },
+  "home": {
+    "errors": {
+      "api_error": "Lỗi khi gọi API:",
+      "cpu_api_error": "Lỗi khi gọi API CPU:",
+      "disconnected": "Mất kết nối"
+    },
+    "chart": {
+      "difference": "Chênh Lệch (PCS)",
+      "title": "BIỂU ĐỒ THỂ HIỆN MỤC TIÊU GIỜ CỦA TỪNG CHUYỀN",
+      "actual": "THỰC HIỆN (PCS)",
+      "target": "Mục Tiêu",
+      "performance": "HIỆU SUẤT (%)",
+      "production": "BIỂU ĐỒ HIỆU SUẤT VÀ THỰC HIỆN",
+      "tooltip": {
+        "performance": "Hiệu suất:",
+        "actual": "Thực hiện:",
+        "remaining": "Còn lại:"
+      }
+    },
+    "footer": {
+      "line_count": "Số Line đang hoạt động:",
+      "connected": "Có Kết Nối",
+      "disconnected": "Mất Kết Nối",
+      "not_operating": "Không Hoạt Động"
+    }
+  },
+  "detail": {
+    "card": {
+      "daily_target": "MỤC TIÊU NGÀY",
+      "daily_target_en": "(DAILY TARGET)",
+      "hourly_target": "MỤC TIÊU GIỜ",
+      "hourly_target_en": "(HOURLY TARGET)",
+      "actual": "THỰC HIỆN",
+      "actual_en": "(ACTUAL)",
+      "difference": "CHÊNH LỆCH",
+      "difference_en": "(DIFFERENCE)",
+      "performance": "HIỆU SUẤT (%)",
+      "performance_en": "(PERFORMANCE)",
+      "no_data": "Không có dữ liệu máy"
+    }
+  },
+    "settingLine":{
+      "lineActive": "Line hoạt động",
+      "enableTable": "Bảng trạng thái",
+      "settingTable": "Bảng cài đặt",
+      "noData":"Không có dữ liệu",
+      "connected": "Kết nối",
+      "disconnected": "Mất kết nối",
+      "toast": {
+        "success": "Cập Nhật Thành Công",
+        "error": "Lỗi khi cập nhật trạng thái",
+        "update": "Cập nhật thành công Line"
+      },
+      "item":{
+        "Name": "Tên",
+        "daily_target": "MỤC TIÊU NGÀY",
+        "shift_1": "CA SÁNG",
+        "shift_2": "CA CHIỀU",
+        "actual": "THỰC HIỆN",
+        "timeMin": "Thời gian làm việc phải từ 1 đến 1440 phút",
+        "timeWork": "Thời gian làm việc",
+        "state": "Trạng thái"
+      }
+    }
+  
+}

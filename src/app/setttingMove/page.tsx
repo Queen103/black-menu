@@ -16,6 +16,8 @@ import {
     type Machine
 } from '@/services/api/machines';
 import InputTime4Number from '../components/InputTime4Number';
+import messages from '@/messages';
+import { useLanguage } from '../context/LanguageContext';
 
 const DetailPage = () => {
     const [machines, setMachines] = useState<Machine[]>([]);
@@ -24,22 +26,8 @@ const DetailPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
     const { isDark } = useTheme();
-
-    // Refs for input fields
-    const inputRefs = {
-        morning: {
-            hour1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-            hour2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-            minute1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-            minute2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-        },
-        afternoon: {
-            hour1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-            hour2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-            minute1: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-            minute2: useRef<{ [key: number]: HTMLInputElement }>({}).current,
-        }
-    };
+    const { language } = useLanguage();
+    const t = messages[language].settingLine;
 
     // Wrap fetchMachineData trong useCallback
     const fetchMachineData = useCallback(async () => {
@@ -121,7 +109,7 @@ const DetailPage = () => {
             } else {
             }
 
-            toast.success('Cập nhật trạng thái thành công!', {
+            toast.success(t.toast.success, {
                 position: "top-center",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -135,8 +123,8 @@ const DetailPage = () => {
             // Refresh data after successful update
             fetchMachineData();
         } catch (error) {
-            console.error('Error updating machine state:', error);
-            toast.error('Lỗi khi cập nhật trạng thái!', {
+            console.error(t.toast.error, error);
+            toast.error(t.toast.error, {
                 position: "top-center",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -163,32 +151,32 @@ const DetailPage = () => {
 
                 // So sánh và ghi nhận các thay đổi
                 if (editedMachine.name !== undefined && editedMachine.name !== originalMachine.name) {
-                    changes.push(`Tên: ${originalMachine.name} → ${editedMachine.name}`);
+                    changes.push(`${t.item.Name}: ${originalMachine.name} → ${editedMachine.name}`);
                     await setDeviceName(machinedevice_id, editedMachine.name);
                 }
                 if (editedMachine.target !== undefined && editedMachine.target !== originalMachine.target) {
-                    changes.push(`Mục tiêu ngày: ${originalMachine.target} → ${editedMachine.target}`);
+                    changes.push(`${t.item.daily_target}: ${originalMachine.target} → ${editedMachine.target}`);
                     await setDeviceTarget(machinedevice_id, editedMachine.target);
                 }
                 if (editedMachine.shift_1 !== undefined && editedMachine.shift_1 !== originalMachine.shift_1) {
-                    changes.push(`Ca sáng: ${originalMachine.shift_1} → ${editedMachine.shift_1}`);
+                    changes.push(`${t.item.shift_1}: ${originalMachine.shift_1} → ${editedMachine.shift_1}`);
                     await setDeviceStartShift1(machinedevice_id, editedMachine.shift_1);
                 }
                 if (editedMachine.actual !== undefined && editedMachine.actual !== originalMachine.actual) {
-                    changes.push(`Thực hiện: ${originalMachine.actual} → ${editedMachine.actual}`);
+                    changes.push(`${t.item.actual}: ${originalMachine.actual} → ${editedMachine.actual}`);
                     await setDeviceActual(machinedevice_id, editedMachine.actual);
                 }
                 if (editedMachine.shift_2 !== undefined && editedMachine.shift_2 !== originalMachine.shift_2) {
-                    changes.push(`Ca chiều: ${originalMachine.shift_2} → ${editedMachine.shift_2}`);
+                    changes.push(`${t.item.shift_2}: ${originalMachine.shift_2} → ${editedMachine.shift_2}`);
                     await setDeviceStartShift2(machinedevice_id, editedMachine.shift_2);
                 }
                 if (editedMachine.total_min !== undefined && editedMachine.total_min !== originalMachine.total_min) {
                     // Validate total_min range
                     const totalMin = Number(editedMachine.total_min);
                     if (totalMin < 1 || totalMin > 1440) {
-                        throw new Error('Thời gian làm việc phải từ 1 đến 1440 phút');
+                        throw new Error(t.toast.timeMin);
                     }
-                    changes.push(`Thời gian làm việc: ${originalMachine.total_min} → ${totalMin} phút`);
+                    changes.push(`${t.item.total_min}: ${originalMachine.total_min} → ${totalMin} phút`);
                     await setDeviceTotalMin(machinedevice_id, totalMin);
                 }
 
@@ -203,7 +191,7 @@ const DetailPage = () => {
                 if (changes.length > 0) {
                     toast.success(
                         <div>
-                            <div className="font-bold mb-2">Cập nhật thành công Line {machinedevice_id}:</div>
+                            <div className="font-bold mb-2">{t.toast.update} {machinedevice_id}:</div>
                             {changes.map((change, index) => (
                                 <div key={index} className="ml-2">• {change}</div>
                             ))}
@@ -221,7 +209,7 @@ const DetailPage = () => {
 
             } catch (error) {
                 console.error('Error:', error);
-                toast.error('Có lỗi xảy ra khi cập nhật!', {
+                toast.error(t.toast.error, {
                     position: "top-center",
                     autoClose: 3000,
                     hideProgressBar: false,
@@ -244,10 +232,10 @@ const DetailPage = () => {
             <div>
                 <div className="flex justify-between items-center py-2 ">
                     <div className={`text-lg select-none ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                        Số Line đang hoạt động: {enabledCount}/{device_idCount}
+                        {t.lineActive}: {enabledCount}/{device_idCount}
                     </div>
                     <h2 className={`text-xl ${isFullScreen ? "text-3xl" : "text-xl"} font-bold select-none text-center ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                        Bảng Trạng Thái
+                        {t.enableTable}
                     </h2>
                     <div className="w-[250px]"></div>
                 </div>
@@ -290,37 +278,37 @@ const DetailPage = () => {
             {/* Bảng 2: Cài Đặt */}
             <div>
                 <h2 className={` font-bold mb-2 select-none text-center ${isFullScreen ? "text-3xl" : "text-xl"} ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                    Bảng Cài Đặt
+                    {t.settingTable}
                 </h2>
                 <div className="overflow-x-auto text-lg shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
                     <table className={`table-auto w-full border-collapse border-2 ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
-                            <tr className={`${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>ID</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Tên</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Mục Tiêu Ngày</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Thực Hiện</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Sáng</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Ca Chiều</th>
-                                <th className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Tổng thời Gian Làm Việc</th>
-                                <th className={`border-2 border-black ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>Trạng Thái Kết Nối</th>
+                            <tr className={`w-full ${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
+                                <th className={`border-2 w-[8%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>ID</th>
+                                <th className={`border-2 w-[15%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.Name}</th>
+                                <th className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.daily_target}</th>
+                                <th className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.actual}</th>
+                                <th className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.shift_1}</th>
+                                <th className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.shift_2}</th>
+                                <th className={`border-2 w-[14%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.timeWork}</th>
+                                <th className={`border-2 border-black w-[15%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.state}</th>
                             </tr>
                         </thead>
                         <tbody>
                             {machines.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="text-center py-4">Không có dữ liệu</td>
+                                    <td colSpan={8} className="text-center py-4">{t.noData}</td>
                                 </tr>
                             ) : (
                                 machines.filter(machine => machine.enable).map((machine) => (
                                     <tr key={machine.device_id} className={`${machine.connection ? "" : " opacity-80 blink"}`}>
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
+                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
                                             {machine.device_id}
                                         </td>
                                         {/* Tên */}
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
+                                        <td className={`border-2 w-[15%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
                                             <div className="flex items-center justify-between">
-                                                <span className="font-semibold text-center w-1/2">{machine.name}</span>
+                                                <span className="font-semibold text-center w-1/2 truncate" title={machine.name}>{machine.name}</span>
                                                 <input
                                                     type="text"
                                                     value={editedMachines[machine.device_id]?.name ?? ""}
@@ -333,7 +321,7 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Mục tiêu ngày */}
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                        <td className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-between">
                                                 <span className="font-semibold px-2 text-center w-1/2">{machine.target}</span>
                                                 <input
@@ -358,7 +346,7 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Thực hiện */}
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                        <td className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-between">
                                                 <span className="font-semibold px-2 text-center w-1/2">{machine.actual}</span>
                                                 <input
@@ -382,7 +370,7 @@ const DetailPage = () => {
                                             </div>
                                         </td>
 
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                        <td className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-center">
                                                 <span className="font-semibold px-2 text-center w-1/2">{machine.shift_1}</span>
                                                 <InputTime4Number
@@ -396,7 +384,7 @@ const DetailPage = () => {
                                             </div>
                                         </td>
 
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                        <td className={`border-2 w-[12%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-center">
                                                 <span className="font-semibold px-2 text-center w-1/2">{machine.shift_2}</span>
                                                 <InputTime4Number
@@ -410,7 +398,7 @@ const DetailPage = () => {
                                             </div>
                                         </td>
 
-                                        <td className={`border-2 ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
+                                        <td className={`border-2 w-[14%] ${isFullScreen ? "px-4 py-0.5 text-2xl" : "px-2 text-xl"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
                                             <div className="flex items-center justify-between">
                                                 <span className="font-semibold px-2 text-center w-1/2">{machine.total_min}</span>
                                                 <input
@@ -430,10 +418,10 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Trạng Thái Kết Nối */}
-                                        <td className={`border-2 text-center w-[25vh] ${isFullScreen ? " py-0.5 text-2xl" : " text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                        <td className={`border-2 text-center w-[15%] ${isFullScreen ? " py-0.5 text-2xl" : " text-xl"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                             <div className="flex justify-center items-center h-full">
                                                 <span className={`p-1.5 font-semibold text-text-dark w-full h-full flex items-center justify-center ${machine.connection ? "bg-connect" : "bg-error opacity-80 blink"}`}>
-                                                    {machine.connection ? "Kết Nối" : "Mất Kết Nối"}
+                                                    {machine.connection ? t.connected : t.disconnected}
                                                 </span>
                                             </div>
                                         </td>

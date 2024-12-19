@@ -1,3 +1,6 @@
+import messages from "@/messages";
+import { useLanguage } from "../context/LanguageContext";
+
 interface Machine {
   device_id: number;
   target: number;
@@ -23,6 +26,8 @@ interface CardProps {
 }
 
 const Card = ({ machine, isDarkMode }: CardProps) => {
+  const { language } = useLanguage();
+  const t = messages[language].detail.card;
   return (
     <div className="block relative w-[calc(100%/5.08)] flex-shrink-0 hover:scale-[105%] transition-transform select-none">
       <div
@@ -41,19 +46,19 @@ const Card = ({ machine, isDarkMode }: CardProps) => {
 
         <div className="grid grid-cols-2 gap-y-12 text-center mt-10 gap-x-0">
           <div className="flex flex-col justify-center items-center">
-            <div className="font-bold text-md md:text-md select-none">MỤC TIÊU NGÀY</div>
+            <div className="font-bold text-md md:text-md select-none">{t.daily_target}</div>
             <div className="text-md md:text-md select-none">(DAILY TARGET)</div>
           </div>
           <div className="text-4xl md:text-5xl font-bold select-none">{machine.target}</div>
 
           <div className="flex flex-col justify-center items-center">
-            <div className="font-bold text-md md:text-md select-none">MỤC TIÊU GIỜ</div>
+            <div className="font-bold text-md md:text-md select-none">{t.hourly_target}</div>
             <div className="text-md md:text-md select-none">(HOURLY TARGET)</div>
           </div>
           <div className="text-4xl md:text-5xl font-bold select-none">{machine.actual - machine.mtg}</div>
 
           <div className={`flex flex-col justify-center items-center `}>
-            <div className="font-bold text-md md:text-md select-none">THỰC HIỆN</div>
+            <div className="font-bold text-md md:text-md select-none">{t.actual}</div>
             <div className="text-md md:text-md select-none">(ACTUAL)</div>
           </div>
           <div className="text-4xl md:text-5xl font-bold select-none">{machine.actual}</div>

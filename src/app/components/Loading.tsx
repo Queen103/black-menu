@@ -1,9 +1,11 @@
+
+
 interface LoadingProps {
     isDarkMode?: boolean;
     message?: string;
 }
 
-const Loading = ({ isDarkMode = false, message = "Đang tải dữ liệu..." }: LoadingProps) => {
+const Loading = ({ isDarkMode = true, message = "Đang tải dữ liệu..." }: LoadingProps) => {
     return (
         <div className="fixed top-0 left-0 w-full h-full flex flex-col items-center justify-center z-50">
             {/* Lớp overlay mờ */}

@@ -1,0 +1,79 @@
+{
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "username_placeholder": "Enter username",
+    "password": "Password",
+    "password_placeholder": "Enter password",
+    "button": "Login",
+    "loading": "Logging in...",
+    "error": {
+      "invalid_credentials": "Invalid username or password",
+      "general": "An error occurred during login"
+    }
+  },
+  "home": {
+    "errors": {
+      "api_error": "Error calling API:",
+      "cpu_api_error": "Error calling CPU API:",
+      "disconnected": "Disconnected"
+    },
+    "chart": {
+      "difference": "Difference (PCS)",
+      "title": "CHART SHOWING HOURLY TARGETS FOR EACH LINE",
+      "actual": "ACTUAL (PCS)",
+      "target": "Target",
+      "performance": "PERFORMANCE (%)",
+      "production": "PERFORMANCE AND ACTUAL CHART",
+      "tooltip": {
+        "performance": "Performance:",
+        "actual": "Actual:",
+        "remaining": "Remaining:"
+      }
+    },
+    "footer": {
+      "line_count": "Active Lines:",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "not_operating": "Unactive"
+    }
+  },
+  "detail": {
+    "card": {
+      "daily_target": "DAILY TARGET",
+      "daily_target_en": "(DAILY TARGET)",
+      "hourly_target": "HOURLY TARGET",
+      "hourly_target_en": "(HOURLY TARGET)",
+      "actual": "ACTUAL",
+      "actual_en": "(ACTUAL)",
+      "difference": "DIFFERENCE",
+      "difference_en": "(DIFFERENCE)",
+      "performance": "PERFORMANCE (%)",
+      "performance_en": "(PERFORMANCE)",
+      "no_data": "No machine data"
+    }
+  },
+  "settingLine":{
+      "lineActive": "Active Line",
+      "enableTable": "Enable Table",
+      "settingTable": "Setting Table",
+      "noData":"No data",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "toast": {
+        "success": "Update successfully",
+        "error": "Error when updating status",
+        "update": "Update successfully Line"
+      },
+      "item":{
+        "Name": "Name",
+        "daily_target": "DAILY TARGET",
+        "shift_1": "SHIFT 1",
+        "shift_2": "SHIFT 2",
+        "actual": "ACTUAL",
+        "timeMin": "Time work from 1 to 1440 minutes",
+        "timeWork": "Total time",
+        "state": "State"
+      }
+    }
+}

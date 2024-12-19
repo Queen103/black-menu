@@ -8,9 +8,11 @@ import Card from "../components/Card";
 import Loading from "../components/Loading";
 import ReconnectModal from "../components/ReconnectModal";
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useFullScreen } from '../context/FullScreenContext';
 import { fetchMachines } from '@/services/api';
 import { fetchCpuData, type CpuData } from '@/services/api/cpu';
+import messages from '@/messages';
 
 interface Machine {
   device_id: number;
@@ -61,7 +63,9 @@ const HomePage = () => {
   const [isDisconnected, setIsDisconnected] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { isDark } = useTheme();
+  const { language } = useLanguage();
   const { isFullScreen } = useFullScreen();
+  const t = messages[language].home;
 
   // Optimized fetch functions with useCallback
   const fetchMachineData = useCallback(async () => {
@@ -77,13 +81,13 @@ const HomePage = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error("Lỗi khi gọi API:", error);
+      console.error(t.errors.api_error, error);
       setIsDisconnected(true);
       if (isFirstLoad) {
         setIsLoading(false);
       }
     }
-  }, [isLoading, isFirstLoad]);
+  }, [isLoading, isFirstLoad, t.errors.api_error]);
 
   const fetchCpuDataHandler = useCallback(async () => {
     try {
@@ -91,10 +95,10 @@ const HomePage = () => {
       setCpuData(data);
       setIsCpuDisconnected(!data.connection);
     } catch (error) {
-      console.error("Lỗi khi gọi API CPU:", error);
+      console.error(t.errors.cpu_api_error, error);
       setIsCpuDisconnected(true);
     }
-  }, []);
+  }, [t.errors.cpu_api_error]);
 
   const handleReconnect = useCallback(() => {
     window.location.reload();
@@ -188,23 +192,21 @@ const HomePage = () => {
         <div className="flex justify-between gap-3 py-2 scale-[100%]">
           <div className={`flex-1 ${isDark ? 'bg-secondary text-text-dark shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]' : 'bg-gray-300 text-text-light shadow-[inset_0px_0px_4px_rgba(0,0,0,1)]'} p-2 md:py-8 transition-transform rounded-lg ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-start item-center'>
-              <div className="flex space-x-20 text-sm  text-center font-bold item-center gap-x-2 select-none">
-                Chênh Lệch (PCS)
+              <div className="flex space-x-20 text-sm text-center font-bold item-center gap-x-2 select-none">
+                {t.chart.difference}
               </div>
-              <div className="text-lg  text-center font-bold select-none">
-                BIỂU ĐỒ THỂ HIỆN MỤC TIÊU GIỜ CỦA TỪNG CHUYỀN 
+              <div className="text-lg text-center font-bold select-none">
+                {t.chart.title}
               </div>
-              <div className=" flex space-x-20 text-sm  text-center font-bold gap-x-2 select-none" >
+              <div className="flex space-x-20 text-sm text-center font-bold gap-x-2 select-none">
               </div>
             </div>
             <Bar className='px-7'
               data={{
-                labels: machines
-                  .filter((machine) =>  machine.enable )
-                  .map((machine) => machine.name),
+                labels: filteredMachines.map(machine => machine.name || `Chuyền ${machine.device_id}`),
                 datasets: [
                   {
-                    label: 'Chênh Lệch',
+                    label: t.chart.difference,
                     data: machines
                       .filter((machine) =>  machine.enable )
                       .map((machine) => machine.actual - machine.mtg),
@@ -281,15 +283,39 @@ const HomePage = () => {
                     },
                   },
                   y: {
-                    title: {
-                      display: false,
-                      text: 'Mục Tiêu (PCS)',
+                    stacked: true,
+                    grid: {
+                      color: (context: any) => {
+                        const value = context.tick.value;
+                        if (value === 0) {
+                          return isDark ? '#ffffff' : '#333333';
+                        }
+                        return isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                      },
+                      lineWidth: (context: any) => {
+                        const value = context.tick.value;
+                        return value === 0 ? 2 : 1;
+                      },
+                      offset: false
+                    },
+                    ticks: {
                       font: {
-                        size: 16,
                         weight: 'bold',
+                        size: 14,
                       },
                       color: isDark ? '#ffffff' : '#333333',
                     },
+                    min: 0,
+                    max: Math.ceil(
+                      Math.max(...filteredMachines.map((machine) => (machine.actual / machine.target) * 100)) * 1.5 / 20
+                    ) * 20,
+                    beginAtZero: true,
+                    offset: false,
+                    grace: 0
+                  },
+                  y1: {
+                    stacked: false,
+                    position: 'right',
                     grid: {
                       color: (context: any) => {
                         const value = context.tick.value;
@@ -321,38 +347,10 @@ const HomePage = () => {
                     offset: false,
                     grace: 0
                   },
-                  y1: {
-                    position: 'right',
-                    display: true,
-                    grid: {
-                      color: (context: any) => {
-                        const value = context.tick.value;
-                        if (value === 0) {
-                          return isDark ? '#ffffff' : '#333333';
-                        }
-                        return isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-                      },
-                      lineWidth: (context: any) => {
-                        const value = context.tick.value;
-                        return value === 0 ? 2 : 1;
-                      },
-                      offset: false
-                    },
-                    ticks: {
-                      display: false,
-                    },
-                    min: Math.floor(
-                      Math.min(0, Math.min(...machines.filter((machine) => machine.enable).map((machine) => machine.actual - machine.mtg)) * 1.2) / 5
-                    ) * 5,
-                    max: Math.ceil(
-                      Math.max(...machines.filter((machine) => machine.enable).map((machine) => machine.actual - machine.mtg)) * 1.2 / 5
-                    ) * 5,
-                    beginAtZero: true,
-                    offset: false,
-                    grace: 0
-                  },
+                  
                 },
               }}
+              plugins={[ChartDataLabels]}
             />
 
           </div>
@@ -363,25 +361,25 @@ const HomePage = () => {
           <div className={`flex-1 ${isDark ? 'bg-secondary text-text-dark shadow-[inset_0px_0px_4px_rgba(255,255,255,1)]' : 'bg-gray-300 text-text-light shadow-[inset_0px_0px_4px_rgba(0,0,0,1)]'} rounded-lg p-2 md:py-8 transition-transform ${isFullScreen ? "h-[40vh]" : "h-[34vh]"} `}>
             <div className='flex space-x-20 justify-between item-center' >
               <div className="flex space-x-20 text-sm text-center font-bold item-center gap-x-2 select-none" onClick={() => setShowPerformance((prev) => !prev)}>
-                HIỆU SUẤT (%)
+                {t.chart.performance}
                 <div className={`h-5 w-5 rounded-lg bg-notConnect `} />
               </div>
               <div className="text-lg text-center font-bold select-none">
-                BIỂU ĐỒ HIỆU SUẤT VÀ THỰC HIỆN
+                {t.chart.production}
               </div>
               <div className=" flex space-x-20 text-sm text-center font-bold gap-x-2 select-none" onClick={() => setShowActual((prev) => !prev)}>
                 <div className={`h-5 w-5 rounded-lg bg-[#33cde5]`} />
-                THỰC HIỆN (PCS)
+                {t.chart.actual}
 
               </div></div>
 
             <Bar className='px-7'
               data={{
-                labels: filteredMachines.filter(machine => machine.enable ).map((machine) => machine.name),
+                labels: filteredMachines.map(machine => machine.name || `Chuyền ${machine.device_id}`),
                 datasets: [
                   showPerformance && {
-                    label: 'Hiệu Suất',
-                    data: filteredMachines.filter(machine => machine.enable ).map((machine) => (machine.actual/machine.mtg)*100),
+                    label: t.chart.performance,
+                    data: filteredMachines.map(machine => (machine.actual/machine.mtg)*100),
                     borderColor: '#c40005',
                     backgroundColor: 'rgba(255, 99, 71, 0.2)',
                     type: 'line',
@@ -393,8 +391,8 @@ const HomePage = () => {
                     },
                   },
                   showActual && {
-                    label: 'Thực Hiện',
-                    data: filteredMachines.filter(machine => machine.enable).map((machine) => machine.actual),
+                    label: t.chart.actual,
+                    data: filteredMachines.map(machine => machine.actual),
                     backgroundColor: '#33cde5',
                     borderColor: '#111111',
                     borderWidth: 1,
@@ -459,7 +457,7 @@ const HomePage = () => {
                     },
                     min: 0,
                     max: Math.ceil(
-                      Math.max(...filteredMachines.filter(machine => machine.enable).map((machine) => (machine.actual / machine.mtg) * 100)) * 1.5 / 20
+                      Math.max(...filteredMachines.map((machine) => (machine.actual / machine.mtg) * 100)) * 1.5 / 20
                     ) * 20,
                     beginAtZero: true,
                     offset: false,
@@ -492,7 +490,7 @@ const HomePage = () => {
 
                     min: 0,
                     max: Math.ceil(
-                      Math.max(...filteredMachines.filter(machine => machine.enable).map((machine) => machine.actual)) * 1.2 / 50
+                      Math.max(...filteredMachines.map((machine) => machine.actual)) * 1.2 / 50
                     ) * 50,
                     beginAtZero: true,
                     offset: false,
@@ -514,7 +512,7 @@ const HomePage = () => {
                         const performanceValueData = (filteredMachines[filteredIndex].actual / filteredMachines[filteredIndex].mtg) * 100 || 0;
                         let performanceValue = performanceValueData.toFixed(2);
                         const actualValue = filteredMachines[filteredIndex].actual || 0;
-                        const targetValue = filteredMachines[filteredIndex].target || 0;
+                        const targetValue = filteredMachines[filteredIndex].mtg || 0;
                         const remainValue = targetValue - actualValue;
 
                         if (remainValue <= 0) {
@@ -537,9 +535,9 @@ const HomePage = () => {
                         };
 
                         return [
-                          dinhDangTooltip('Hiệu suất:', performanceValue, '%'),
-                          dinhDangTooltip('Thực hiện:', actualValue, 'PCS'),
-                          dinhDangTooltip1('Còn lại:', remainValue, 'PCS')
+                          dinhDangTooltip(t.chart.tooltip.performance, performanceValue, '%'),
+                          dinhDangTooltip(t.chart.tooltip.actual, actualValue, 'PCS'),
+                          dinhDangTooltip1(t.chart.tooltip.remaining, remainValue, 'PCS')
                         ];
                       },
                     },
@@ -559,7 +557,7 @@ const HomePage = () => {
         <div className={` font-semibold flex space-x-20 justify-between p-0 py-2 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
           <div className=' flex justify-start'>
             <div className="select-none">
-              Số Line đang hoạt động: {enabledCount}/{idCount}
+              {t.footer.line_count} {enabledCount}/{idCount}
             </div>
           </div>
           <div className='justify-end'>
@@ -571,7 +569,7 @@ const HomePage = () => {
                 <div className="flex items-center gap-2">
                   <div className={`h-5 w-5 rounded-full ${cpuData.connection ? 'bg-connect' : 'bg-notConnect'}`} />
                   <span className={`${cpuData.connection ? 'text-connect' : 'text-notConnect'}`}>
-                    {cpuData.connection ? 'Có kết nối' : 'Mất kết nối'}
+                    {cpuData.connection ? t.footer.connected : t.footer.disconnected}
                   </span>
                 </div>
               </div>
@@ -597,7 +595,7 @@ const HomePage = () => {
             ) : (
               machines.length === 0 ? (
                 <div className="text-center text-[#333333] text-xl md:text-3xl h-[30vh] ml-[80vh] select-none">
-                  Mất kết nối
+                  {t.errors.disconnected}
                 </div>
               ) : (
                 machines.map((machine) => (
@@ -612,15 +610,15 @@ const HomePage = () => {
           {/* Nội dung trạng thái */}
           <div className="space-x-20 flex items-center mb-0">
             <div className="flex items-center space-x-2">
-              <div className="select-none">Có Kết Nối</div>
+              <div className="select-none">{t.footer.connected}</div>
               <div className={`h-5 w-5 rounded-lg bg-[#00964d]`} />
             </div>
             <div className="flex items-center space-x-2">
-              <div className="select-none">Không Hoạt Động</div>
+              <div className="select-none">{t.footer.not_operating}</div>
               <div className={`h-5 w-5 rounded-lg bg-gray-400`} />
             </div>
             <div className="flex items-center space-x-2">
-              <div className="select-none">Mất Kết Nối</div>
+              <div className="select-none">{t.footer.disconnected}</div>
               <div className={`h-5 w-5 rounded-lg bg-notConnect`} />
             </div>
           </div>

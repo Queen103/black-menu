@@ -14,6 +14,7 @@ import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { FullScreenProvider } from './context/FullScreenContext'
 import SnowEffect from './components/SnowEffect';
 import { SettingsProvider } from './context/SettingsContext'
+import { LanguageProvider } from './context/LanguageContext'
 
 // Component con sử dụng useTheme
 const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, ref) => {
@@ -144,12 +145,14 @@ export function RootLayout({ children }: RootLayoutProps) {
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none ">
         <ThemeProvider>
           <SettingsProvider>
-            <FullScreenProvider>
-              <SnowEffect />
-              <MainContent>
-                {children}
-              </MainContent>
-            </FullScreenProvider>
+            <LanguageProvider>
+              <FullScreenProvider>
+                <SnowEffect />
+                <MainContent>
+                  {children}
+                </MainContent>
+              </FullScreenProvider>
+            </LanguageProvider>
           </SettingsProvider>
         </ThemeProvider>
       </body>

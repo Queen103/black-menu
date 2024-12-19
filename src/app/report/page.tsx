@@ -163,7 +163,7 @@ const ReportPage = () => {
                                     </h2>
                                 </div>
 
-                                <div className={`py-0 flex flex-col items-center`}>
+                                <div className={`py-0 flex flex-col items-end `}>
                                     <span className="font-semibold text-center mb-2 py-3 text-3xl">
                                         {/* Hiển thị thởi gian hoặc thông báo chưa cài đặt */}
                                         {slot.time ? (

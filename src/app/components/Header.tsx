@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = () => {
   return (
     <header className={`w-full h-[65px] text-white flex items-center px-0 top-0 left-0 transition-colors duration-200 relative
       ${isDark ? 'bg-gray-900' : 'bg-[#4a4a4a]'}`}>
-      <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[3.5vh] text-white text-center tracking-[0.2em]">
+      <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[3vh] text-white text-center tracking-[0.2em]">
         {language === 'en' ? 'PRODUCTIVITY MANAGEMENT SOFTWARE' : 'PHẦN MỀM QUẢN LÝ NĂNG SUẤT'}
       </div>
 

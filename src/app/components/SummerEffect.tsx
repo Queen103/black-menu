@@ -3,10 +3,10 @@
 import { useSettings } from '../context/SettingsContext';
 import React, { useEffect, useState } from 'react';
 
-const SnowEffect: React.FC = () => {
+const SummerEffect: React.FC = () => {
   const { settings } = useSettings();
   const [mounted, setMounted] = useState(false);
-  const [snowflakes, setSnowflakes] = useState<React.ReactNode[]>([]);
+  const [flowers, setFlowers] = useState<React.ReactNode[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -15,13 +15,13 @@ const SnowEffect: React.FC = () => {
   useEffect(() => {
     if (!mounted || !settings.effect) return;
 
-    // Tạo bông tuyết ban đầu
-    const initialFlakes = Array.from({ length: 30 }, (_, index) => createSnowflake(index));
-    setSnowflakes(initialFlakes);
+    // Tạo hoa phượng ban đầu
+    const initialFlowers = Array.from({ length: 30 }, (_, index) => createFlower(index));
+    setFlowers(initialFlowers);
 
-    // Tạo bông tuyết mới mỗi 200ms
+    // Tạo hoa phượng mới mỗi 200ms
     const interval = setInterval(() => {
-      setSnowflakes(prev => [...prev, createSnowflake(prev.length)]);
+      setFlowers(prev => [...prev, createFlower(prev.length)]);
     }, 200);
 
     return () => {
@@ -29,31 +29,31 @@ const SnowEffect: React.FC = () => {
     };
   }, [mounted, settings.effect]);
 
-  // Hàm tạo một bông tuyết
-  const createSnowflake = (index: number) => {
-    const snowflakeChars = ['❆', '❄','☃️'];
-    const randomChar = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+  // Hàm tạo một bông hoa phường
+  const createFlower = (index: number) => {
+    const flowerChars = ['🍍','🍉','🍋','🍎','🍐'];
+    const randomChar = flowerChars[Math.floor(Math.random() * flowerChars.length)];
     const size = Math.random() * 1 + 0.3;
-    const duration = Math.random() * 5 + 10; // 10-15s
+    const duration = Math.random() * 5 + 8; // 8-13s
     const startPosition = Math.random() * 100;
+    const swayAmount = Math.random() * 100 + 50; // 50-150px
 
     return (
       <div
-        key={`snow-${index}-${Date.now()}`}
+        key={`flower-${index}-${Date.now()}`}
         style={{
           position: 'fixed',
-          color: 'white',
           fontSize: `${size}rem`,
           left: `${startPosition}%`,
           top: '-20px',
           opacity: Math.random() * 0.7 + 0.3,
-          animation: `snowfall ${duration}s linear`,
-          textShadow: '0 0 5px rgba(255, 255, 255, 0.8)',
+          animation: `flowerfall ${duration}s linear`,
           zIndex: 1000,
           pointerEvents: 'none',
+          filter: 'hue-rotate(330deg)', // Điều chỉnh màu đỏ cho hoa phượng
         }}
         onAnimationEnd={(e) => {
-          // Xóa bông tuyết khi animation kết thúc
+          // Xóa hoa khi animation kết thúc
           if (e.currentTarget.parentNode) {
             e.currentTarget.parentNode.removeChild(e.currentTarget);
           }
@@ -69,12 +69,15 @@ const SnowEffect: React.FC = () => {
   return (
     <>
       <style jsx global>{`
-        @keyframes snowfall {
+        @keyframes flowerfall {
           0% {
-            transform: translateY(0) rotate(0deg);
+            transform: translateY(0) rotate(0deg) translateX(0);
+          }
+          50% {
+            transform: translateY(50vh) rotate(180deg) translateX(50px);
           }
           100% {
-            transform: translateY(100vh) rotate(360deg);
+            transform: translateY(100vh) rotate(360deg) translateX(0);
           }
         }
       `}</style>
@@ -88,10 +91,10 @@ const SnowEffect: React.FC = () => {
         zIndex: 100,
         overflow: 'hidden',
       }}>
-        {snowflakes}
+        {flowers}
       </div>
     </>
   );
 };
 
-export default SnowEffect;
+export default SummerEffect;

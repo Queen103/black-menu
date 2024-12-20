@@ -13,6 +13,10 @@ import { isMobile, isTablet } from 'react-device-detect';
 import { ThemeProvider, useTheme } from './context/ThemeContext'
 import { FullScreenProvider } from './context/FullScreenContext'
 import SnowEffect from './components/SnowEffect';
+import SpringEffect from './components/SpringEffect';
+import SummerEffect from './components/SummerEffect';
+import AutumnEffect from './components/AutumnEffect';
+import { useSeasonEffect } from '@/hooks/useSeasonEffect';
 import { SettingsProvider } from './context/SettingsContext'
 import { LanguageProvider } from './context/LanguageContext'
 import { CustomToast } from './components/CustomToast';
@@ -122,8 +126,23 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: RootLayoutProps) {
   const [showError, setShowError] = useState(false);
+  const season = useSeasonEffect();
+  const renderSeasonEffect = () => {
+    switch (season) {
+      case 'spring':
+        return <SpringEffect />;
+      case 'summer':
+        return <SummerEffect />;
+      case 'autumn':
+        return <AutumnEffect />;
+      case 'winter':
+        return <SnowEffect />;
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     const isPhone = isMobile && !isTablet;
@@ -150,13 +169,13 @@ export function RootLayout({ children }: RootLayoutProps) {
   }
 
   return (
-    <html translate="no" className="notranslate" lang="vi">
+    <html lang="vi">
       <body className="min-h-screen flex flex-col hidden-on-mobile select-none ">
         <ThemeProvider>
           <SettingsProvider>
             <LanguageProvider>
               <FullScreenProvider>
-                <SnowEffect />
+                {renderSeasonEffect()}
                 <MainContent>
                   {children}
                 </MainContent>
@@ -170,5 +189,3 @@ export function RootLayout({ children }: RootLayoutProps) {
 }
 
 RootLayout.displayName = 'RootLayout';
-
-export default RootLayout;

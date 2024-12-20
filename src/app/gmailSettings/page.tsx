@@ -6,6 +6,8 @@ import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
 import { useTheme } from "../context/ThemeContext";
 import { useFullScreen } from '../context/FullScreenContext';
+import { useLanguage } from '../context/LanguageContext';
+import messages from "@/messages";
 import { fetchGmailSettings, updateGmailSettings, EmailSlot } from '@/services/api/gmail';
 
 const GmailSettingsPage = () => {
@@ -15,6 +17,8 @@ const GmailSettingsPage = () => {
     const [isFirstLoad, setIsFirstLoad] = useState(true);
     const { isDark } = useTheme();
     const { isFullScreen } = useFullScreen();
+    const { language } = useLanguage();
+    const t = messages[language].gmail;
     const [editedEmails, setEditedEmails] = useState<{ [key: number]: string }>({});
 
     const validateEmail = (email: string): boolean => {
@@ -36,13 +40,13 @@ const GmailSettingsPage = () => {
 
         // Kiểm tra nếu không có email hiện tại và không có input mới
         if (!currentSlot?.email && !email) {
-            toast.error("Không thể xóa email không tồn tại");
+            toast.error(t.error.cannotDelete);
             return;
         }
 
         // Kiểm tra định dạng email nếu có nhập email mới
         if (email && !validateEmail(email)) {
-            toast.error("Email không hợp lệ");
+            toast.error(t.error.invalidEmail);
             return;
         }
 
@@ -63,10 +67,10 @@ const GmailSettingsPage = () => {
             });
             
             setEditedEmails(prev => ({ ...prev, [slotId]: "" }));
-            toast.success(email ? `Cập nhật email thành công: ${email}` : "Đã xóa email thành công");
+            toast.success(email ? `${t.success.emailUpdated} ${email}` : t.success.emailDeleted);
         } catch (error: any) {
             console.error("Lỗi:", error);
-            toast.error(error.message || `Có lỗi xảy ra trong quá trình ${email ? "cập nhật" : "xóa"}`);
+            toast.error(error.message || t.error[email ? 'updateFailed' : 'deleteFailed']);
         }
     };
 
@@ -123,7 +127,7 @@ const GmailSettingsPage = () => {
                         >
                             <div className="bg-blue-500">
                                 <h2 className={`text-2xl w-full font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"} truncate`}>
-                                    EMAIL THỨ {slot.index}
+                                    {t.emailSlot} {slot.index}
                                 </h2>
                             </div>
 
@@ -141,7 +145,8 @@ const GmailSettingsPage = () => {
                                         type="text"
                                         value={editedEmails[slot.index] || ''}
                                         onChange={(e) => handleEmailChange(slot.index, e.target.value)}
-                                        placeholder="Nhập email mới"
+                                        placeholder={t.placeholder}
+                                        autoComplete="off"
                                         className={`w-full h-full px-4 py-2 text-black text-lg ${
                                             isDark
                                                 ? 'bg-dark-input border-gray-600'

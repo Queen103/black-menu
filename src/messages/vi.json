@@ -53,28 +53,53 @@
       "no_data": "Không có dữ liệu máy"
     }
   },
-    "settingLine":{
-      "lineActive": "Line hoạt động",
-      "enableTable": "Bảng trạng thái",
-      "settingTable": "Bảng cài đặt",
-      "noData":"Không có dữ liệu",
-      "connected": "Kết nối",
-      "disconnected": "Mất kết nối",
-      "toast": {
-        "success": "Cập Nhật Thành Công",
-        "error": "Lỗi khi cập nhật trạng thái",
-        "update": "Cập nhật thành công Line"
-      },
-      "item":{
-        "Name": "Tên",
-        "daily_target": "MỤC TIÊU NGÀY",
-        "shift_1": "CA SÁNG",
-        "shift_2": "CA CHIỀU",
-        "actual": "THỰC HIỆN",
-        "timeMin": "Thời gian làm việc phải từ 1 đến 1440 phút",
-        "timeWork": "Thời gian làm việc",
-        "state": "Trạng thái"
-      }
+  "report": {
+    "timePoint": "THỜI ĐIỂM THỨ",
+    "error": {
+      "cannotDelete": "Không thể xóa thời gian không tồn tại",
+      "updateFailed": "Có lỗi xảy ra trong quá trình cập nhật",
+      "deleteFailed": "Có lỗi xảy ra trong quá trình xóa"
+    },
+    "success": {
+      "timeUpdated": "Cập nhật thời gian thành công:",
+      "timeDeleted": "Đã xóa thời gian thành công"
     }
-  
+  },
+  "gmail": {
+    "emailSlot": "EMAIL THỨ",
+    "placeholder": "Nhập email mới",
+    "error": {
+      "cannotDelete": "Không thể xóa email không tồn tại",
+      "invalidEmail": "Email không hợp lệ",
+      "updateFailed": "Có lỗi xảy ra trong quá trình cập nhật",
+      "deleteFailed": "Có lỗi xảy ra trong quá trình xóa"
+    },
+    "success": {
+      "emailUpdated": "Cập nhật email thành công:",
+      "emailDeleted": "Đã xóa email thành công"
+    }
+  },
+  "settingLine":{
+    "lineActive": "Line hoạt động",
+    "enableTable": "Bảng trạng thái",
+    "settingTable": "Bảng cài đặt",
+    "noData":"Không có dữ liệu",
+    "connected": "Kết nối",
+    "disconnected": "Mất kết nối",
+    "toast": {
+      "success": "Cập Nhật Thành Công",
+      "error": "Lỗi khi cập nhật trạng thái",
+      "update": "Cập nhật thành công Line"
+    },
+    "item":{
+      "Name": "Tên",
+      "daily_target": "MỤC TIÊU NGÀY",
+      "shift_1": "CA SÁNG",
+      "shift_2": "CA CHIỀU",
+      "actual": "THỰC HIỆN",
+      "timeMin": "Thời gian làm việc phải từ 1 đến 1440 phút",
+      "timeWork": "Thời gian làm việc",
+      "state": "Trạng thái"
+    }
+  }
 }

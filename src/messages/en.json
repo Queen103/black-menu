@@ -75,5 +75,31 @@
         "timeWork": "Total time",
         "state": "State"
       }
+    },
+    "gmail": {
+      "emailSlot": "EMAIL SLOT",
+      "placeholder": "Enter new email",
+      "error": {
+        "cannotDelete": "Cannot delete non-existent email",
+        "invalidEmail": "Invalid email format",
+        "updateFailed": "An error occurred during update",
+        "deleteFailed": "An error occurred during deletion"
+      },
+      "success": {
+        "emailUpdated": "Email updated successfully:",
+        "emailDeleted": "Email deleted successfully"
+      }
+    },
+    "report": {
+      "timePoint": "TIME SLOT",
+      "error": {
+        "cannotDelete": "Cannot delete non-existent time",
+        "updateFailed": "An error occurred during update",
+        "deleteFailed": "An error occurred during deletion"
+      },
+      "success": {
+        "timeUpdated": "Time updated successfully:",
+        "timeDeleted": "Time deleted successfully"
+      }
     }
 }

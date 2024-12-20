@@ -8,9 +8,12 @@ import { useTheme } from "../context/ThemeContext";
 import { useFullScreen } from '../context/FullScreenContext';
 import InputTime2Number from '../components/InputTime2Number';
 import { fetchReportSettings, updateReportTime, TimeSlot } from '@/services/api/report';
-
+import { useLanguage } from '../context/LanguageContext';
+import messages from "@/messages";
 
 const ReportPage = () => {
+    const { language } = useLanguage();
+    const t = messages[language].report;
     const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +68,7 @@ const ReportPage = () => {
 
         // Kiểm tra nếu không có time hiện tại và không có input mới
         if (!currentSlot?.time && !hours && !minutes) {
-            toast.error("Không thể xóa thởi gian không tồn tại");
+            toast.error(t.error.cannotDelete);
             return;
         }
 
@@ -89,10 +92,10 @@ const ReportPage = () => {
             setEditedHours(prev => ({ ...prev, [slotId]: "" }));
             setEditedMinutes(prev => ({ ...prev, [slotId]: "" }));
             
-            toast.success(newTime ? `Cập nhật thởi gian thành công: ${newTime}` : "Đã xóa thởi gian thành công");
+            toast.success(newTime ? `${t.success.timeUpdated} ${newTime}` : t.success.timeDeleted);
         } catch (error: any) {
             console.error("Lỗi:", error);
-            toast.error(error.message || `Có lỗi xảy ra trong quá trình ${newTime ? "cập nhật" : "xóa"}`);
+            toast.error(error.message || t.error[newTime ? 'updateFailed' : 'deleteFailed']);
         }
     };
 
@@ -159,11 +162,11 @@ const ReportPage = () => {
                             >
                                 <div className="bg-report">
                                     <h2 className={`text-2xl font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"}`}>
-                                        THỜI ĐIỂM THỨ {slot.index}
+                                        {t.timePoint} {slot.index}
                                     </h2>
                                 </div>
 
-                                <div className={`py-0 flex flex-col items-end `}>
+                                <div className={`py-0 flex flex-col items-center `}>
                                     <span className="font-semibold text-center mb-2 py-3 text-3xl">
                                         {/* Hiển thị thởi gian hoặc thông báo chưa cài đặt */}
                                         {slot.time ? (

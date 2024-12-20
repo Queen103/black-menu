@@ -7,7 +7,7 @@ interface CustomToastProps {
 }
 
 const toastConfig = {
-    autoClose: 2000,
+    autoClose: 1000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: false,
@@ -34,6 +34,7 @@ export const CustomToast = ({ isDarkMode }: CustomToastProps) => {
             draggablePercent={60}
             theme={isDarkMode ? "dark" : "light"}
             limit={3}
+            autoClose={1000}
         />
     );
 };

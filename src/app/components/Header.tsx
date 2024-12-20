@@ -4,8 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useSettings } from '../context/SettingsContext';
 import { updateSettings } from '@/services/api/settings';
-import { toast } from 'react-toastify';
-import { CustomToast } from '../components/CustomToast';
+import { showSuccessToast, showErrorToast } from '../components/CustomToast';
 import { US, VN } from 'country-flag-icons/react/3x2';
 
 interface HeaderProps {
@@ -31,11 +30,11 @@ const Header: React.FC<HeaderProps> = () => {
       };
       await updateSettings(newSettings);
       updateContextSettings(newSettings);
-      toast.success("Cập nhật ngôn ngữ thành công");
+      showSuccessToast("Cập nhật ngôn ngữ thành công");
     } catch (error) {
       // Revert language if API call fails
       setLanguage(language);
-      toast.error("Có lỗi xảy ra khi cập nhật ngôn ngữ");
+      showErrorToast("Có lỗi xảy ra khi cập nhật ngôn ngữ");
     }
   };
 
@@ -51,19 +50,17 @@ const Header: React.FC<HeaderProps> = () => {
       };
       await updateSettings(newSettings);
       updateContextSettings(newSettings);
-      toast.success("Cập nhật giao diện thành công");
+      showSuccessToast("Cập nhật giao diện thành công");
     } catch (error) {
       // Revert theme if API call fails
       toggleTheme();
-      toast.error("Có lỗi xảy ra khi cập nhật giao diện");
+      showErrorToast("Có lỗi xảy ra khi cập nhật giao diện");
     }
   };
 
   return (
-    <>
-      <CustomToast isDarkMode={isDark} />
-      <header className={`w-full h-[65px] text-white flex items-center px-0 top-0 left-0 transition-colors duration-200 relative
-        ${isDark ? 'bg-gray-900' : 'bg-[#4a4a4a]'}`}>
+    <header className={`w-full h-[65px] text-white flex items-center px-0 top-0 left-0 transition-colors duration-200 relative
+      ${isDark ? 'bg-gray-900' : 'bg-[#4a4a4a]'}`}>
       <div className="absolute left-1/2 -translate-x-1/2 font-semibold text-[3vh] text-white text-center tracking-[0.2em]">
         {language === 'en' ? 'PRODUCTIVITY MANAGEMENT SOFTWARE' : 'PHẦN MỀM QUẢN LÝ NĂNG SUẤT'}
       </div>
@@ -94,7 +91,6 @@ const Header: React.FC<HeaderProps> = () => {
         <Logo className="h-14 flex items-center" />
       </div>
     </header>
-    </>
   );
 };
 

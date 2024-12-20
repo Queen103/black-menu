@@ -4,8 +4,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useSettings } from "../context/SettingsContext";
 import { Switch } from "../components/Switch";
-import { toast } from "react-toastify";
-import { CustomToast } from "../components/CustomToast";
+import { showSuccessToast, showErrorToast } from "../components/CustomToast";
 import { Settings, updateSettings } from "@/services/api/settings";
 
 const SettingsPage = () => {
@@ -24,9 +23,9 @@ const SettingsPage = () => {
         if (event.key === 'Enter') {
             try {
                 await updateSettings(settings);
-                toast.success("Cập nhật thởi gian thành công");
+                showSuccessToast("Cập nhật thởi gian thành công");
             } catch (error) {
-                toast.error("Có lỗi xảy ra khi cập nhật thởi gian");
+                showErrorToast("Có lỗi xảy ra khi cập nhật thởi gian");
             }
         }
     };
@@ -35,9 +34,9 @@ const SettingsPage = () => {
         try {
             updateContextSettings(newSettings);
             await updateSettings(newSettings);
-            toast.success("Cập nhật cài đặt thành công");
+            showSuccessToast("Cập nhật cài đặt thành công");
         } catch (error) {
-            toast.error("Có lỗi xảy ra khi cập nhật cài đặt");
+            showErrorToast("Có lỗi xảy ra khi cập nhật cài đặt");
         }
     };
 
@@ -46,7 +45,6 @@ const SettingsPage = () => {
 
     return (
         <div className={`min-h-screen bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-6`}>
-            <CustomToast isDarkMode={isDark} />
             <div className="max-w-2xl mx-auto">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow-sm space-y-6">
                     {/* Hiệu ứng tuyết rơi */}
@@ -80,9 +78,9 @@ const SettingsPage = () => {
                                     const newSettings = { ...settings, dark_mode: !settings.dark_mode };
                                     await updateSettings(newSettings);
                                     updateContextSettings(newSettings);
-                                    toast.success("Cập nhật giao diện thành công");
+                                    showSuccessToast("Cập nhật giao diện thành công");
                                 } catch (error) {
-                                    toast.error("Có lỗi xảy ra khi cập nhật giao diện");
+                                    showErrorToast("Có lỗi xảy ra khi cập nhật giao diện");
                                     // Revert theme if settings update fails
                                     toggleTheme();
                                 }
@@ -103,7 +101,6 @@ const SettingsPage = () => {
                                 onChange={async (checked: boolean) => {
                                     const newLang = checked ? 'vi' : 'en';
                                     setLanguage(newLang);
-                                    
                                     try {
                                         const newSettings = {
                                             ...settings,
@@ -112,9 +109,9 @@ const SettingsPage = () => {
                                         };
                                         await updateSettings(newSettings);
                                         updateContextSettings(newSettings);
-                                        toast.success("Cập nhật ngôn ngữ thành công");
+                                        showSuccessToast("Cập nhật ngôn ngữ thành công");
                                     } catch (error) {
-                                        toast.error("Có lỗi xảy ra khi cập nhật ngôn ngữ");
+                                        showErrorToast("Có lỗi xảy ra khi cập nhật ngôn ngữ");
                                         // Revert language if settings update fails
                                         setLanguage(language);
                                     }

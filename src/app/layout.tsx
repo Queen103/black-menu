@@ -15,6 +15,7 @@ import { FullScreenProvider } from './context/FullScreenContext'
 import SnowEffect from './components/SnowEffect';
 import { SettingsProvider } from './context/SettingsContext'
 import { LanguageProvider } from './context/LanguageContext'
+import { CustomToast } from './components/CustomToast';
 
 // Component con sử dụng useTheme
 const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, ref) => {
@@ -83,26 +84,34 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   }, [pathname, router]);
 
   return (
-    <div ref={ref} className={`notranslate flex h-screen ${isDark ? 'dark' : ''}`}>
+    <div ref={ref} className={`flex flex-col min-h-screen ${isDark ? 'dark' : ''}`}>
       {!isLoginPage && (
         <>
-          <Sidebar isOpen={sidebarOpen} ref={sidebarRef} />
-          <button
-            ref={buttonRef}
-            className=" notranslate fixed top-2 left-3 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-            onClick={toggleSidebar}
-          >
-            <IoMenuOutline className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-          </button>
+          <Header toggleSidebar={toggleSidebar} />
+          <div className="flex flex-1">
+            <Sidebar ref={sidebarRef} isOpen={sidebarOpen} />
+            <button
+              ref={buttonRef}
+              onClick={toggleSidebar}
+              className={`fixed top-[1.5vh] left-[1.5vh] z-50 rounded-lg transition-colors duration-200 
+                ${isDark ? ' hover:bg-gray-700' : ' hover:bg-gray-300'}`}
+            >
+              <IoMenuOutline size={40} />
+            </button>
+            <main className="flex-1 relative">
+              <CustomToast isDarkMode={isDark} />
+              {props.children}
+            </main>
+          </div>
+          <Footer />
         </>
       )}
-      <div className={`notranslate flex flex-col flex-grow `}>
-        { <Header />}
-        <main className={`flex-grow notranslate`}>
+      {isLoginPage && (
+        <main className="flex-1 relative">
+          <CustomToast isDarkMode={isDark} />
           {props.children}
         </main>
-        { <Footer />}
-      </div>
+      )}
     </div>
   );
 });

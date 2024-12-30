@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, forwardRef } from 'react';
+import { useState, useRef, useEffect, forwardRef, useContext } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import './globals.css';
@@ -18,8 +18,9 @@ import SummerEffect from './components/SummerEffect';
 import AutumnEffect from './components/AutumnEffect';
 import { useSeasonEffect } from '@/hooks/useSeasonEffect';
 import { SettingsProvider } from './context/SettingsContext'
-import { LanguageProvider } from './context/LanguageContext'
+import { LanguageProvider, useLanguage } from './context/LanguageContext'
 import { CustomToast } from './components/CustomToast';
+import { fetchSettings } from '@/services/api/settings';
 
 // Component con sử dụng useTheme
 const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((props, ref) => {
@@ -28,7 +29,9 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const { isDark } = useTheme();
+  const { isDark, setIsDark } = useTheme();
+  const { setEffect } = useSeasonEffect();
+  const { setLanguage } = useLanguage();
   const isLoginPage = pathname === '/login';
 
   useEffect(() => {
@@ -87,6 +90,29 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
     };
   }, [pathname, router]);
 
+  // Load settings on mount and route change
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await fetchSettings();
+        // Cập nhật theme
+        setIsDark(settings.dark_mode);
+        // Cập nhật hiệu ứng
+        setEffect(settings.effect);
+        // Cập nhật ngôn ngữ
+        if (settings.is_vietnamese) {
+          setLanguage('vi');
+        } else if (settings.is_english) {
+          setLanguage('en');
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+
+    loadSettings();
+  }, [pathname, setIsDark, setEffect, setLanguage]);
+
   return (
     <div ref={ref} className={`flex flex-col min-h-screen ${isDark ? 'dark' : ''}`}>
       {!isLoginPage && (
@@ -128,9 +154,10 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   const [showError, setShowError] = useState(false);
-  const season = useSeasonEffect();
+  const { currentSeason } = useSeasonEffect();
+  
   const renderSeasonEffect = () => {
-    switch (season) {
+    switch (currentSeason) {
       case 'spring':
         return <SpringEffect />;
       case 'summer':

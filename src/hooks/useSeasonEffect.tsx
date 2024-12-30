@@ -4,8 +4,22 @@ import { useState, useEffect } from 'react';
 
 type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 
-export const useSeasonEffect = () => {
+interface SeasonEffectHook {
+  currentSeason: Season;
+  setEffect: (enabled: boolean) => void;
+}
+
+export const useSeasonEffect = (): SeasonEffectHook => {
   const [currentSeason, setCurrentSeason] = useState<Season>('spring');
+  const [effectEnabled, setEffectEnabled] = useState(true);
+
+  useEffect(() => {
+    // Load effect state from localStorage
+    const savedEffect = localStorage.getItem('effect');
+    if (savedEffect !== null) {
+      setEffectEnabled(savedEffect === 'true');
+    }
+  }, []);
 
   useEffect(() => {
     const getCurrentSeason = (): Season => {
@@ -22,16 +36,16 @@ export const useSeasonEffect = () => {
       }
     };
 
-    // Cập nhật lần đầu
     setCurrentSeason(getCurrentSeason());
-
-    // Cập nhật mỗi giờ
-    const interval = setInterval(() => {
-      setCurrentSeason(getCurrentSeason());
-    }, 24*60 * 60 * 1000); // 1 giờ
-
-    return () => clearInterval(interval);
   }, []);
 
-  return currentSeason;
+  const setEffect = (enabled: boolean) => {
+    setEffectEnabled(enabled);
+    localStorage.setItem('effect', enabled.toString());
+  };
+
+  return {
+    currentSeason: effectEnabled ? currentSeason : 'spring',
+    setEffect
+  };
 };

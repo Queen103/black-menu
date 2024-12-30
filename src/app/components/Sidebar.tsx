@@ -14,6 +14,7 @@ import { forwardRef, ForwardedRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/services/api/user';
 import { useLanguage } from '../context/LanguageContext';
+import { MdOutlineMonitor } from "react-icons/md";
 
 interface SidebarProps {
     isOpen: boolean;
@@ -36,6 +37,7 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
         { href: "/home", icon: <BiHomeAlt className="text-[26px]" />, label: messages.sidebar.menu.home },
         { href: "/detail", icon: <LuEye className="text-[26px]" />, label: messages.sidebar.menu.detail },
         { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: messages.sidebar.menu.line_settings },
+        { href: "/monitor", icon: <MdOutlineMonitor className="text-[26px]" />, label: messages.sidebar.menu.monitor },
         { href: "/report", icon: <IoTimerOutline className="text-[26px]" />, label: messages.sidebar.menu.report_settings },
         { href: "/gmailSettings", icon: <MdOutlineEmail className="text-[26px]" />, label: messages.sidebar.menu.email_settings },
         { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: messages.sidebar.menu.general_settings },

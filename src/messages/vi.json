@@ -114,6 +114,7 @@
       "detail": "CHI TIẾT",
       "line_settings": "CÀI ĐẶT LINE",
       "report_settings": "CÀI ĐẶT BÁO CÁO",
+      "monitor": "GIÁM SÁT",
       "email_settings": "CÀI ĐẶT EMAIL",
       "general_settings": "CÀI ĐẶT CHUNG",
       "account": "TÀI KHOẢN"
@@ -153,5 +154,27 @@
       "language_update_success": "Cập nhật ngôn ngữ thành công",
       "language_update_error": "Có lỗi xảy ra khi cập nhật ngôn ngữ"
     }
-  }
+  },
+  "table": {
+    "item": {
+      "Name": "Tên",
+      "daily_target": "MỤC TIÊU NGÀY",
+      "productedCode": "MÃ HÀNG",
+      "totalProducted": "TỔNG ĐƠN HÀNG",
+      "timeStart": "NGÀY BẮT ĐẦU",
+      "timeEnd": "NGÀY KẾT THÚC",
+      "actualProducted": "ĐƠN THỰC HIỆN",
+      "remainingProducted": "ĐƠN CÒN LẠI",
+      "shift_1": "CA SÁNG",
+      "shift_2": "CA CHIỀU",
+      "actual": "THỰC HIỆN",
+      "timeMin": "Thời gian làm việc phải từ 1 đến 1440 phút",
+      "timeWork": "GIỜ LÀM VIỆC",
+      "state": "TRẠNG THÁI",
+      "workers": "SỐ LAO ĐỘNG",
+      "total": "LŨY KẾ",
+      "efficiency": "HIỆU SUẤT"
+    }
+  },
+  "monitorTable": "BẢNG THEO DÕI SẢN XUẤT"
 }

@@ -1,5 +1,8 @@
 import { Metadata, Viewport } from 'next';
 import RootLayoutClient from './layout_client';
+import { LanguageProvider } from './context/LanguageContext'
+import { ThemeProvider } from './context/ThemeContext'
+import { ScreenProvider } from './context/ScreenContext'
 
 export const metadata: Metadata = {
   title: 'VNA Tech',
@@ -20,5 +23,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <RootLayoutClient>{children}</RootLayoutClient>;
+  return (
+    <html lang="en">
+      <body>
+        <LanguageProvider>
+          <ThemeProvider>
+            <ScreenProvider>
+              <RootLayoutClient>
+                {children}
+              </RootLayoutClient>
+            </ScreenProvider>
+          </ThemeProvider>
+        </LanguageProvider>
+      </body>
+    </html>
+  );
 }

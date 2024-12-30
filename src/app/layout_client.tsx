@@ -65,6 +65,7 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
         "/home",
         "/detail",
         "/setttingMove",
+        "/monitor",
         "/report",
         "/gmailSettings",
         "/settings",

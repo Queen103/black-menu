@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import { CustomToast } from "../components/CustomToast";
 import Loading from "../components/Loading";
@@ -278,7 +278,7 @@ const DetailPage = () => {
             </div>
             {/* Bảng 2: Cài Đặt */}
             <div>
-                <h2 className={` font-bold mb-1 select-none text-center ${isFullScreen ? "text-lg" : "text-md"} ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+                <h2 className={`font-bold mb-1 select-none text-center ${isFullScreen ? "text-lg" : "text-md"} ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
                     {t.settingTable}
                 </h2>
                 <div className="overflow-x-auto shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">

@@ -79,8 +79,33 @@
         "actual": "ACTUAL",
         "timeMin": "Time work from 1 to 1440 minutes",
         "timeWork": "Total time",
-        "state": "State"
-      }
+        "state": "State",
+        "workers": "WORKERS",
+        "total": "TOTAL",
+        "efficiency": "EFFICIENCY"
+      },
+      "table": {
+        "item": {
+          "Name": "Name",
+          "daily_target": "DAILY TARGET",
+          "productedCode": "PRODUCTED CODE",
+          "totalProducted": "TOTAL ORDER",
+          "timeStart": "TIME START",
+          "timeEnd": "TIME END",
+          "actualProducted": "ACTUAL ORDER",
+          "remainingProducted": "REMAIN ORDER",
+          "shift_1": "SHIFT 1",
+          "shift_2": "SHIFT 2",
+          "actual": "ACTUAL",
+          "timeMin": "Time work from 1 to 1440 minutes",
+          "timeWork": "Total time",
+          "state": "State",
+          "workers": "WORKERS",
+          "total": "TOTAL",
+          "efficiency": "EFFICIENCY"
+        }
+      },
+      "monitorTable": "PRODUCTION MONITORING"
     },
     "gmail": {
       "emailSlot": "EMAIL SLOT",
@@ -114,6 +139,7 @@
         "detail": "DETAIL",
         "line_settings": "LINE SETTINGS",
         "report_settings": "REPORT SETTINGS",
+        "monitor": "MONITOR",
         "email_settings": "EMAIL SETTINGS", 
         "general_settings": "GENERAL SETTINGS",
         "account": "ACCOUNT"

@@ -48,7 +48,7 @@ const InputTime4Number: React.FC<InputTime4NumberProps> = ({
         type: "text",
         maxLength: 1,
         disabled,
-        className: `w-8 ${isFullScreen ? "text-2xl py-0.5" : "text-xl"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'
+        className: `w-4 ${isFullScreen ? "text-md py-0.5" : "text-sm"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'
             } bg-transparent border-b-2 text-center focus:outline-none focus:border-b-2 focus:border-accent mx-0.5`
     };
 

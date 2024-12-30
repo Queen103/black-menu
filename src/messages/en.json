@@ -68,6 +68,12 @@
       "item":{
         "Name": "Name",
         "daily_target": "DAILY TARGET",
+        "productedCode": "PRODUCTED CODE",
+        "totalProducted": "TOTAL ORDER",
+        "timeStart": "TIME START",
+        "timeEnd": "TIME END",
+        "actualProducted": "ACTUAL ORDER",
+        "remainingProducted": "REMAIN ORDER",
         "shift_1": "SHIFT 1",
         "shift_2": "SHIFT 2",
         "actual": "ACTUAL",

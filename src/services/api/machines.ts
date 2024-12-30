@@ -2,6 +2,11 @@ import { DeviceStatus, CpuData } from './cpu';
 
 export interface Machine {
     device_id: number;
+    code: string;
+    total_production: number;
+    time_start: string;
+    time_end: string;
+    actual_production: number;
     target: number;
     mtg: number;
     actual: number;

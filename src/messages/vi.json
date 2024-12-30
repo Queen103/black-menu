@@ -94,12 +94,18 @@
     "item":{
       "Name": "Tên",
       "daily_target": "MỤC TIÊU NGÀY",
+      "productedCode": "MÃ HÀNG",
+      "totalProducted": "TỔNG ĐƠN HÀNG",
+      "timeStart": "NGÀY BẮT ĐẦU",
+      "timeEnd": "NGÀY KẾT THÚC",
+      "actualProducted": "ĐƠN THỰC HIỆN",
+      "remainingProducted": "ĐƠN CÒN LẠI",
       "shift_1": "CA SÁNG",
       "shift_2": "CA CHIỀU",
       "actual": "THỰC HIỆN",
       "timeMin": "Thời gian làm việc phải từ 1 đến 1440 phút",
-      "timeWork": "Thời gian làm việc",
-      "state": "Trạng thái"
+      "timeWork": "GIỜ LÀM VIỆC",
+      "state": "TRẠNG THÁI"
     }
   },
   "sidebar": {

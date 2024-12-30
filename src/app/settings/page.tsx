@@ -11,6 +11,7 @@ const SettingsPage = () => {
     const { isDark, toggleTheme } = useTheme();
     const { language, setLanguage } = useLanguage();
     const { settings, updateSettings: updateContextSettings, isLoading, error } = useSettings();
+    const messages = require(`@/messages/${language}.json`);
 
     const handleTimeChange = (value: string) => {
         const numValue = parseInt(value);
@@ -23,9 +24,9 @@ const SettingsPage = () => {
         if (event.key === 'Enter') {
             try {
                 await updateSettings(settings);
-                showSuccessToast("Cập nhật thởi gian thành công");
+                showSuccessToast(messages.settings.messages.time_update_success);
             } catch (error) {
-                showErrorToast("Có lỗi xảy ra khi cập nhật thởi gian");
+                showErrorToast(messages.settings.messages.time_update_error);
             }
         }
     };
@@ -34,14 +35,14 @@ const SettingsPage = () => {
         try {
             updateContextSettings(newSettings);
             await updateSettings(newSettings);
-            showSuccessToast("Cập nhật cài đặt thành công");
+            showSuccessToast(messages.settings.messages.update_success);
         } catch (error) {
-            showErrorToast("Có lỗi xảy ra khi cập nhật cài đặt");
+            showErrorToast(messages.settings.messages.update_error);
         }
     };
 
-    if (isLoading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error}</div>;
+    if (isLoading) return <div>{messages.settings.loading}</div>;
+    if (error) return <div>{messages.settings.error.replace("{0}", error)}</div>;
 
     return (
         <div className={`min-h-screen bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-6`}>
@@ -50,8 +51,8 @@ const SettingsPage = () => {
                     {/* Hiệu ứng tuyết rơi */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">Hiệu ứng tuyết rơi</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Bật/tắt hiệu ứng tuyết rơi trên giao diện</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.snow_effect.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.snow_effect.description}</p>
                         </div>
                         <Switch
                             checked={settings.effect}
@@ -65,23 +66,20 @@ const SettingsPage = () => {
                     {/* Dark Mode */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">Dark Mode</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Bật/tắt chế độ tối</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.dark_mode.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.dark_mode.description}</p>
                         </div>
                         <Switch
                             checked={isDark}
                             onChange={async (checked: boolean) => {
-                                // First update the theme in context and localStorage
                                 toggleTheme();
-                                // Then update the backend settings
                                 try {
                                     const newSettings = { ...settings, dark_mode: !settings.dark_mode };
                                     await updateSettings(newSettings);
                                     updateContextSettings(newSettings);
-                                    showSuccessToast("Cập nhật giao diện thành công");
+                                    showSuccessToast(messages.settings.messages.theme_update_success);
                                 } catch (error) {
-                                    showErrorToast("Có lỗi xảy ra khi cập nhật giao diện");
-                                    // Revert theme if settings update fails
+                                    showErrorToast(messages.settings.messages.theme_update_error);
                                     toggleTheme();
                                 }
                             }}
@@ -91,11 +89,11 @@ const SettingsPage = () => {
                     {/* Ngôn ngữ */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">Ngôn ngữ</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Chọn ngôn ngữ hiển thị</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.language.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.language.description}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <span className={`text-sm ${language === 'vi' ? 'text-blue-500 font-medium' : ''}`}>Tiếng Việt</span>
+                            <span className={`text-sm ${language === 'vi' ? 'text-blue-500 font-medium' : ''}`}>{messages.settings.language.vietnamese}</span>
                             <Switch
                                 checked={language === 'vi'}
                                 onChange={async (checked: boolean) => {
@@ -109,36 +107,32 @@ const SettingsPage = () => {
                                         };
                                         await updateSettings(newSettings);
                                         updateContextSettings(newSettings);
-                                        showSuccessToast("Cập nhật ngôn ngữ thành công");
+                                        showSuccessToast(messages.settings.messages.language_update_success);
                                     } catch (error) {
-                                        showErrorToast("Có lỗi xảy ra khi cập nhật ngôn ngữ");
-                                        // Revert language if settings update fails
+                                        showErrorToast(messages.settings.messages.language_update_error);
                                         setLanguage(language);
                                     }
                                 }}
                             />
-                            <span className={`text-sm ${language === 'en' ? 'text-blue-500 font-medium' : ''}`}>English</span>
+                            <span className={`text-sm ${language === 'en' ? 'text-blue-500 font-medium' : ''}`}>{messages.settings.language.english}</span>
                         </div>
                     </div>
 
                     {/* Thời gian cập nhật */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">Thời gian cập nhật</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Thời gian cập nhật dữ liệu (giây)</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.time_update.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.time_update.description}</p>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="number"
-                                min="1"
-                                max="60"
-                                value={settings.change_time}
-                                onChange={(e) => handleTimeChange(e.target.value)}
-                                onKeyDown={handleTimeUpdate}
-                                className="w-20 px-3 py-2 text-black border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <span className="text-sm text-gray-500">giây</span>
-                        </div>
+                        <input
+                            type="number"
+                            min={messages.settings.time_update.min}
+                            max={messages.settings.time_update.max}
+                            value={settings.change_time}
+                            onChange={(e) => handleTimeChange(e.target.value)}
+                            onKeyDown={handleTimeUpdate}
+                            className="w-20 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                        />
                     </div>
                 </div>
             </div>

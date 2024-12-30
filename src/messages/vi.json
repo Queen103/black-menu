@@ -101,5 +101,51 @@
       "timeWork": "Thời gian làm việc",
       "state": "Trạng thái"
     }
+  },
+  "sidebar": {
+    "menu": {
+      "home": "TRANG CHỦ",
+      "detail": "CHI TIẾT",
+      "line_settings": "CÀI ĐẶT LINE",
+      "report_settings": "CÀI ĐẶT BÁO CÁO",
+      "email_settings": "CÀI ĐẶT EMAIL",
+      "general_settings": "CÀI ĐẶT CHUNG",
+      "account": "TÀI KHOẢN"
+    },
+    "logout": "Đăng xuất"
+  },
+  "settings": {
+    "loading": "Đang tải...",
+    "error": "Lỗi: {0}",
+    "snow_effect": {
+      "title": "Hiệu ứng",
+      "description": "Bật/tắt hiệu ứng trên giao diện"
+    },
+    "dark_mode": {
+      "title": "Dark Mode",
+      "description": "Bật/tắt chế độ tối"
+    },
+    "language": {
+      "title": "Ngôn ngữ",
+      "description": "Chọn ngôn ngữ hiển thị",
+      "vietnamese": "Tiếng Việt",
+      "english": "English"
+    },
+    "time_update": {
+      "title": "Thời gian cuộn",
+      "description": "Thời gian cuộn dữ liệu (giây)",
+      "min": "1",
+      "max": "60"
+    },
+    "messages": {
+      "update_success": "Cập nhật cài đặt thành công",
+      "update_error": "Có lỗi xảy ra khi cập nhật cài đặt",
+      "time_update_success": "Cập nhật thời gian thành công",
+      "time_update_error": "Có lỗi xảy ra khi cập nhật thời gian",
+      "theme_update_success": "Cập nhật giao diện thành công",
+      "theme_update_error": "Có lỗi xảy ra khi cập nhật giao diện",
+      "language_update_success": "Cập nhật ngôn ngữ thành công",
+      "language_update_error": "Có lỗi xảy ra khi cập nhật ngôn ngữ"
+    }
   }
 }

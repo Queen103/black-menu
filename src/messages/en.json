@@ -101,5 +101,51 @@
         "timeUpdated": "Time updated successfully:",
         "timeDeleted": "Time deleted successfully"
       }
+    },
+    "sidebar": {
+      "menu": {
+        "home": "HOME",
+        "detail": "DETAIL",
+        "line_settings": "LINE SETTINGS",
+        "report_settings": "REPORT SETTINGS",
+        "email_settings": "EMAIL SETTINGS", 
+        "general_settings": "GENERAL SETTINGS",
+        "account": "ACCOUNT"
+      },
+      "logout": "Logout"
+    },
+    "settings": {
+      "loading": "Loading...",
+      "error": "Error: {0}",
+      "snow_effect": {
+        "title": "Effect",
+        "description": "Enable/disable effect on interface"
+      },
+      "dark_mode": {
+        "title": "Dark Mode",
+        "description": "Enable/disable dark mode"
+      },
+      "language": {
+        "title": "Language",
+        "description": "Choose display language",
+        "vietnamese": "Tiếng Việt",
+        "english": "English"
+      },
+      "time_update": {
+        "title": "Scroll Time",
+        "description": "Scroll Time (seconds)",
+        "min": "1",
+        "max": "60"
+      },
+      "messages": {
+        "update_success": "Settings updated successfully",
+        "update_error": "Error occurred while updating settings",
+        "time_update_success": "Time updated successfully",
+        "time_update_error": "Error occurred while updating time",
+        "theme_update_success": "Theme updated successfully",
+        "theme_update_error": "Error occurred while updating theme",
+        "language_update_success": "Language updated successfully",
+        "language_update_error": "Error occurred while updating language"
+      }
     }
 }

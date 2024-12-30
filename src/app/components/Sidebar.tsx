@@ -2,16 +2,18 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { LuEye, LuPhoneCall, LuSlack } from "react-icons/lu";
+import { LuEye, LuSlack } from "react-icons/lu";
 import { BiHomeAlt } from "react-icons/bi";
 import { MdOutlineEmail } from "react-icons/md";
 import { FiSettings } from "react-icons/fi";
 import { IoPersonOutline } from "react-icons/io5";
 import { IoLogOutOutline } from 'react-icons/io5';
+import { IoTimerOutline } from "react-icons/io5";
 import { useTheme } from '../context/ThemeContext';
 import { forwardRef, ForwardedRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/services/api/user';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -21,6 +23,8 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
     const pathname = usePathname();
     const { isDark } = useTheme();
     const router = useRouter();
+    const { language } = useLanguage();
+    const messages = require(`@/messages/${language}.json`);
 
     const handleLogout = () => {
         logout();
@@ -29,13 +33,13 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
 
     // Danh sách menu
     const menuItems = [
-        { href: "/home", icon: <BiHomeAlt className="text-[26px]" />, label: "TRANG CHỦ" },
-        { href: "/detail", icon: <LuEye className="text-[26px]" />, label: "CHI TIẾT" },
-        { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: "CÀI ĐẶT LINE" },
-        { href: "/report", icon: <MdOutlineEmail className="text-[26px]" />, label: "CÀI ĐẶT BÁO CÁO" },
-        { href: "/gmailSettings", icon: <LuPhoneCall className="text-[26px]" />, label: "CÀI ĐẶT EMAIL" },
-        { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: "CÀI ĐẶT CHUNG" },
-        { href: "/account", icon: <IoPersonOutline className="text-[26px]" />, label: "TÀI KHOẢN" },
+        { href: "/home", icon: <BiHomeAlt className="text-[26px]" />, label: messages.sidebar.menu.home },
+        { href: "/detail", icon: <LuEye className="text-[26px]" />, label: messages.sidebar.menu.detail },
+        { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: messages.sidebar.menu.line_settings },
+        { href: "/report", icon: <IoTimerOutline className="text-[26px]" />, label: messages.sidebar.menu.report_settings },
+        { href: "/gmailSettings", icon: <MdOutlineEmail className="text-[26px]" />, label: messages.sidebar.menu.email_settings },
+        { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: messages.sidebar.menu.general_settings },
+        { href: "/account", icon: <IoPersonOutline className="text-[26px]" />, label: messages.sidebar.menu.account },
     ];
 
     // Màu nền và chữ dựa trên chế độ sáng/tối
@@ -72,7 +76,7 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
                     className="flex items-center justify-center w-full px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                     <IoLogOutOutline className="w-5 h-5 mr-3" />
-                    <span>Đăng xuất</span>
+                    <span>{messages.sidebar.logout}</span>
                 </button>
             </div>
         </div>

@@ -115,8 +115,8 @@ const InputTime2Number: React.FC<InputTime2NumberProps> = ({
     };
 
     return (
-        <div className="flex items-center h-full">
-            <div className="flex items-center gap-1 ">
+        <div className="flex items-end h-full">
+            <div className="flex items-center gap-1">
                 <input
                     {...commonInputProps}
                     ref={hour1Ref}

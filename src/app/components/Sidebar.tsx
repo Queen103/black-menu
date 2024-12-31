@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { logout } from '@/services/api/user';
 import { useLanguage } from '../context/LanguageContext';
 import { MdOutlineMonitor } from "react-icons/md";
+import messages from '@/messages';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -25,7 +26,6 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
     const { isDark } = useTheme();
     const router = useRouter();
     const { language } = useLanguage();
-    const messages = require(`@/messages/${language}.json`);
 
     const handleLogout = () => {
         logout();
@@ -34,14 +34,14 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
 
     // Danh sách menu
     const menuItems = [
-        { href: "/home", icon: <BiHomeAlt className="text-[26px]" />, label: messages.sidebar.menu.home },
-        { href: "/detail", icon: <LuEye className="text-[26px]" />, label: messages.sidebar.menu.detail },
-        { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: messages.sidebar.menu.line_settings },
-        { href: "/monitor", icon: <MdOutlineMonitor className="text-[26px]" />, label: messages.sidebar.menu.monitor },
-        { href: "/report", icon: <IoTimerOutline className="text-[26px]" />, label: messages.sidebar.menu.report_settings },
-        { href: "/gmailSettings", icon: <MdOutlineEmail className="text-[26px]" />, label: messages.sidebar.menu.email_settings },
-        { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: messages.sidebar.menu.general_settings },
-        { href: "/account", icon: <IoPersonOutline className="text-[26px]" />, label: messages.sidebar.menu.account },
+        { href: "/home", icon: <BiHomeAlt className="text-[26px]" />, label: messages[language].sidebar.menu.home },
+        { href: "/detail", icon: <LuEye className="text-[26px]" />, label: messages[language].sidebar.menu.detail },
+        { href: "/setttingMove", icon: <FiSettings className="text-[26px]" />, label: messages[language].sidebar.menu.line_settings },
+        { href: "/monitor", icon: <MdOutlineMonitor className="text-[26px]" />, label: messages[language].sidebar.menu.monitor },
+        { href: "/report", icon: <IoTimerOutline className="text-[26px]" />, label: messages[language].sidebar.menu.report_settings },
+        { href: "/gmailSettings", icon: <MdOutlineEmail className="text-[26px]" />, label: messages[language].sidebar.menu.email_settings },
+        { href: "/settings", icon: <LuSlack className="text-[26px]" />, label: messages[language].sidebar.menu.general_settings },
+        { href: "/account", icon: <IoPersonOutline className="text-[26px]" />, label: messages[language].sidebar.menu.account },
     ];
 
     // Màu nền và chữ dựa trên chế độ sáng/tối
@@ -78,7 +78,7 @@ const Sidebar = forwardRef(({ isOpen }: SidebarProps, ref: ForwardedRef<HTMLDivE
                     className="flex items-center justify-center w-full px-4 py-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 >
                     <IoLogOutOutline className="w-5 h-5 mr-3" />
-                    <span>{messages.sidebar.logout}</span>
+                    <span>{messages[language].sidebar.logout}</span>
                 </button>
             </div>
         </div>

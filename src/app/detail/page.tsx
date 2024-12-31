@@ -64,7 +64,7 @@ const DetailPage = () => {
     }
 
     return (
-        <div className={`px-5 h-[100vh] ${isDark ? 'text-white bg-bg-dark' : 'text-[#333333] bg-bg-light'}`}>
+        <div className={`px-5 h-[100vh] ${isFullScreen ? "py-1" : ""} ${isDark ? 'text-white bg-bg-dark' : 'text-[#333333] bg-bg-light'}`}>
             {isLoading && <Loading isDarkMode={isDark} />}
             <div className={`${isDark ? 'text-white' : 'text-[#333333]'} text-2xl font-semibold flex items-center space-x-4 justify-between px-2 ${isFullScreen ? "py-8" : "py-3"}`}>
                 <div>

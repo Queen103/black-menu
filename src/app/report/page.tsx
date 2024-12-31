@@ -161,7 +161,7 @@ const ReportPage = () => {
                                 className={`border h-[21vh] border-report border-8 shadow-[0px_4px_6px_rgba(0,0,0,0.5)] rounded-lg py-0 text-center ${isDark ? 'bg-secondary text-text-dark' : 'bg-gray-300 text-text-light'}`}
                             >
                                 <div className="bg-report">
-                                    <h2 className={`text-2xl font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"}`}>
+                                    <h2 className={`text-2xl font-semibold mb-2 p-2 border-t-lg ${isFullScreen ? "py-5" : "py-2"}`}>
                                         {t.timePoint} {slot.index}
                                     </h2>
                                 </div>
@@ -181,14 +181,13 @@ const ReportPage = () => {
                                     </span>
 
                                     {/* Input chỉnh sửa thởi gian */}
-                                    <div className="bg-bg-light py-3 h-full w-full flex items-end justify-center">
+                                    <div className="bg-bg-light py-3 w-full flex items-end justify-center">
                                         <InputTime2Number
                                             hours={editedHours[slot.index]?.toString() || ""}
                                             minutes={editedMinutes[slot.index]?.toString() || ""}
                                             onHourChange={(value) => handleHourChange(slot.index, value)}
                                             onMinuteChange={(value) => handleMinuteChange(slot.index, value)}
                                             onEnter={() => handleTimeUpdate(slot.index)}
-                                            isFullScreen={isFullScreen}
                                             disabled={!slot.index}
                                         />
                                     </div>

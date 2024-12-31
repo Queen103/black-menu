@@ -6,12 +6,12 @@ import { useSettings } from "../context/SettingsContext";
 import { Switch } from "../components/Switch";
 import { showSuccessToast, showErrorToast } from "../components/CustomToast";
 import { Settings, updateSettings } from "@/services/api/settings";
+import messages from "@/messages";
 
 const SettingsPage = () => {
     const { isDark, toggleTheme } = useTheme();
     const { language, setLanguage } = useLanguage();
     const { settings, updateSettings: updateContextSettings, isLoading, error } = useSettings();
-    const messages = require(`@/messages/${language}.json`);
 
     const handleTimeChange = (value: string) => {
         const numValue = parseInt(value);
@@ -24,9 +24,9 @@ const SettingsPage = () => {
         if (event.key === 'Enter') {
             try {
                 await updateSettings(settings);
-                showSuccessToast(messages.settings.messages.time_update_success);
+                showSuccessToast(messages[language].settings.messages.time_update_success);
             } catch (error) {
-                showErrorToast(messages.settings.messages.time_update_error);
+                showErrorToast(messages[language].settings.messages.time_update_error);
             }
         }
     };
@@ -35,14 +35,14 @@ const SettingsPage = () => {
         try {
             updateContextSettings(newSettings);
             await updateSettings(newSettings);
-            showSuccessToast(messages.settings.messages.update_success);
+            showSuccessToast(messages[language].settings.messages.update_success);
         } catch (error) {
-            showErrorToast(messages.settings.messages.update_error);
+            showErrorToast(messages[language].settings.messages.update_error);
         }
     };
 
-    if (isLoading) return <div>{messages.settings.loading}</div>;
-    if (error) return <div>{messages.settings.error.replace("{0}", error)}</div>;
+    if (isLoading) return <div>{messages[language].settings.loading}</div>;
+    if (error) return <div>{messages[language].settings.error.replace("{0}", error)}</div>;
 
     return (
         <div className={`min-h-screen bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-6`}>
@@ -51,8 +51,8 @@ const SettingsPage = () => {
                     {/* Hiệu ứng tuyết rơi */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.snow_effect.title}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.snow_effect.description}</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages[language].settings.snow_effect.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.snow_effect.description}</p>
                         </div>
                         <Switch
                             checked={settings.effect}
@@ -66,8 +66,8 @@ const SettingsPage = () => {
                     {/* Dark Mode */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.dark_mode.title}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.dark_mode.description}</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages[language].settings.dark_mode.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.dark_mode.description}</p>
                         </div>
                         <Switch
                             checked={isDark}
@@ -77,9 +77,9 @@ const SettingsPage = () => {
                                     const newSettings = { ...settings, dark_mode: !settings.dark_mode };
                                     await updateSettings(newSettings);
                                     updateContextSettings(newSettings);
-                                    showSuccessToast(messages.settings.messages.theme_update_success);
+                                    showSuccessToast(messages[language].settings.messages.theme_update_success);
                                 } catch (error) {
-                                    showErrorToast(messages.settings.messages.theme_update_error);
+                                    showErrorToast(messages[language].settings.messages.theme_update_error);
                                     toggleTheme();
                                 }
                             }}
@@ -89,11 +89,11 @@ const SettingsPage = () => {
                     {/* Ngôn ngữ */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.language.title}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.language.description}</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages[language].settings.language.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.language.description}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                            <span className={`text-sm ${language === 'vi' ? 'text-blue-500 font-medium' : ''}`}>{messages.settings.language.vietnamese}</span>
+                            <span className={`text-sm ${language === 'vi' ? 'text-blue-500 font-medium' : ''}`}>{messages[language].settings.language.vietnamese}</span>
                             <Switch
                                 checked={language === 'vi'}
                                 onChange={async (checked: boolean) => {
@@ -107,27 +107,27 @@ const SettingsPage = () => {
                                         };
                                         await updateSettings(newSettings);
                                         updateContextSettings(newSettings);
-                                        showSuccessToast(messages.settings.messages.language_update_success);
+                                        showSuccessToast(messages[language].settings.messages.language_update_success);
                                     } catch (error) {
-                                        showErrorToast(messages.settings.messages.language_update_error);
+                                        showErrorToast(messages[language].settings.messages.language_update_error);
                                         setLanguage(language);
                                     }
                                 }}
                             />
-                            <span className={`text-sm ${language === 'en' ? 'text-blue-500 font-medium' : ''}`}>{messages.settings.language.english}</span>
+                            <span className={`text-sm ${language === 'en' ? 'text-blue-500 font-medium' : ''}`}>{messages[language].settings.language.english}</span>
                         </div>
                     </div>
 
                     {/* Thời gian cập nhật */}
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <h3 className="text-lg font-medium dark:text-gray-100">{messages.settings.time_update.title}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages.settings.time_update.description}</p>
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages[language].settings.time_update.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.time_update.description}</p>
                         </div>
                         <input
                             type="number"
-                            min={messages.settings.time_update.min}
-                            max={messages.settings.time_update.max}
+                            min={messages[language].settings.time_update.min}
+                            max={messages[language].settings.time_update.max}
                             value={settings.change_time}
                             onChange={(e) => handleTimeChange(e.target.value)}
                             onKeyDown={handleTimeUpdate}

@@ -256,8 +256,7 @@ const DetailPage = () => {
                                 {machines.slice(0, 15).map((machine) => (
                                     <td
                                         key={machine.device_id}
-                                        className={`border-2 ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 py-2 text-sm"} ${isDark ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer`}
-                                        onClick={() => handleChangeStateMachine(machine.device_id, "enable", !(editedMachines[machine.device_id]?.enable ?? machine.enable))}
+                                        className={`border-2 ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 py-2 text-sm"} ${isDark ? 'border-border-dark bg-bg-tableIn' : 'border-border-light bg-bg-light'} cursor-pointer h-full`}
                                     >
                                         <div className="flex justify-center item-center h-full ">
                                             <input
@@ -285,20 +284,19 @@ const DetailPage = () => {
                     <table className={`table-auto w-full border-collapse border-2 ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                         <thead>
                             <tr className={`w-full ${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
-                                <th className={`border-2 w-[2%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>ID</th>
-                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.Name}</th>
-                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.productedCode}</th>
-                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.totalProducted}</th>
-                                <th className={`border-2 w-[10%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.timeStart}</th>
-                                <th className={`border-2 w-[10%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.timeEnd}</th>
-                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.actualProducted}</th>
-                                <th className={`border-2 w-[7%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.remainingProducted}</th>
-                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.daily_target}</th>
-                                <th className={`border-2 w-[5%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.actual}</th>
-                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.shift_1}</th>
-                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.shift_2}</th>
-                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.timeWork}</th>
-                                <th className={`border-2 border-black w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.item.state}</th>
+                                <th className={`border-2 w-[2%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>ID</th>
+                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.Name}</th>
+                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.productedCode}</th>
+                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.totalProducted}</th>
+                                <th className={`border-2 w-[10%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.timeStart}</th>
+                                <th className={`border-2 w-[10%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.timeEnd}</th>
+                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.actualProducted}</th>
+                                <th className={`border-2 w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.daily_target}</th>
+                                <th className={`border-2 w-[5%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.actual}</th>
+                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.shift_1}</th>
+                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.shift_2}</th>
+                                <th className={`border-2 w-[6%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.timeWork}</th>
+                                <th className={`border-2 border-black w-[8%] ${isFullScreen ? "  text-md" : " text-md"} ${isDark ? 'border-border-dark' : 'border-border-light'} h-full`}>{t.item.state}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -309,12 +307,14 @@ const DetailPage = () => {
                             ) : (
                                 machines.filter(machine => machine.enable).map((machine) => (
                                     <tr key={machine.device_id} className={`${machine.connection ? "" : " opacity-80 blink"}`}>
-                                        <td className={`border-2 w-[2%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-0 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
-                                            {machine.device_id}
+                                        <td className={`border-2 w-[2%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-0 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
+                                                {machine.device_id}
+                                            </div>
                                         </td>
                                         {/* Tên */}
-                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center w-2/3 truncate" title={machine.name}>{machine.name}</span>
                                                 <input
                                                     type="text"
@@ -327,8 +327,8 @@ const DetailPage = () => {
                                             </div>
                                         </td>
                                         {/* Mã Hàng */}
-                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center w-1/2 truncate" title={machine.code}>{machine.code}</span>
                                                 <input
                                                     type="text"
@@ -342,8 +342,8 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Tổng số đơn hàng*/}
-                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center w-1/3">{machine.total_production}</span>
                                                 <input
                                                     type="number"
@@ -357,7 +357,7 @@ const DetailPage = () => {
                                                         }
                                                     }}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
-                                                    className={`w-2/3 ${isFullScreen ? "text-sm py-0.5" : "text-sm"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
+                                                    className={`w-1/3 ${isFullScreen ? "text-sm py-0.5" : "text-sm"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
                                                     disabled={!machine.connection}
                                                     style={{
                                                         MozAppearance: 'textfield',
@@ -367,14 +367,13 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Thoi gian bat dau */}
-                                        <td className={`border-2 w-[10%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[10%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark text-white' : 'border-border-light text-dark'} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center">{machine.time_start}</span>
                                                 <InputDateTime
                                                     value={editedMachines[machine.device_id]?.time_start ?? ""}
                                                     onChange={(value) => handleChange(machine.device_id, "time_start", value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
-                                                    isFullScreen={isFullScreen}
                                                     isDark={isDark}
                                                     disabled={!machine.connection}
                                                 />
@@ -382,129 +381,97 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Thoi gian ket thuc */}
-                                        <td className={`border-2 w-[10%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[10%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark text-text-dark' : 'border-border-light text-text-light'} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center">{machine.time_end}</span>
                                                 <InputDateTime
                                                     value={editedMachines[machine.device_id]?.time_end ?? ""}
                                                     onChange={(value) => handleChange(machine.device_id, "time_end", value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
-                                                    isFullScreen={isFullScreen}
                                                     isDark={isDark}
                                                     disabled={!machine.connection}
                                                 />
                                             </div>
                                         </td>
                                         {/* Số đơn hàng thực hiện */}
-                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold px-1 text-center w-1/2">{machine.actual_production}</span>
                                                 <input
                                                     type="number"
                                                     min="0"
                                                     max="9999"
                                                     value={editedMachines[machine.device_id]?.actual_production ?? ""}
-                                                    onChange={(e) => {
-                                                        const value = Number(e.target.value);
-                                                        if (value >= 0 && value <= 9999) {
-                                                            handleChange(machine.device_id, "target", value);
-                                                        }
-                                                    }}
+                                                    onChange={(e) => handleChange(machine.device_id, "actual_production", e.target.value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     className={`w-1/2 ${isFullScreen ? "text-sm py-0.5" : "text-sm"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
                                                     disabled={!machine.connection}
-                                                    style={{
-                                                        MozAppearance: 'textfield',
-                                                    }}
                                                 />
                                             </div>
                                         </td>
-                                        {/* Số đơn hàng còn lại */}
-                                        <td className={`border-2 w-[7%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex item-center justify-center">
-                                                <span className="font-semibold px-1 text-center">{machine.total_production - machine.actual_production}</span>
-                                            </div>
-                                        </td>
+
                                         {/* Mục tiêu ngày */}
-                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold px-1 text-center w-1/2">{machine.target}</span>
                                                 <input
                                                     type="number"
                                                     min="0"
                                                     max="9999"
                                                     value={editedMachines[machine.device_id]?.target ?? ""}
-                                                    onChange={(e) => {
-                                                        const value = Number(e.target.value);
-                                                        if (value >= 0 && value <= 9999) {
-                                                            handleChange(machine.device_id, "target", value);
-                                                        }
-                                                    }}
+                                                    onChange={(e) => handleChange(machine.device_id, "target", e.target.value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     className={`w-1/2 ${isFullScreen ? "text-sm py-0.5" : "text-sm"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
                                                     disabled={!machine.connection}
-                                                    style={{
-                                                        MozAppearance: 'textfield',
-                                                    }}
                                                 />
                                             </div>
                                         </td>
 
                                         {/* Thực hiện */}
-                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold px-1 text-center w-1/2">{machine.actual}</span>
                                                 <input
                                                     type="number"
                                                     min="0"
                                                     max="9999"
                                                     value={editedMachines[machine.device_id]?.actual ?? ""}
-                                                    onChange={(e) => {
-                                                        const value = Number(e.target.value);
-                                                        if (value >= 0 && value <= 9999) {
-                                                            handleChange(machine.device_id, "actual", value);
-                                                        }
-                                                    }}
+                                                    onChange={(e) => handleChange(machine.device_id, "actual", e.target.value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     className={`w-1/2 ${isFullScreen ? "text-sm py-0.5" : "text-sm"} ${isDark ? 'text-text-dark border-border-dark' : 'text-text-light border-border-light'} bg-transparent border-b text-center focus:outline-none focus:border-b focus:border-accent`}
                                                     disabled={!machine.connection}
-                                                    style={{
-                                                        MozAppearance: 'textfield',
-                                                    }}
                                                 />
                                             </div>
                                         </td>
 
-                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[7%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center w-1/2">{machine.shift_1}</span>
                                                 <InputTime4Number
                                                     value={editedMachines[machine.device_id]?.shift_1 ?? ""}
                                                     onChange={(value) => handleChange(machine.device_id, "shift_1", value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
-                                                    isFullScreen={isFullScreen}
                                                     isDark={isDark}
                                                     disabled={!machine.connection}
                                                 />
                                             </div>
                                         </td>
 
-                                        <td className={`border-2 w-[7%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[7%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold text-center w-1/2">{machine.shift_2}</span>
                                                 <InputTime4Number
                                                     value={editedMachines[machine.device_id]?.shift_2 ?? ""}
                                                     onChange={(value) => handleChange(machine.device_id, "shift_2", value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
-                                                    isFullScreen={isFullScreen}
                                                     isDark={isDark}
                                                     disabled={!machine.connection}
                                                 />
                                             </div>
                                         </td>
 
-                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '}`}>
-                                            <div className="flex flex-col item-center ">
+                                        <td className={`border-2 w-[6%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
+                                            <div className="flex flex-col items-center justify-center h-full">
                                                 <span className="font-semibold px-1 text-center w-1/2">{machine.total_min}</span>
                                                 <input
                                                     type="number"
@@ -523,9 +490,9 @@ const DetailPage = () => {
                                         </td>
 
                                         {/* Trạng Thái Kết Nối */}
-                                        <td className={`border-2 text-center w-[8%] ${isFullScreen ? " py-0.5 text-sm" : " text-sm"} ${isDark ? 'border-border-dark' : 'border-border-light'} ${machine.connection ? "bg-connect" : "bg-error opacity-80 blink"}`}>
-                                            <div className="flex justify-center item-center">
-                                                <span className="p-1.5 font-semibold text-text-dark w-full flex item-center justify-center">
+                                        <td className={`border-2 text-center w-[8%] ${isFullScreen ? " py-0.5 text-sm" : " text-sm"} ${isDark ? 'border-border-dark' : 'border-border-light'} ${machine.connection ? "bg-connect" : "bg-error opacity-80 blink"} h-full`}>
+                                            <div className="flex items-center justify-center h-full">
+                                                <span className="p-1.5 font-semibold text-text-dark w-full flex items-center justify-center">
                                                     {machine.connection ? t.connected : t.disconnected}
                                                 </span>
                                             </div>

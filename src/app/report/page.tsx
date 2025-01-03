@@ -60,7 +60,7 @@ const ReportPage = () => {
         console.log('Updating time for slot:', slotId);
         const hours = editedHours[slotId] || "";
         const minutes = editedMinutes[slotId] || "";
-        
+
         // Tìm slot hiện tại và log để debug
         const currentSlot = timeSlots.find(slot => slot.index === slotId);
         console.log('Current slot:', currentSlot);
@@ -79,7 +79,7 @@ const ReportPage = () => {
             // Sử dụng index từ slot hiện tại
             const updatedSlot = await updateReportTime(slotId - 1, newTime);
             console.log('Updated slot response:', updatedSlot);
-            
+
             setTimeSlots((prevSlots) => {
                 const newSlots = prevSlots.map((slot) =>
                     slot.index === slotId ? { ...slot, time: newTime } : slot
@@ -87,11 +87,11 @@ const ReportPage = () => {
                 console.log('New slots state:', newSlots);
                 return newSlots;
             });
-            
+
             // Reset input fields
             setEditedHours(prev => ({ ...prev, [slotId]: "" }));
             setEditedMinutes(prev => ({ ...prev, [slotId]: "" }));
-            
+
             toast.success(newTime ? `${t.success.timeUpdated} ${newTime}` : t.success.timeDeleted);
         } catch (error: any) {
             console.error("Lỗi:", error);
@@ -151,7 +151,7 @@ const ReportPage = () => {
                 </div>
             )}
             {/* Grid Layout */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-5 px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 py-2 px-4">
                 {Array.isArray(timeSlots) && timeSlots.length > 0 ? (
                     timeSlots.map((slot) => {
                         console.log('Rendering slot:', slot);
@@ -166,7 +166,7 @@ const ReportPage = () => {
                                     </h2>
                                 </div>
 
-                                <div className={`py-0 flex flex-col items-center `}>
+                                <div className={`py-0 flex flex-col items-center justify-center `}>
                                     <span className="font-semibold text-center mb-2 py-3 text-3xl">
                                         {/* Hiển thị thởi gian hoặc thông báo chưa cài đặt */}
                                         {slot.time ? (
@@ -181,7 +181,7 @@ const ReportPage = () => {
                                     </span>
 
                                     {/* Input chỉnh sửa thởi gian */}
-                                    <div className="bg-bg-light py-3 w-full flex items-end justify-center">
+                                    <div className="bg-bg-light py-3 w-full h-full flex items-end justify-center bottom-0">
                                         <InputTime2Number
                                             hours={editedHours[slot.index]?.toString() || ""}
                                             minutes={editedMinutes[slot.index]?.toString() || ""}

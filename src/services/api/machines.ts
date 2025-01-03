@@ -7,7 +7,7 @@ export interface Machine {
     time_start: string;
     time_end: string;
     actual_production: number;
-    worker:number;
+    worker: number;
     target: number;
     mtg: number;
     actual: number;

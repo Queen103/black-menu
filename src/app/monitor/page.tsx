@@ -14,7 +14,7 @@ const MonitorPage = () => {
 
     // Thời gian làm việc theo từng khung giờ
     const timeSlots = [
-        "07:30-08:30", "08:30-09:30", "09:30-10:30", "10:30-11:30","11:30-12:30",
+        "07:30-08:30", "08:30-09:30", "09:30-10:30", "10:30-11:30", "11:30-12:30",
         "13:30-14:30", "14:30-15:30", "15:30-16:30", "16:30-17:30"
     ];
 
@@ -67,12 +67,12 @@ const MonitorPage = () => {
     };
 
     return (
-        <div className={`${isDark ? 'text-text-dark bg-bg-dark' : 'text-text-light bg-bg-light'} h-full ${isFullScreen ? "py-8 px-4" : "py-6 px-2"}`}>
+        <div className={`${isDark ? 'text-text-dark bg-bg-dark' : 'text-text-light bg-bg-light'} h-full ${isFullScreen ? "py-2 px-4" : "py-1 px-2"}`}>
 
             <div className="overflow-x-auto shadow-[0px_0px_8px_rgba(0,0,0,0.8)]">
                 <table className={`table-auto w-full border-collapse border-2 ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                     <thead>
-                    <tr className={`w-full ${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
+                        <tr className={`w-full ${isDark ? 'border-border-dark bg-bg-table' : 'border-border-light bg-gray-400'}`}>
                             <th className={`border-2 w-[2%] text-md ${isDark ? 'border-border-dark' : 'border-border-light'}`}>ID</th>
                             <th className={`border-2 w-[6%] text-md ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.Name}</th>
                             <th className={`border-2 w-[6%] text-md ${isDark ? 'border-border-dark' : 'border-border-light'}`}>{t.productedCode}</th>
@@ -102,53 +102,53 @@ const MonitorPage = () => {
 
                             return (
                                 <tr key={machine.device_id} className={` ${machine.connection ? "" : "opacity-80 blink"} ${isDark ? 'bg-bg-dark text-white' : 'bg-bg-light text-black'}`}>
-                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.device_id}
                                     </td>
-                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         <span className="font-semibold truncate" title={machine.name}>{machine.name}</span>
                                     </td>
-                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         <span className="font-semibold truncate" title={machine.code}>{machine.code}</span>
                                     </td>
-                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.total_production}
                                     </td>
-                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.time_start}
                                     </td>
-                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.time_end}
                                     </td>
-                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.actual_production}
                                     </td>
-                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        {machine.total_production - machine.actual_production}
+                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                        {machine.total_production - machine.actual_production || 0}
                                     </td>
-                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.worker || 0}
                                     </td>
                                     {hourlyTargets.map((target, index) => (
-                                        <td key={index} className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                        <td key={index} className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                             <div className="flex flex-col">
                                                 <span className={`font-semibold ${isDark ? ' text-yellow-300' : ' text-blue-500'}`}>{target}</span>
-                                                <span className={hourlyActuals[index] >= target ? "text-green-500" : "text-green-500"}>
+                                                <span className={hourlyActuals[index] >= target ? "text-green-500" : "text-red-500"}>
                                                     {hourlyActuals[index]}
                                                 </span>
                                             </div>
                                         </td>
                                     ))}
-                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                    <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         <div className="flex flex-col">
                                             <span className={`font-semibold ${isDark ? ' text-yellow-300' : ' text-blue-500'}`}>{totalTarget}</span>
-                                            <span className={totalActual >= totalTarget ? "text-green-500" : "text-green-500"}>
+                                            <span className={totalActual >= totalTarget ? "text-green-500" : "text-red-500"}>
                                                 {totalActual}
                                             </span>
                                         </div>
                                     </td>
-                                    <td className={`border-2 font-bold ${isFullScreen ? "px-1 py-1 text-2xl" : "px-1 py-0.5 text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        <span className={efficiency >= 100 ? "text-green-500" : "text-green-500"}>
+                                    <td className={`border-2 font-bold ${isFullScreen ? "px-1 py-1 text-2xl" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
+                                        <span className={efficiency >= 100 ? "text-green-500" : "text-red-500"}>
                                             {efficiency.toFixed(1)}%
                                         </span>
                                     </td>

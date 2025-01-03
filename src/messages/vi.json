@@ -79,11 +79,11 @@
       "emailDeleted": "Đã xóa email thành công"
     }
   },
-  "settingLine":{
+  "settingLine": {
     "lineActive": "Line hoạt động",
     "enableTable": "Bảng trạng thái",
     "settingTable": "Bảng cài đặt",
-    "noData":"Không có dữ liệu",
+    "noData": "Không có dữ liệu",
     "connected": "Kết nối",
     "disconnected": "Mất kết nối",
     "toast": {
@@ -91,13 +91,13 @@
       "error": "Lỗi khi cập nhật trạng thái",
       "update": "Cập nhật thành công Line"
     },
-    "item":{
-      "Name": "Tên",
+    "item": {
+      "Name": "TÊN LINE",
       "daily_target": "MỤC TIÊU NGÀY",
-      "productedCode": "MÃ HÀNG",
+      "productedCode": "TÊN MÃ HÀNG",
       "totalProducted": "TỔNG ĐƠN HÀNG",
-      "timeStart": "NGÀY BẮT ĐẦU",
-      "timeEnd": "NGÀY KẾT THÚC",
+      "timeStart": "NGÀY BẮT ĐẦU MÃ",
+      "timeEnd": "NGÀY KẾT THÚC MÃ",
       "actualProducted": "ĐƠN THỰC HIỆN",
       "remainingProducted": "ĐƠN CÒN LẠI",
       "shift_1": "CA SÁNG",
@@ -157,12 +157,12 @@
   },
   "table": {
     "item": {
-      "Name": "Tên",
+      "Name": "TÊN LINE",
       "daily_target": "MỤC TIÊU NGÀY",
-      "productedCode": "MÃ HÀNG",
+      "productedCode": "TÊN MÃ HÀNG",
       "totalProducted": "TỔNG ĐƠN HÀNG",
-      "timeStart": "NGÀY BẮT ĐẦU",
-      "timeEnd": "NGÀY KẾT THÚC",
+      "timeStart": "NGÀY BẮT ĐẦU MÃ",
+      "timeEnd": "NGÀY KẾT THÚC MÃ",
       "actualProducted": "ĐƠN THỰC HIỆN",
       "remainingProducted": "ĐƠN CÒN LẠI",
       "shift_1": "CA SÁNG",

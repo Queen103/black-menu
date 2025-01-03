@@ -34,7 +34,7 @@ const GmailSettingsPage = () => {
         console.log('Updating email for slot:', slotId);
         const email = editedEmails[slotId] || "";
         const currentSlot = emailSlots.find(slot => slot.index === slotId);
-        
+
         console.log('Current slot:', currentSlot);
         console.log('All slots:', emailSlots);
 
@@ -54,7 +54,7 @@ const GmailSettingsPage = () => {
             // Điều chỉnh index trước khi gửi đến API
             const apiIndex = slotId - 1;
             console.log('Sending to API with index:', apiIndex);
-            
+
             const updatedSlot = await updateGmailSettings(apiIndex, email);
             console.log('API response:', updatedSlot);
 
@@ -65,7 +65,7 @@ const GmailSettingsPage = () => {
                 console.log('New email slots:', newSlots);
                 return newSlots;
             });
-            
+
             setEditedEmails(prev => ({ ...prev, [slotId]: "" }));
             toast.success(email ? `${t.success.emailUpdated} ${email}` : t.success.emailDeleted);
         } catch (error: any) {
@@ -118,7 +118,7 @@ const GmailSettingsPage = () => {
                     Lỗi: {error}
                 </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 py-5 px-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 py-1 px-4">
                 {Array.isArray(emailSlots) && emailSlots.length > 0 ? (
                     emailSlots.map((slot) => (
                         <div
@@ -147,17 +147,16 @@ const GmailSettingsPage = () => {
                                         onChange={(e) => handleEmailChange(slot.index, e.target.value)}
                                         placeholder={t.placeholder}
                                         autoComplete="off"
-                                        className={`w-full h-full px-4 py-2 text-black text-lg ${
-                                            isDark
-                                                ? 'bg-dark-input border-gray-600'
-                                                : 'bg-white border-gray-300'
-                                        } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        className={`w-full h-full px-4 py-2 text-black text-lg ${isDark
+                                            ? 'bg-dark-input border-gray-600'
+                                            : 'bg-white border-gray-300'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 handleEmailUpdate(slot.index);
                                             }
                                         }}
-                                        
+
                                     />
                                 </div>
                             </div>

@@ -132,8 +132,8 @@ const MonitorPage = () => {
                                     {hourlyTargets.map((target, index) => (
                                         <td key={index} className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                             <div className="flex flex-col">
-                                                <span className={`font-semibold ${isDark ? ' text-yellow-300' : ' text-blue-500'}`}>{target}</span>
-                                                <span className={hourlyActuals[index] >= target ? "text-green-500" : "text-red-500"}>
+                                                <span className={`font-semibold ${isDark ? ' text-orange-100' : ' text-blue-500'}`}>{target}</span>
+                                                <span className={hourlyActuals[index] >= target ? "text-green-500" : "text-text-table"}>
                                                     {hourlyActuals[index]}
                                                 </span>
                                             </div>
@@ -141,14 +141,14 @@ const MonitorPage = () => {
                                     ))}
                                     <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         <div className="flex flex-col">
-                                            <span className={`font-semibold ${isDark ? ' text-yellow-300' : ' text-blue-500'}`}>{totalTarget}</span>
-                                            <span className={totalActual >= totalTarget ? "text-green-500" : "text-red-500"}>
+                                            <span className={`font-semibold ${isDark ? ' text-orange-100' : ' text-blue-500'}`}>{totalTarget}</span>
+                                            <span className={totalActual >= totalTarget ? "text-green-500" : "text-text-table"}>
                                                 {totalActual}
                                             </span>
                                         </div>
                                     </td>
                                     <td className={`border-2 font-bold ${isFullScreen ? "px-1 py-1 text-2xl" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        <span className={efficiency >= 100 ? "text-green-500" : "text-red-500"}>
+                                        <span className={efficiency >= 100 ? "text-green-500" : "text-text-table"}>
                                             {efficiency.toFixed(1)}%
                                         </span>
                                     </td>

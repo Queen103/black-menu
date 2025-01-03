@@ -39,6 +39,7 @@ const config: Config = {
         // Màu text
         'text-dark': '#ffffff',    // Text trên nền tối
         'text-light': '#333333',   // Text trên nền sáng
+        'text-table': '#D4AF37',   // Text trên nền bảng
 
         // Màu border
         'border-dark': '#ffffff',  // Viền trên nền tối

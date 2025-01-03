@@ -91,9 +91,9 @@ export const InputDateTime = ({
     return (
         <div className="flex items-center space-x-1">
             {[
-                { value: inputValues.day, placeholder: 'DD', maxLength: 2, onChange: (e) => handleChange(e, 'day'), width: 'w-10' },
-                { value: inputValues.month, placeholder: 'MM', maxLength: 2, onChange: (e) => handleChange(e, 'month'), width: 'w-10' },
-                { value: inputValues.year, placeholder: 'YYYY', maxLength: 4, onChange: (e) => handleChange(e, 'year'), width: 'w-16' },
+                { value: inputValues.day, placeholder: 'DD', maxLength: 2, onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e, 'day'), width: 'w-10' },
+                { value: inputValues.month, placeholder: 'MM', maxLength: 2, onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e, 'month'), width: 'w-10' },
+                { value: inputValues.year, placeholder: 'YYYY', maxLength: 4, onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleChange(e, 'year'), width: 'w-16' },
             ].map((field, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && <span>/</span>}

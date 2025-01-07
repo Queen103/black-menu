@@ -52,7 +52,7 @@ const GmailSettingsPage = () => {
 
         try {
             // Điều chỉnh index trước khi gửi đến API
-            const apiIndex = slotId - 1;
+            const apiIndex = slotId;
             console.log('Sending to API with index:', apiIndex);
 
             const updatedSlot = await updateGmailSettings(apiIndex, email);
@@ -127,7 +127,7 @@ const GmailSettingsPage = () => {
                         >
                             <div className="bg-report">
                                 <h2 className={`text-2xl w-full font-semibold mb-2 p-3 border-t-lg ${isFullScreen ? "py-5" : "py-2"} truncate`}>
-                                    {t.emailSlot} {slot.index}
+                                    {t.emailSlot} {slot.index + 1}
                                 </h2>
                             </div>
 

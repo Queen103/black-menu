@@ -77,7 +77,7 @@ const ReportPage = () => {
 
         try {
             // Sử dụng index từ slot hiện tại
-            const updatedSlot = await updateReportTime(slotId - 1, newTime);
+            const updatedSlot = await updateReportTime(slotId, newTime);
             console.log('Updated slot response:', updatedSlot);
 
             setTimeSlots((prevSlots) => {
@@ -162,7 +162,7 @@ const ReportPage = () => {
                             >
                                 <div className="bg-report">
                                     <h2 className={`text-2xl font-semibold mb-2 p-2 border-t-lg ${isFullScreen ? "py-5" : "py-2"}`}>
-                                        {t.timePoint} {slot.index}
+                                        {t.timePoint} {slot.index + 1}
                                     </h2>
                                 </div>
 
@@ -188,7 +188,7 @@ const ReportPage = () => {
                                             onHourChange={(value) => handleHourChange(slot.index, value)}
                                             onMinuteChange={(value) => handleMinuteChange(slot.index, value)}
                                             onEnter={() => handleTimeUpdate(slot.index)}
-                                            disabled={!slot.index}
+
                                         />
                                     </div>
                                 </div>

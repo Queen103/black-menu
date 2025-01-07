@@ -37,7 +37,7 @@ export const getUserInfo = async (): Promise<User[]> => {
 export const validateLogin = async (email: string, password: string): Promise<User | null> => {
     try {
         const users = await getUserInfo();
-        
+
         const user = users.find(u => u.account === email && u.password === password);
         console.log(user);
         if (user && user.is_valid) {
@@ -54,7 +54,7 @@ export const validateLogin = async (email: string, password: string): Promise<Us
 
 export const getCurrentUser = (): User | null => {
     if (typeof window === 'undefined') return null;
-    
+
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
     try {

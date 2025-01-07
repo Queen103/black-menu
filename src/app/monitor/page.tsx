@@ -109,19 +109,19 @@ const MonitorPage = () => {
                                         <span className="font-semibold truncate" title={machine.name}>{machine.name}</span>
                                     </td>
                                     <td className={`border-2 ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        <span className="font-semibold truncate" title={machine.code}>{machine.code}</span>
+                                        <span className="font-semibold truncate" title={machine.code}>{machine.code || 'xxx'}</span>
                                     </td>
                                     <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        {machine.total_production}
+                                        {machine.total_production || '0'}
                                     </td>
                                     <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        {machine.time_start}
+                                        {machine.time_start || '0-0-0'}
                                     </td>
                                     <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        {machine.time_end}
+                                        {machine.time_end || '0-0-0'}
                                     </td>
                                     <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
-                                        {machine.actual_production}
+                                        {machine.actual_production || '0'}
                                     </td>
                                     <td className={`border-2 font-semibold ${isFullScreen ? "px-1 py-1 text-md" : "px-1  text-md"} text-center ${isDark ? 'border-border-dark' : 'border-border-light'}`}>
                                         {machine.total_production - machine.actual_production || 0}

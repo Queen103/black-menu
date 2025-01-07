@@ -331,8 +331,8 @@ const DetailPage = () => {
                                 </tr>
                             ) : (
                                 machines.filter(machine => machine.enable).map((machine) => (
-                                    <tr key={machine.device_id} className={`${machine.connection ? "" : " opacity-80 blink"}`}>
-                                        <td className={`border-2 w-[2%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-0 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'} h-full`}>
+                                    <tr key={machine.device_id} className={`${machine.connection ? "" : " opacity-80 blink"} tracking-[0.1em]`}>
+                                        <td className={`border-2 w-[2%] ${isFullScreen ? "px-1 py-0.5 text-md" : "px-0 text-md"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'} h-full`}>
                                             <div className="flex flex-col items-center justify-center h-full">
                                                 {machine.device_id}
                                             </div>
@@ -354,7 +354,7 @@ const DetailPage = () => {
                                         {/* Mã Hàng */}
                                         <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light'} h-full`}>
                                             <div className="flex flex-col items-center justify-center h-full">
-                                                <span className="font-semibold text-center w-1/2 truncate" title={machine.code}>{machine.code}</span>
+                                                <span className="font-semibold text-center w-1/2 truncate" title={machine.code}>{machine.code || 'xxx'}</span>
                                                 <input
                                                     type="text"
                                                     value={editedMachines[machine.device_id]?.code ?? ""}
@@ -369,7 +369,7 @@ const DetailPage = () => {
                                         {/* Tổng số đơn hàng*/}
                                         <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
                                             <div className="flex flex-col items-center justify-center h-full">
-                                                <span className="font-semibold text-center w-1/3">{machine.total_production}</span>
+                                                <span className="font-semibold text-center w-1/3">{machine.total_production || '0'}</span>
                                                 <input
                                                     type="number"
                                                     min="0"
@@ -394,7 +394,7 @@ const DetailPage = () => {
                                         {/* Thoi gian bat dau */}
                                         <td className={`border-2 w-[10%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark text-white' : 'border-border-light text-dark'} h-full`}>
                                             <div className="flex flex-col items-center justify-center h-full">
-                                                <span className="font-semibold text-center">{machine.time_start}</span>
+                                                <span className="font-semibold text-center">{machine.time_start || '0-0-0'}</span>
                                                 <InputDateTime
                                                     value={editedMachines[machine.device_id]?.time_start ?? ""}
                                                     onChange={(value) => handleChange(machine.device_id, "time_start", value)}
@@ -409,7 +409,7 @@ const DetailPage = () => {
                                         {/* Thoi gian ket thuc */}
                                         <td className={`border-2 w-[10%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark text-text-dark' : 'border-border-light text-text-light'} h-full`}>
                                             <div className="flex flex-col items-center justify-center h-full">
-                                                <span className="font-semibold text-center">{machine.time_end}</span>
+                                                <span className="font-semibold text-center">{machine.time_end || '0-0-0'}</span>
                                                 <InputDateTime
                                                     value={editedMachines[machine.device_id]?.time_end ?? ""}
                                                     onChange={(value) => handleChange(machine.device_id, "time_end", value)}
@@ -422,7 +422,7 @@ const DetailPage = () => {
                                         {/* Số đơn hàng thực hiện */}
                                         <td className={`border-2 w-[8%] ${isFullScreen ? "px-1 py-0.5 text-sm" : "px-1 text-sm"} text-center ${isDark ? 'border-border-dark ' : 'border-border-light '} h-full`}>
                                             <div className="flex flex-col items-center justify-center h-full">
-                                                <span className="font-semibold px-1 text-center w-1/2">{machine.actual_production}</span>
+                                                <span className="font-semibold px-1 text-center w-1/2">{machine.actual_production || '0'}</span>
                                                 <input
                                                     type="number"
                                                     min="0"
@@ -518,7 +518,7 @@ const DetailPage = () => {
                                         {/* Trạng Thái Kết Nối */}
                                         <td className={`border-2 text-center w-[8%] ${isFullScreen ? " py-0.5 text-sm" : " text-sm"} ${isDark ? 'border-border-dark' : 'border-border-light'} ${machine.connection ? "bg-connect" : "bg-error opacity-80 blink"} h-full`}>
                                             <div className="flex items-center justify-center h-full">
-                                                <span className="p-1.5 font-semibold text-text-dark w-full flex items-center justify-center">
+                                                <span className="p-1.5 text-xl font-semibold text-text-dark w-full flex items-center justify-center">
                                                     {machine.connection ? t.connected : t.disconnected}
                                                 </span>
                                             </div>

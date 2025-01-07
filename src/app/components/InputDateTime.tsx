@@ -50,7 +50,7 @@ export const InputDateTime = ({
             }
 
             // Cập nhật giá trị mới
-            newDate = `${year}-${month}-${day}`;
+            newDate = `${day}-${month}-${year}`;
             setDateTime(newDate);
             onChange(newDate);
         }

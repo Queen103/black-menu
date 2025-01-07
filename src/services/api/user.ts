@@ -10,10 +10,14 @@ export interface User {
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const NEXT_PUBLIC_API_CREATE_ACCOUNT = process.env.NEXT_PUBLIC_API_CREATE_ACCOUNT;
+const NEXT_PUBLIC_API_GET_USER_INFO = process.env.NEXT_PUBLIC_API_GET_USER_INFO;
+const NEXT_PUBLIC_API_DELETE_ACCOUNT = process.env.NEXT_PUBLIC_API_DELETE_ACCOUNT;
+const NEXT_PUBLIC_API_SET_USER_PASSWORD = process.env.NEXT_PUBLIC_API_SET_USER_PASSWORD;
 
 export const getUserInfo = async (): Promise<User[]> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_get_user_info`, {
+        const response = await fetch(`${API_BASE_URL}${NEXT_PUBLIC_API_GET_USER_INFO}`, {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
@@ -80,7 +84,7 @@ export const createUser = async (userData: {
     info: string;
 }): Promise<User> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_create_account`, {
+        const response = await fetch(`${API_BASE_URL}${NEXT_PUBLIC_API_CREATE_ACCOUNT}`, {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
@@ -103,7 +107,7 @@ export const createUser = async (userData: {
 
 export const deleteUser = async (account: string): Promise<void> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_delete_account?account=${account}`, {
+        const response = await fetch(`${API_BASE_URL}${NEXT_PUBLIC_API_DELETE_ACCOUNT}?account=${account}`, {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
@@ -121,7 +125,7 @@ export const deleteUser = async (account: string): Promise<void> => {
 
 export const changeUserPassword = async (account: string, password: string): Promise<void> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/nam_co_london/v1/api_set_user_password?account=${account}&password=${password}`, {
+        const response = await fetch(`${API_BASE_URL}${NEXT_PUBLIC_API_SET_USER_PASSWORD}?account=${account}&password=${password}`, {
             method: 'POST',
             headers: {
                 'accept': 'application/json',

@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'react-toastify';
 import { CustomToast } from '../components/CustomToast';
 import { validateLogin } from '@/services/api/user';
+import { getUserInfo } from '@/services/api/user';
 import messages from '@/messages';
 
 export default function LoginPage() {
@@ -39,8 +40,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleForgotPassword = () => {
-    toast.info("Hãy liên hệ quản lý");
+  const handleForgotPassword = async () => {
+    const users = getUserInfo();
+    for (const user of await users) {
+      if (user.is_admin) {
+        toast.info(`Hãy liên hệ quản lý theo số điện thoại ${user.info}`);
+        return;
+      }
+    }
+
   };
 
   return (

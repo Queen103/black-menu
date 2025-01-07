@@ -173,7 +173,7 @@ const AccountPage = () => {
                                     value={formData.account}
                                     onChange={(e) => setFormData({ ...formData, account: e.target.value })}
                                     className="w-full border rounded p-2 bg-bg-light text-text-light"
-                                    required
+
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault();
@@ -194,7 +194,7 @@ const AccountPage = () => {
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="w-full border rounded p-2 bg-bg-light text-text-light"
-                                    required
+
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault();
@@ -233,9 +233,10 @@ const AccountPage = () => {
                                 <thead className="sticky top-0 z-10">
                                     <tr className={`border-b ${isDark ? 'border-gray-600' : 'border-gray-400'} ${isDark ? 'bg-secondary' : 'bg-gray-300'
                                         }`}>
-                                        <th className="px-4 py-2 text-center w-[15%]">Tài khoản</th>
+                                        <th className="px-4 py-2 text-center w-[10%]">Tài khoản</th>
+                                        <th className="px-4 py-2 text-center w-[15%]">Thông tin</th>
                                         <th className="px-4 py-2 text-center w-[10%]">Quyền</th>
-                                        <th className="px-4 py-2 text-center w-[20%]">Ngày tạo</th>
+                                        <th className="px-4 py-2 text-center w-[15%]">Ngày tạo</th>
                                         <th className="px-4 py-2 text-center w-[15%]">Người tạo</th>
                                         <th className="px-4 py-2 text-center w-[25%]">Đổi mật khẩu</th>
                                         <th className="px-4 py-2 text-center w-[15%]">Xóa Tài Khoản</th>
@@ -248,6 +249,7 @@ const AccountPage = () => {
                                             className={`border-b ${isDark ? 'border-gray-600' : 'border-gray-400'} hover:bg-opacity-50 hover:bg-primary`}
                                         >
                                             <td className="px-4 py-2 text-center">{user.account}</td>
+                                            <td className="px-4 py-2 text-center">{user.info || 'Chưa cập nhật'} </td>
                                             <td className="px-4 py-2 text-center">
                                                 {user.is_admin ? "Admin" : user.is_writer ? "Writer" : "User"}
                                             </td>
@@ -291,6 +293,7 @@ const AccountPage = () => {
                     </h2>
                     <div className="space-y-4">
                         <p><span className="font-semibold">Tài khoản:</span> {currentUser.account}</p>
+                        <p><span className="font-semibold">Thông tin:</span> {currentUser.info}</p>
                         <p><span className="font-semibold">Vai trò:</span> {currentUser.is_writer ? "Writer" : "User"}</p>
                         <p><span className="font-semibold">Ngày tạo tài khoản:</span> {currentUser.date_created}</p>
                         <p><span className="font-semibold">Người tạo:</span> {currentUser.create_by}</p>

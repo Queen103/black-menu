@@ -122,6 +122,123 @@ export const setDeviceName = async (device_id: number, name: string): Promise<vo
     }
 };
 
+export const setDeviceCode = async (device_id: number, code: string): Promise<void> => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_CODE}?device_id=${device_id}&code=${encodeURIComponent(code)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật mật khóa thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device code:', error);
+        throw error;
+    }
+};
+
+export const setDeviceTotalProduction = async (device_id: number, total_production: number): Promise<void> => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_TOTAL_PRODUCTION}?device_id=${device_id}&total_production=${total_production}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật số lần thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device total production:', error);
+        throw error;
+    }
+};
+
+export const setDeviceActualProduction = async (device_id: number, actual_production: number): Promise<void> => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_ACTUAL_PRODUCTION}?device_id=${device_id}&actual_production=${actual_production}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật số lần thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device actual production:', error);
+        throw error;
+    }
+};
+
+export const setDeviceTimeStart = async (device_id: number, time_start: string): Promise<void> => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_TIME_START}?device_id=${device_id}&time_start=${encodeURIComponent(time_start)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật thời gian bản đồ thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device time start:', error);
+        throw error;
+    }
+};
+
+export const setDeviceTimeEnd = async (device_id: number, time_end: string): Promise<void> => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_TIME_END}?device_id=${device_id}&time_end=${encodeURIComponent(time_end)}`,
+            {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json'
+                },
+                body: ''
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Lỗi khi cập nhật thời gian bản đồ thiết bị");
+        }
+    } catch (error) {
+        console.error('Error setting device time end:', error);
+        throw error;
+    }
+};
+
+
+
 export const setDeviceTarget = async (device_id: number, target: number): Promise<void> => {
     try {
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_SET_DEVICE_TARGET}`;

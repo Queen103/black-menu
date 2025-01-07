@@ -13,6 +13,11 @@ import {
     setDeviceStartShift2,
     setDeviceActual,
     setDeviceTotalMin,
+    setDeviceTotalProduction,
+    setDeviceCode,
+    setDeviceTimeStart,
+    setDeviceTimeEnd,
+    setDeviceActualProduction,
     type Machine
 } from '@/services/api/machines';
 import InputDateTime from '../components/InputDateTime';
@@ -158,6 +163,26 @@ const DetailPage = () => {
                 if (editedMachine.target !== undefined && editedMachine.target !== originalMachine.target) {
                     changes.push(`${t.item.daily_target}: ${originalMachine.target} → ${editedMachine.target}`);
                     await setDeviceTarget(machinedevice_id, editedMachine.target);
+                }
+                if (editedMachine.code !== undefined && editedMachine.code !== originalMachine.code) {
+                    changes.push(`${t.item.code}: ${originalMachine.code} → ${editedMachine.code}`);
+                    await setDeviceCode(machinedevice_id, editedMachine.code);
+                }
+                if (editedMachine.total_production !== undefined && editedMachine.total_production !== originalMachine.total_production) {
+                    changes.push(`${t.item.totalProducted}: ${originalMachine.total_production} → ${editedMachine.total_production}`);
+                    await setDeviceTotalProduction(machinedevice_id, editedMachine.total_production);
+                }
+                if (editedMachine.time_start !== undefined && editedMachine.time_start !== originalMachine.time_start) {
+                    changes.push(`${t.item.timeStart}: ${originalMachine.time_start} → ${editedMachine.time_start}`);
+                    await setDeviceTimeStart(machinedevice_id, editedMachine.time_start);
+                }
+                if (editedMachine.time_end !== undefined && editedMachine.time_end !== originalMachine.time_end) {
+                    changes.push(`${t.item.timeEnd}: ${originalMachine.time_end} → ${editedMachine.time_end}`);
+                    await setDeviceTimeEnd(machinedevice_id, editedMachine.time_end);
+                }
+                if (editedMachine.actual_production !== undefined && editedMachine.actual_production !== originalMachine.actual_production) {
+                    changes.push(`${t.item.actualProducted}: ${originalMachine.actual_production} → ${editedMachine.actual_production}`);
+                    await setDeviceActualProduction(machinedevice_id, editedMachine.actual_production);
                 }
                 if (editedMachine.shift_1 !== undefined && editedMachine.shift_1 !== originalMachine.shift_1) {
                     changes.push(`${t.item.shift_1}: ${originalMachine.shift_1} → ${editedMachine.shift_1}`);
@@ -375,6 +400,7 @@ const DetailPage = () => {
                                                     onChange={(value) => handleChange(machine.device_id, "time_start", value)}
                                                     onKeyDown={(e) => handleKeyDown(e, machine.device_id)}
                                                     isDark={isDark}
+                                                    isFullScreen={isFullScreen}
                                                     disabled={!machine.connection}
                                                 />
                                             </div>

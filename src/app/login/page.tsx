@@ -21,7 +21,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const user = await validateLogin(username, password);
       if (user) {
@@ -39,12 +39,16 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = () => {
+    toast.info("Hãy liên hệ quản lý");
+  };
+
   return (
-    <div className={`min-h-screen flex items-start pt-[23vh] justify-center ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
+    <div className={`min-h-screen flex items-start pt-[24vh] justify-center ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
       <CustomToast isDarkMode={isDark} />
       <div className={`w-full max-w-md p-8 rounded-lg shadow-lg ${isDark ? 'bg-secondary text-text-dark' : 'bg-white text-text-light'}`}>
         <h2 className="text-3xl font-bold text-center mb-8">{t.title}</h2>
-        
+
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-sm font-medium mb-2">
@@ -80,6 +84,15 @@ export default function LoginPage() {
             {loading ? t.loading : t.button}
           </button>
         </form>
+
+        <div className="text-center mt-4">
+          <button
+            onClick={handleForgotPassword}
+            className="text-sm text-primary hover:underline focus:outline-none"
+          >
+            {t.forgot_password}
+          </button>
+        </div>
       </div>
     </div>
   );

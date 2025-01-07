@@ -10,7 +10,8 @@
     "error": {
       "invalid_credentials": "Tài khoản hoặc mật khẩu không đúng",
       "general": "Có lỗi xảy ra khi đăng nhập"
-    }
+    },
+    "forgot_password": "Quên mật khẩu"
   },
   "home": {
     "errors": {

@@ -156,8 +156,13 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   const [showError, setShowError] = useState(false);
   const { currentSeason } = useSeasonEffect();
-  
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
+
   const renderSeasonEffect = () => {
+    if (isLoginPage) {
+      return null;
+    }
     switch (currentSeason) {
       case 'spring':
         return <SpringEffect />;

@@ -10,7 +10,8 @@
     "error": {
       "invalid_credentials": "Invalid username or password",
       "general": "An error occurred during login"
-    }
+    },
+    "forgot_password": "Forgot password"
   },
   "home": {
     "errors": {
@@ -53,19 +54,39 @@
       "no_data": "No machine data"
     }
   },
-  "settingLine":{
-      "lineActive": "Active Line",
-      "enableTable": "Enable Table",
-      "settingTable": "Setting Table",
-      "noData":"No data",
-      "connected": "Connected",
-      "disconnected": "Disconnected",
-      "toast": {
-        "success": "Update successfully",
-        "error": "Error when updating status",
-        "update": "Update successfully Line"
-      },
-      "item":{
+  "settingLine": {
+    "lineActive": "Active Line",
+    "enableTable": "Enable Table",
+    "settingTable": "Setting Table",
+    "noData": "No data",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "toast": {
+      "success": "Update successfully",
+      "error": "Error when updating status",
+      "update": "Update successfully Line"
+    },
+    "item": {
+      "Name": "Name",
+      "daily_target": "DAILY TARGET",
+      "productedCode": "PRODUCTED CODE",
+      "totalProducted": "TOTAL ORDER",
+      "timeStart": "TIME START",
+      "timeEnd": "TIME END",
+      "actualProducted": "ACTUAL ORDER",
+      "remainingProducted": "REMAIN ORDER",
+      "shift_1": "SHIFT 1",
+      "shift_2": "SHIFT 2",
+      "actual": "ACTUAL",
+      "timeMin": "Time work from 1 to 1440 minutes",
+      "timeWork": "Total time",
+      "state": "State",
+      "workers": "WORKERS",
+      "total": "TOTAL",
+      "efficiency": "EFFICIENCY"
+    },
+    "table": {
+      "item": {
         "Name": "Name",
         "daily_target": "DAILY TARGET",
         "productedCode": "PRODUCTED CODE",
@@ -83,101 +104,81 @@
         "workers": "WORKERS",
         "total": "TOTAL",
         "efficiency": "EFFICIENCY"
-      },
-      "table": {
-        "item": {
-          "Name": "Name",
-          "daily_target": "DAILY TARGET",
-          "productedCode": "PRODUCTED CODE",
-          "totalProducted": "TOTAL ORDER",
-          "timeStart": "TIME START",
-          "timeEnd": "TIME END",
-          "actualProducted": "ACTUAL ORDER",
-          "remainingProducted": "REMAIN ORDER",
-          "shift_1": "SHIFT 1",
-          "shift_2": "SHIFT 2",
-          "actual": "ACTUAL",
-          "timeMin": "Time work from 1 to 1440 minutes",
-          "timeWork": "Total time",
-          "state": "State",
-          "workers": "WORKERS",
-          "total": "TOTAL",
-          "efficiency": "EFFICIENCY"
-        }
-      },
-      "monitorTable": "PRODUCTION MONITORING"
-    },
-    "gmail": {
-      "emailSlot": "EMAIL SLOT",
-      "placeholder": "Enter new email",
-      "error": {
-        "cannotDelete": "Cannot delete non-existent email",
-        "invalidEmail": "Invalid email format",
-        "updateFailed": "An error occurred during update",
-        "deleteFailed": "An error occurred during deletion"
-      },
-      "success": {
-        "emailUpdated": "Email updated successfully:",
-        "emailDeleted": "Email deleted successfully"
       }
     },
-    "report": {
-      "timePoint": "TIME SLOT",
-      "error": {
-        "cannotDelete": "Cannot delete non-existent time",
-        "updateFailed": "An error occurred during update",
-        "deleteFailed": "An error occurred during deletion"
-      },
-      "success": {
-        "timeUpdated": "Time updated successfully:",
-        "timeDeleted": "Time deleted successfully"
-      }
+    "monitorTable": "PRODUCTION MONITORING"
+  },
+  "gmail": {
+    "emailSlot": "EMAIL SLOT",
+    "placeholder": "Enter new email",
+    "error": {
+      "cannotDelete": "Cannot delete non-existent email",
+      "invalidEmail": "Invalid email format",
+      "updateFailed": "An error occurred during update",
+      "deleteFailed": "An error occurred during deletion"
     },
-    "sidebar": {
-      "menu": {
-        "home": "HOME",
-        "detail": "DETAIL",
-        "line_settings": "LINE SETTINGS",
-        "report_settings": "REPORT SETTINGS",
-        "monitor": "MONITOR",
-        "email_settings": "EMAIL SETTINGS", 
-        "general_settings": "GENERAL SETTINGS",
-        "account": "ACCOUNT"
-      },
-      "logout": "Logout"
-    },
-    "settings": {
-      "loading": "Loading...",
-      "error": "Error: {0}",
-      "snow_effect": {
-        "title": "Effect",
-        "description": "Enable/disable effect on interface"
-      },
-      "dark_mode": {
-        "title": "Dark Mode",
-        "description": "Enable/disable dark mode"
-      },
-      "language": {
-        "title": "Language",
-        "description": "Choose display language",
-        "vietnamese": "Tiếng Việt",
-        "english": "English"
-      },
-      "time_update": {
-        "title": "Scroll Time",
-        "description": "Scroll Time (seconds)",
-        "min": "1",
-        "max": "60"
-      },
-      "messages": {
-        "update_success": "Settings updated successfully",
-        "update_error": "Error occurred while updating settings",
-        "time_update_success": "Time updated successfully",
-        "time_update_error": "Error occurred while updating time",
-        "theme_update_success": "Theme updated successfully",
-        "theme_update_error": "Error occurred while updating theme",
-        "language_update_success": "Language updated successfully",
-        "language_update_error": "Error occurred while updating language"
-      }
+    "success": {
+      "emailUpdated": "Email updated successfully:",
+      "emailDeleted": "Email deleted successfully"
     }
+  },
+  "report": {
+    "timePoint": "TIME SLOT",
+    "error": {
+      "cannotDelete": "Cannot delete non-existent time",
+      "updateFailed": "An error occurred during update",
+      "deleteFailed": "An error occurred during deletion"
+    },
+    "success": {
+      "timeUpdated": "Time updated successfully:",
+      "timeDeleted": "Time deleted successfully"
+    }
+  },
+  "sidebar": {
+    "menu": {
+      "home": "HOME",
+      "detail": "DETAIL",
+      "line_settings": "LINE SETTINGS",
+      "report_settings": "REPORT SETTINGS",
+      "monitor": "MONITOR",
+      "email_settings": "EMAIL SETTINGS",
+      "general_settings": "GENERAL SETTINGS",
+      "account": "ACCOUNT"
+    },
+    "logout": "Logout"
+  },
+  "settings": {
+    "loading": "Loading...",
+    "error": "Error: {0}",
+    "snow_effect": {
+      "title": "Effect",
+      "description": "Enable/disable effect on interface"
+    },
+    "dark_mode": {
+      "title": "Dark Mode",
+      "description": "Enable/disable dark mode"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose display language",
+      "vietnamese": "Tiếng Việt",
+      "english": "English"
+    },
+    "time_update": {
+      "title": "Scroll Time",
+      "description": "Scroll Time (seconds)",
+      "min": "1",
+      "max": "60"
+    },
+    "messages": {
+      "update_success": "Settings updated successfully",
+      "update_error": "Error occurred while updating settings",
+      "time_update_success": "Time updated successfully",
+      "time_update_error": "Error occurred while updating time",
+      "theme_update_success": "Theme updated successfully",
+      "theme_update_error": "Error occurred while updating theme",
+      "language_update_success": "Language updated successfully",
+      "language_update_error": "Error occurred while updating language"
+    }
+  }
 }

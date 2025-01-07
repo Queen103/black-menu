@@ -7,11 +7,15 @@ import { Switch } from "../components/Switch";
 import { showSuccessToast, showErrorToast } from "../components/CustomToast";
 import { Settings, updateSettings } from "@/services/api/settings";
 import messages from "@/messages";
+import { useSeasonEffect } from "@/hooks/useSeasonEffect";
 
 const SettingsPage = () => {
     const { isDark, toggleTheme } = useTheme();
     const { language, setLanguage } = useLanguage();
     const { settings, updateSettings: updateContextSettings, isLoading, error } = useSettings();
+    const { currentSeason, setMode, setManualSeason, mode } = useSeasonEffect();
+    type Season = 'spring' | 'summer' | 'autumn' | 'winter';
+
 
     const handleTimeChange = (value: string) => {
         const numValue = parseInt(value);
@@ -62,6 +66,54 @@ const SettingsPage = () => {
                             }}
                         />
                     </div>
+                    {/* Chế độ hiệu ứng mùa */}
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages[language].settings.season_mode.title}  {(mode === "auto") ? 'Tự Động' : 'Tùy Chỉnh'}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.season_mode.description}</p>
+                        </div>
+                        <Switch
+                            checked={mode === "auto"}
+                            onChange={(checked: boolean) => {
+                                if (checked) {
+                                    setMode('auto');
+                                }
+                                else {
+                                    setMode('manual');
+                                }
+                            }}
+                        />
+                    </div>
+
+                    {/* Chọn mùa (hiển thị khi chế độ manual được bật) */}
+                    {mode === "manual" && (
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-medium dark:text-gray-100">{messages[language].settings.manual_season.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.manual_season.description}</p>
+
+                            {/* Danh sách các checkbox */}
+                            <div className="grid grid-cols-2 gap-2">
+                                {["spring", "summer", "autumn", "winter"].map((season) => (
+                                    <label key={season} className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={currentSeason === season}
+                                            onChange={() => {
+                                                if (currentSeason !== season) {
+                                                    setManualSeason(season as Season); // Cập nhật mùa
+                                                }
+                                            }}
+                                            className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                                        />
+                                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                                            {messages[language].settings.manual_season[season]}
+                                        </span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
 
                     {/* Dark Mode */}
                     <div className="flex items-center justify-between">

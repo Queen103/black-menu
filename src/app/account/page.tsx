@@ -11,6 +11,7 @@ interface AccountFormData {
     account: string;
     password: string;
     is_writer: boolean;
+    is_admin: boolean;
 }
 
 interface PasswordChangeState {
@@ -26,6 +27,7 @@ const AccountPage = () => {
         account: "",
         password: "",
         is_writer: false,
+        is_admin: false
     });
     const [passwords, setPasswords] = useState<PasswordChangeState>({});
     const [oldPassword, setOldPassword] = useState("");
@@ -94,6 +96,7 @@ const AccountPage = () => {
                 account: "",
                 password: "",
                 is_writer: false,
+                is_admin: false
             });
             fetchUsers();
         } catch (error) {
@@ -203,17 +206,29 @@ const AccountPage = () => {
                                     }}
                                 />
                             </div>
-                            <label className="flex text-lg items-center whitespace-nowrap">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.is_writer}
-                                    onChange={(e) => setFormData({ ...formData, is_writer: e.target.checked })}
-                                    className="mr-2"
-                                />
+                            <label className="flex items-center text-lg space-x-4 whitespace-nowrap">
                                 <span className={` ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                                    Quyền Writer
+                                    Quyền:
                                 </span>
+                                <select
+                                    value={formData.is_writer ? "writer" : formData.is_admin ? "admin" : "reader"}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setFormData({
+                                            ...formData,
+                                            is_writer: value === "writer",
+                                            is_admin: value === "admin",
+                                        });
+                                    }}
+                                    className="px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                                >
+                                    <option value="reader">Đọc</option>
+                                    <option value="writer">Đọc/Ghi</option>
+                                    <option value="admin">Quản trị viên</option>
+                                </select>
                             </label>
+
+
                             <button
                                 type="submit"
                                 className="px-4 py-2 bg-primary text-white rounded hover:bg-accent transition-colors whitespace-nowrap"
@@ -284,7 +299,7 @@ const AccountPage = () => {
                 </div>
             ) : (
                 // User/Writer View
-                <div className={`max-w-md mx-auto rounded-lg shadow-[0px_4px_6px_rgba(0,0,0,0.5)] p-6 border-4 ${isDark
+                <div className={`max-w-md mx-auto rounded-lg mt-[12vh] shadow-[0px_4px_6px_rgba(0,0,0,0.5)] p-6 border-4 ${isDark
                     ? 'bg-secondary text-text-dark border-primary'
                     : 'bg-gray-300 text-text-light border-primary'
                     }`}>

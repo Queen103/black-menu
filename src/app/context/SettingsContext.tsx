@@ -8,6 +8,7 @@ interface SettingsContextType {
     updateSettings: (newSettings: Settings) => void;
     isLoading: boolean;
     error: string | null;
+
 }
 
 const defaultSettings: Settings = {
@@ -21,7 +22,7 @@ const defaultSettings: Settings = {
 
 const SettingsContext = createContext<SettingsContextType>({
     settings: defaultSettings,
-    updateSettings: () => {},
+    updateSettings: () => { },
     isLoading: true,
     error: null
 });

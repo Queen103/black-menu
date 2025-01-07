@@ -148,6 +148,18 @@
     "logout": "Logout"
   },
   "settings": {
+    "season_mode": {
+      "title": "Mode:",
+      "description": "Change effect mode"
+    },
+    "manual_season": {
+      "title": "Effect",
+      "description": "Effect option",
+      "spring": "Spring",
+      "summer": "Summner",
+      "autumn": "Autumn",
+      "winter": "Winter"
+    },
     "loading": "Loading...",
     "error": "Error: {0}",
     "snow_effect": {

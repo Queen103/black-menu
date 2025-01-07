@@ -123,6 +123,18 @@
     "logout": "Đăng xuất"
   },
   "settings": {
+    "season_mode": {
+      "title": "Chế độ hiệu ứng:",
+      "description": "Thay đổi chế độ Hiệu ứng tự động hoặc điều chỉnh"
+    },
+    "manual_season": {
+      "title": "Hiệu ứng:",
+      "description": "Tùy chỉnh hiệu ứng",
+      "spring":"Hoa rơi mùa xuân",
+      "summer":"Hiệu ứng mùa hè",
+      "autumn":"Lá thu rơi",
+      "winter":"Tuyết rơi"
+    },
     "loading": "Đang tải...",
     "error": "Lỗi: {0}",
     "snow_effect": {

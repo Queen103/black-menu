@@ -44,7 +44,7 @@ export default function LoginPage() {
     const users = getUserInfo();
     for (const user of await users) {
       if (user.is_admin) {
-        toast.info(`Hãy liên hệ quản lý theo số điện thoại ${user.info}`);
+        toast.info(`Vui lòng liên hệ người quản lý để đổi lại mật khẩu`);
         return;
       }
     }

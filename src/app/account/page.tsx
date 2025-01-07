@@ -266,7 +266,7 @@ const AccountPage = () => {
                                             <td className="px-4 py-2 text-center">{user.account}</td>
                                             <td className="px-4 py-2 text-center">{user.info || 'Chưa cập nhật'} </td>
                                             <td className="px-4 py-2 text-center">
-                                                {user.is_admin ? "Admin" : user.is_writer ? "Writer" : "User"}
+                                                {user.is_admin ? "Quản trị viên" : user.is_writer ? "Đọc/Ghi" : "Đọc"}
                                             </td>
                                             <td className="px-4 py-2 text-center">
                                                 {new Date(user.date_created).toLocaleString('vi-VN')}
@@ -309,7 +309,7 @@ const AccountPage = () => {
                     <div className="space-y-4">
                         <p><span className="font-semibold">Tài khoản:</span> {currentUser.account}</p>
                         <p><span className="font-semibold">Thông tin:</span> {currentUser.info}</p>
-                        <p><span className="font-semibold">Vai trò:</span> {currentUser.is_writer ? "Writer" : "User"}</p>
+                        <p><span className="font-semibold">Vai trò:</span> {currentUser.is_writer ? "Đoc/Ghi" : "Đọc"}</p>
                         <p><span className="font-semibold">Ngày tạo tài khoản:</span> {currentUser.date_created}</p>
                         <p><span className="font-semibold">Người tạo:</span> {currentUser.create_by}</p>
 

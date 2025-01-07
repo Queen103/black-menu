@@ -50,7 +50,7 @@ const SettingsPage = () => {
 
     return (
         <div className={`min-h-screen bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-6`}>
-            <div className="max-w-2xl mx-auto">
+            <div className="flex items-start justify-center max-w-2xl mx-auto mt-[16vh]">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow-sm space-y-6">
                     {/* Hiệu ứng tuyết rơi */}
                     <div className="flex items-center justify-between">

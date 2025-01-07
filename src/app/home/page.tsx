@@ -116,7 +116,7 @@ const HomePage = () => {
   );
 
   const filteredMachines = useMemo(() =>
-    machines.filter((machine) => machine.enable ),
+    machines.filter((machine) => machine.enable),
     [machines]
   );
 
@@ -182,9 +182,9 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
-      <ReconnectModal 
-        isOpen={isCpuDisconnected} 
-        onReconnect={handleReconnect} 
+      <ReconnectModal
+        isOpen={isCpuDisconnected}
+        onReconnect={handleReconnect}
       />
       <ReconnectModal isOpen={isDisconnected} onReconnect={fetchMachineData} />
       {isLoading && <Loading isDarkMode={isDark} />}
@@ -208,10 +208,10 @@ const HomePage = () => {
                   {
                     label: t.chart.difference,
                     data: machines
-                      .filter((machine) =>  machine.enable )
+                      .filter((machine) => machine.enable)
                       .map((machine) => machine.actual - machine.mtg),
                     backgroundColor: machines
-                      .filter((machine) =>  machine.enable )
+                      .filter((machine) => machine.enable)
                       .map((machine) =>
                         (machine.actual - machine.mtg) < 0 ? '#c40005' : '#00964d'
                       ),
@@ -283,38 +283,8 @@ const HomePage = () => {
                     },
                   },
                   y: {
+                    display: false,
                     stacked: true,
-                    grid: {
-                      color: (context: any) => {
-                        const value = context.tick.value;
-                        if (value === 0) {
-                          return isDark ? '#ffffff' : '#333333';
-                        }
-                        return isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-                      },
-                      lineWidth: (context: any) => {
-                        const value = context.tick.value;
-                        return value === 0 ? 2 : 1;
-                      },
-                      offset: false
-                    },
-                    ticks: {
-                      font: {
-                        weight: 'bold',
-                        size: 14,
-                      },
-                      color: isDark ? '#ffffff' : '#333333',
-                    },
-                    min: 0,
-                    max: Math.ceil(
-                      Math.max(...filteredMachines.map((machine) => (machine.actual / machine.target) * 100)) * 1.5 / 20
-                    ) * 20,
-                    beginAtZero: true,
-                    offset: false,
-                    grace: 0
-                  },
-                  y1: {
-                    stacked: false,
                     position: 'right',
                     grid: {
                       color: (context: any) => {
@@ -337,17 +307,46 @@ const HomePage = () => {
                       },
                       color: isDark ? '#ffffff' : '#333333',
                     },
-                    min: Math.floor(
-                      Math.min(0, Math.min(...machines.filter((machine) => machine.enable).map((machine) => machine.actual - machine.mtg)) * 1.2) / 5
-                    ) * 5,
+                    min: Math.ceil(
+                      Math.min(...filteredMachines.map((machine) => (machine.actual - machine.mtg))) * 1.5 / 20
+                    ) * 20,
                     max: Math.ceil(
-                      Math.max(...machines.filter((machine) => machine.enable).map((machine) => machine.actual - machine.mtg)) * 1.2 / 5
-                    ) * 5,
-                    beginAtZero: true,
+                      Math.max(...filteredMachines.map((machine) => (machine.actual - machine.mtg))) * 1.5 / 20
+                    ) * 20,
+                    beginAtZero: false,
                     offset: false,
                     grace: 0
                   },
-                  
+                  y1: {
+                    display: true,
+                    stacked: false,
+                    position: 'left',
+                    grid: {
+                      color: (context: any) => {
+                        const value = context.tick.value;
+                        if (value === 0) {
+                          return isDark ? '#ffffff' : '#333333';
+                        }
+                        return isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+                      },
+                      lineWidth: (context: any) => {
+                        const value = context.tick.value;
+                        return value === 0 ? 2 : 1;
+                      },
+                      offset: false
+                    },
+                    ticks: {
+                      font: {
+                        weight: 'bold',
+                        size: 14,
+                      },
+                      color: isDark ? '#ffffff' : '#333333',
+                    },
+                    beginAtZero: true,
+                    offset: true,
+                    grace: 0
+                  },
+
                 },
               }}
               plugins={[ChartDataLabels]}
@@ -379,7 +378,7 @@ const HomePage = () => {
                 datasets: [
                   showPerformance && {
                     label: t.chart.performance,
-                    data: filteredMachines.map(machine => (machine.actual/machine.mtg)*100),
+                    data: filteredMachines.map(machine => (machine.actual / machine.mtg) * 100),
                     borderColor: '#c40005',
                     backgroundColor: 'rgba(255, 99, 71, 0.2)',
                     type: 'line',
@@ -457,7 +456,7 @@ const HomePage = () => {
                     },
                     min: 0,
                     max: Math.ceil(
-                      Math.max(...filteredMachines.map((machine) => (machine.actual / machine.mtg) * 100)) * 1.5 / 20
+                      Math.max(...filteredMachines.map((machine) => (machine.actual / machine.mtg) * 100)) * 1.1 / 20
                     ) * 20,
                     beginAtZero: true,
                     offset: false,

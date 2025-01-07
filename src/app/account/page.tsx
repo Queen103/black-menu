@@ -28,6 +28,7 @@ const AccountPage = () => {
         is_writer: false,
     });
     const [passwords, setPasswords] = useState<PasswordChangeState>({});
+    const [oldPassword, setOldPassword] = useState("");
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -72,7 +73,7 @@ const AccountPage = () => {
         try {
             const storedUser = localStorage.getItem("user");
             const currentUser = storedUser ? JSON.parse(storedUser) : null;
-            
+
             if (!currentUser) {
                 toast.error("Không thể xác định người tạo tài khoản");
                 return;
@@ -116,15 +117,24 @@ const AccountPage = () => {
         if (e.key === 'Enter') {
             e.preventDefault();
             const newPassword = passwords[account];
-            if (!newPassword.trim()) {
-                toast.error("Mật khẩu không được để trống");
+            if (!oldPassword.trim() || !newPassword.trim()) {
+                toast.error("Mật khẩu cũ và mật khẩu mới không được để trống");
                 return;
             }
 
             try {
+                // Giả sử có một hàm verifyOldPassword để kiểm tra mật khẩu cũ
+                const users = getUserInfo(); // Lấy toàn bộ danh sách user
+                const user = (await users).find(u => u.account === account); // Tìm user theo account hiện tại
+                const isOldPasswordCorrect = user && user.password === oldPassword; if (!isOldPasswordCorrect) {
+                    toast.error("Mật khẩu cũ không đúng");
+                    return;
+                }
+
                 await changeUserPassword(account, newPassword);
                 toast.success("Đổi mật khẩu thành công");
-                setPasswords(prev => ({...prev, [account]: ""}));
+                setPasswords(prev => ({ ...prev, [account]: "" }));
+                setOldPassword(""); // Reset ô nhập mật khẩu cũ
             } catch (error) {
                 console.error('Error changing password:', error);
                 toast.error("Lỗi khi đổi mật khẩu");
@@ -132,13 +142,14 @@ const AccountPage = () => {
         }
     };
 
+
     if (isLoading) return <Loading />;
     if (!currentUser) return <div>Đang tải...</div>;
 
     return (
         <div className={`p-6 h-full ${isDark ? 'bg-bg-dark' : 'bg-bg-light'}`}>
             <CustomToast isDarkMode={isDark} />
-            
+
             {currentUser.is_admin ? (
                 // Admin View
                 <div className="space-y-6">
@@ -149,11 +160,10 @@ const AccountPage = () => {
                     </div>
 
                     {/* Add User Form */}
-                    <div className={`rounded-lg p-4 border-4 ${
-                        isDark 
-                        ? 'bg-secondary text-text-dark border-primary' 
+                    <div className={`rounded-lg p-4 border-4 ${isDark
+                        ? 'bg-secondary text-text-dark border-primary'
                         : 'bg-gray-300 text-text-light border-primary'
-                    }`}>
+                        }`}>
                         <form onSubmit={handleAddUser} className="flex items-center gap-6">
                             <h1 className="flex">Tài khoản</h1>
                             <div className="flex-1">
@@ -161,7 +171,7 @@ const AccountPage = () => {
                                     type="text"
                                     placeholder="Tài khoản"
                                     value={formData.account}
-                                    onChange={(e) => setFormData({...formData, account: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, account: e.target.value })}
                                     className="w-full border rounded p-2 bg-bg-light text-text-light"
                                     required
                                     onKeyDown={(e) => {
@@ -182,7 +192,7 @@ const AccountPage = () => {
                                     type="password"
                                     placeholder="Mật khẩu"
                                     value={formData.password}
-                                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="w-full border rounded p-2 bg-bg-light text-text-light"
                                     required
                                     onKeyDown={(e) => {
@@ -197,7 +207,7 @@ const AccountPage = () => {
                                 <input
                                     type="checkbox"
                                     checked={formData.is_writer}
-                                    onChange={(e) => setFormData({...formData, is_writer: e.target.checked})}
+                                    onChange={(e) => setFormData({ ...formData, is_writer: e.target.checked })}
                                     className="mr-2"
                                 />
                                 <span className={` ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
@@ -214,17 +224,15 @@ const AccountPage = () => {
                     </div>
 
                     {/* User List */}
-                    <div className={`rounded-lg border-4 ${
-                        isDark 
-                        ? 'bg-secondary text-text-dark border-primary' 
+                    <div className={`rounded-lg border-4 ${isDark
+                        ? 'bg-secondary text-text-dark border-primary'
                         : 'bg-gray-300 text-text-light border-primary'
-                    }`}>
+                        }`}>
                         <div className="relative overflow-x-auto">
                             <table className="w-full">
                                 <thead className="sticky top-0 z-10">
-                                    <tr className={`border-b ${isDark ? 'border-gray-600' : 'border-gray-400'} ${
-                                        isDark ? 'bg-secondary' : 'bg-gray-300'
-                                    }`}>
+                                    <tr className={`border-b ${isDark ? 'border-gray-600' : 'border-gray-400'} ${isDark ? 'bg-secondary' : 'bg-gray-300'
+                                        }`}>
                                         <th className="px-4 py-2 text-center w-[15%]">Tài khoản</th>
                                         <th className="px-4 py-2 text-center w-[10%]">Quyền</th>
                                         <th className="px-4 py-2 text-center w-[20%]">Ngày tạo</th>
@@ -235,8 +243,8 @@ const AccountPage = () => {
                                 </thead>
                                 <tbody className="relative">
                                     {users.map((user) => (
-                                        <tr 
-                                            key={user.account} 
+                                        <tr
+                                            key={user.account}
                                             className={`border-b ${isDark ? 'border-gray-600' : 'border-gray-400'} hover:bg-opacity-50 hover:bg-primary`}
                                         >
                                             <td className="px-4 py-2 text-center">{user.account}</td>
@@ -252,7 +260,7 @@ const AccountPage = () => {
                                                     type="password"
                                                     placeholder="Nhập mật khẩu mới"
                                                     value={passwords[user.account]}
-                                                    onChange={(e) => setPasswords({...passwords, [user.account]: e.target.value})}
+                                                    onChange={(e) => setPasswords({ ...passwords, [user.account]: e.target.value })}
                                                     onKeyDown={(e) => handlePasswordChange(user.account, e)}
                                                     className="text-center w-full border rounded p-2 bg-bg-light text-text-light"
                                                 />
@@ -274,11 +282,10 @@ const AccountPage = () => {
                 </div>
             ) : (
                 // User/Writer View
-                <div className={`max-w-md mx-auto rounded-lg shadow-[0px_4px_6px_rgba(0,0,0,0.5)] p-6 border-4 ${
-                    isDark 
-                    ? 'bg-secondary text-text-dark border-primary' 
+                <div className={`max-w-md mx-auto rounded-lg shadow-[0px_4px_6px_rgba(0,0,0,0.5)] p-6 border-4 ${isDark
+                    ? 'bg-secondary text-text-dark border-primary'
                     : 'bg-gray-300 text-text-light border-primary'
-                }`}>
+                    }`}>
                     <h2 className={`text-2xl font-bold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
                         Thông tin tài khoản
                     </h2>
@@ -294,14 +301,21 @@ const AccountPage = () => {
                             </label>
                             <input
                                 type="password"
+                                placeholder="Nhập mật khẩu cũ"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                                className="w-full border rounded p-2 bg-bg-light text-text-light mb-4"
+                            />
+                            <input
+                                type="password"
                                 placeholder="Nhập mật khẩu mới"
                                 value={passwords[currentUser.account] || ""}
-                                onChange={(e) => setPasswords({...passwords, [currentUser.account]: e.target.value})}
+                                onChange={(e) => setPasswords({ ...passwords, [currentUser.account]: e.target.value })}
                                 onKeyDown={(e) => handlePasswordChange(currentUser.account, e)}
                                 className="w-full border rounded p-2 bg-bg-light text-text-light mb-4"
                             />
                         </div>
-                        
+
                         <button
                             onClick={() => handleDeleteUser(currentUser.account)}
                             className="w-full bg-error text-white px-4 py-2 rounded hover:bg-notConnect transition-colors"

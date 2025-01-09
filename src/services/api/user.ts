@@ -38,7 +38,7 @@ export const getUserInfo = async (): Promise<User[]> => {
     }
 };
 
-export const validateLogin = async (email: string, password: string): Promise<User | null> => {
+export const validateLogin = async (email: string, password: string): Promise<User | string> => {
     try {
         const users = await getUserInfo();
 
@@ -49,7 +49,7 @@ export const validateLogin = async (email: string, password: string): Promise<Us
             localStorage.setItem('user', JSON.stringify(user));
             return user;
         }
-        return null;
+        return "Invalid email or password";
     } catch (error) {
         console.error('Error validating login:', error);
         throw error;

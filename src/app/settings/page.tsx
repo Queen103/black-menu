@@ -37,6 +37,7 @@ const SettingsPage = () => {
 
     const handleSettingChange = async (newSettings: Settings) => {
         try {
+            console.log(newSettings);
             updateContextSettings(newSettings);
             await updateSettings(newSettings);
             showSuccessToast(messages[language].settings.messages.update_success);
@@ -50,7 +51,7 @@ const SettingsPage = () => {
 
     return (
         <div className={`min-h-screen bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white p-6`}>
-            <div className="flex items-start justify-center max-w-2xl mx-auto mt-[16vh]">
+            <div className={`flex items-start justify-center max-w-2xl mx-auto ${mode === "auto" ? 'mt-[16vh]' : 'mt-[12vh]'}`}>
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 shadow-sm space-y-6">
                     {/* Hiệu ứng tuyết rơi */}
                     <div className="flex items-center justify-between">
@@ -73,8 +74,10 @@ const SettingsPage = () => {
                             <p className="text-sm text-gray-500 dark:text-gray-400">{messages[language].settings.season_mode.description}</p>
                         </div>
                         <Switch
-                            checked={mode === "auto"}
+                            checked={settings.mode === "auto"}
                             onChange={(checked: boolean) => {
+                                const newSettings = { ...settings, mode: checked ? 'auto' : 'manual' };
+                                handleSettingChange(newSettings);
                                 if (checked) {
                                     setMode('auto');
                                 }
@@ -97,9 +100,11 @@ const SettingsPage = () => {
                                     <label key={season} className="flex items-center space-x-2">
                                         <input
                                             type="checkbox"
-                                            checked={currentSeason === season}
+                                            checked={settings.effect_mode === season}
                                             onChange={() => {
-                                                if (currentSeason !== season) {
+                                                if (settings.effect_mode !== season) {
+                                                    const newSettings = { ...settings, effect_mode: season as Season };
+                                                    handleSettingChange(newSettings);
                                                     setManualSeason(season as Season); // Cập nhật mùa
                                                 }
                                             }}

@@ -30,7 +30,7 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   const pathname = usePathname();
   const router = useRouter();
   const { isDark, setIsDark } = useTheme();
-  const { setEffect } = useSeasonEffect();
+  const { setEffect, setMode, setManualSeason } = useSeasonEffect();
   const { setLanguage } = useLanguage();
   const isLoginPage = pathname === '/login';
 
@@ -61,6 +61,7 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   // Xử lý phím mũi tên cho điều hướng
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
+
       const menuItems = [
         "/home",
         "/detail",
@@ -95,17 +96,22 @@ const MainContent = forwardRef<HTMLDivElement, { children: React.ReactNode }>((p
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        type Season = 'spring' | 'summer' | 'autumn' | 'winter';
+        type Mode = 'auto' | 'manual';
         const settings = await fetchSettings();
         // Cập nhật theme
         setIsDark(settings.dark_mode);
         // Cập nhật hiệu ứng
         setEffect(settings.effect);
+        setMode(settings.mode as Mode);
+        setManualSeason(settings.effect_mode as Season);
         // Cập nhật ngôn ngữ
         if (settings.is_vietnamese) {
           setLanguage('vi');
         } else if (settings.is_english) {
           setLanguage('en');
         }
+
       } catch (error) {
         console.error('Error loading settings:', error);
       }

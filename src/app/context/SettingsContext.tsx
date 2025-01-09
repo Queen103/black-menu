@@ -17,6 +17,8 @@ const defaultSettings: Settings = {
     effect: true,
     is_vietnamese: true,
     is_english: false,
+    mode: "auto",
+    effect_mode: "spring",
     client_ip: ""
 };
 

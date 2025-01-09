@@ -4,6 +4,8 @@ export interface Settings {
     effect: boolean;
     is_vietnamese: boolean;
     is_english: boolean;
+    mode: string;
+    effect_mode: string;
     client_ip: string;
 }
 
